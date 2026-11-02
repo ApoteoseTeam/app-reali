@@ -8,10 +8,10 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "web": {
-  "bundler": "metro",
-  "output": "single",
-  "favicon": "./assets/favicon.png"
-},
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/favicon.png"
+    },
     "ios": {
       "supportsTablet": true
     },
@@ -29,6 +29,17 @@
       "eas": {
         "projectId": "a2b0820c-a9a9-48bf-b857-a26cede89e49"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#F7FAF3",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200
+        }
+      ],
+      "expo-asset"
+    ]
   }
 }
