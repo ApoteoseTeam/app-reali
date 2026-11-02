@@ -12,7 +12,8 @@ import {
   LayoutDashboard,
   type LucideIcon,
 } from 'lucide-react-native';
-
+import {Button} from '../../components/Button/Button';
+import {Card} from '../../components/Card/Card';
 import { styles } from './styles';
 
 const ABAS: { nome: string; icone: LucideIcon; ativa?: boolean }[] = [
@@ -46,7 +47,7 @@ export default function PerfilUsuario() {
 
       <View style={styles.avatarArea}>
         <View style={styles.avatarBorda}>
-          <Image source={require('../assets/avatar.png')} style={styles.avatar} />
+          <Image source={require('../../assets/perfil.jpeg')} style={styles.avatar} />
         </View>
         <Pressable style={styles.editar}>
           <Pencil size={18} color="#FFF" />

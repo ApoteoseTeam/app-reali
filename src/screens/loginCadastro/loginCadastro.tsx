@@ -12,9 +12,9 @@ import {
   View,
 } from 'react-native';
 import { styles } from './styles';
-import { Checkbox } from '../../components/Checkbox';
-import { Input } from '../../components/input';
-import { Button } from '../../components/button';
+import { Checkbox } from '../../components/CheckBox/CheckBox';
+import { Input } from '../../components/Input/Input';
+import { Button } from '../../components/Button/Button';
 // import { Header } from '../components/header';
 
 type Funcao = 'Nutricionista' | 'Gestor';

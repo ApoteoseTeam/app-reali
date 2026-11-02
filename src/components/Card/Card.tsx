@@ -1,5 +1,5 @@
 import {Text, View, } from "react-native"
-import { globalStyles } from "../theme/global"
+import { globalStyles } from "../../theme/global" 
 import type { ReactNode, } from "react";
 type CardProps = {
     title: string

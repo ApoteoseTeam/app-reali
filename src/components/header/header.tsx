@@ -1,6 +1,6 @@
 import {View, Text, Pressable, Modal, FlatList } from "react-native";
 import { style } from "./style"
-import { IconButton } from '../iconbuttons/IconButton';
+import { IconButton } from '../IconButton/IconButton';
 
 
 import {
