@@ -3,10 +3,21 @@ import { spacing } from "../../theme/spacing";
 import { colors } from "../../theme/colors";
 
 export const styles = StyleSheet.create({
-    container: {
-        flex: 1
+    mainWrapper: {
+        flex: 1,
+        backgroundColor: '#FFFFFF',
     },
 
+    headerContainer: {
+        width: '100%',
+        backgroundColor: '#2A5234', 
+    },
+
+    container: {
+        padding: spacing.md,
+        paddingBottom: spacing.xxl,
+        gap: spacing.lg,
+    },
     stepper: {
         flexDirection: "row",
         alignItems: "center",
