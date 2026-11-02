@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View, Text, ScrollView } from 'react-native';
 
 import { globalStyles } from '../theme/global';
+import { Chart } from '../components/Chart/Chart';
 
 // Ícones
 import {
@@ -33,7 +34,7 @@ export default function testPage() {
   return (
     <ScrollView>
       <View style={globalStyles.container}>
-        <Header name="Dashboard"/>
+        <Header name="Dashboard" />
         <Text style={globalStyles.title}>
           Essa Página é para testar componentes criados
         </Text>
@@ -106,30 +107,30 @@ export default function testPage() {
           value={categoria}
           onChange={setCategoria}
         />
-        
-          <Banner
-            tipo="info"
-            titulo="Informação"
-            mensagem="Este é um banner informativo."
-          />
 
-          <Banner
-            tipo="alerta"
-            titulo="Atenção"
-            mensagem="Verifique os dados informados."
-          />
+        <Banner
+          tipo="info"
+          titulo="Informação"
+          mensagem="Este é um banner informativo."
+        />
 
-          <Banner
-            tipo="erro"
-            titulo="Erro"
-            mensagem="Não foi possível salvar os dados."
-          />
+        <Banner
+          tipo="alerta"
+          titulo="Atenção"
+          mensagem="Verifique os dados informados."
+        />
 
-          <Banner
-            tipo="sucesso"
-            titulo="Sucesso"
-            mensagem="Dados salvos com sucesso!"
-          />
+        <Banner
+          tipo="erro"
+          titulo="Erro"
+          mensagem="Não foi possível salvar os dados."
+        />
+
+        <Banner
+          tipo="sucesso"
+          titulo="Sucesso"
+          mensagem="Dados salvos com sucesso!"
+        />
 
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
           <Chip texto="Todas as Refeições" />
@@ -155,6 +156,29 @@ export default function testPage() {
         <Text style={globalStyles.subtitle}>
           Selecionado: {categoria || 'Nenhum'}
         </Text>
+
+        <Chart
+          style={{ marginVertical: 24, borderRadius: 20 }}
+          variant="line"
+          series={[
+            {
+              name: "Este mês",
+              color: "#315F52",
+              points: [
+                { label: "Seg", value: 0.8, color: "#FFB627",accessibilityLabel: "segunda-feira", },
+                { label: "Ter", value: 0.7,accessibilityLabel: "terça-feira",},
+              ],
+            },
+            {
+              name: "Mês passado",
+              color: "#87929C",
+              points: [
+                { label: "Seg", value: 1.2 },
+                { label: "Ter", value: 1.0 },
+              ],
+            },
+          ]}
+        />
       </View>
     </ScrollView>
   );
