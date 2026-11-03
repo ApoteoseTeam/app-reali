@@ -6,7 +6,7 @@ import { styles } from './style';
 import { Logo } from '../../components/Logo/Logo';
 import { Button } from '../../components/Button/Button';
 import { Kpicard } from '../../components/KpiCard/KpiCard';
-import { Card } from '../../components/Card';
+import { Card } from '../../components/Card/Card';
 import { IconButton } from '../../components/IconButton/IconButton';
 import { Bell } from 'lucide-react-native';
 import { History, Utensils, BarChart2, MessageSquare } from 'lucide-react-native';
