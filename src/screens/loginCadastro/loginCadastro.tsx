@@ -6,7 +6,6 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   useWindowDimensions,
   View,
@@ -15,6 +14,7 @@ import { styles } from './styles';
 import { Checkbox } from '../../components/CheckBox/CheckBox';
 import { Input } from '../../components/Input/Input';
 import { Button } from '../../components/Button/Button';
+import { Select } from "../../components/select/Select";
 // import { Header } from '../components/header';
 
 type Funcao = 'Nutricionista' | 'Gestor';
@@ -40,14 +40,12 @@ export default function TelaAutenticacao() {
   const [senha, setSenha] = useState('');
   const [termosCadastro, setTermosCadastro] = useState(false);
 
-  const [seletorAberto, setSeletorAberto] = useState(false);
   const [tentouCadastrar, setTentouCadastrar] = useState(false);
 
   const senhaInvalida = tentouCadastrar && senha.length < 8;
 
   function trocarAba(aba: Aba) {
     Keyboard.dismiss();
-    setSeletorAberto(false);
     setAbaAtiva(aba);
 
     paginasRef.current?.scrollTo({
@@ -68,7 +66,6 @@ export default function TelaAutenticacao() {
   function handleCadastro() {
     Keyboard.dismiss();
     setTentouCadastrar(true);
-    setSeletorAberto(false);
 
     if (!nome.trim() || !email.trim() || !escola.trim()) {
       Alert.alert('Campos obrigatórios', 'Preencha todos os campos.');
@@ -119,7 +116,7 @@ export default function TelaAutenticacao() {
 
         <View style={styles.cabecalho}>
           <Text style={styles.logo}>
-            Re<Text style={styles.logoDestaque}>Alimenta</Text>
+            Re<Text style={styles.logoDestaque}>ali</Text>
           </Text>
 
           <Text style={styles.subtitulo}>
@@ -165,10 +162,7 @@ export default function TelaAutenticacao() {
           showsHorizontalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           scrollEventThrottle={16}
-          onScrollBeginDrag={() => {
-            Keyboard.dismiss();
-            setSeletorAberto(false);
-          }}
+          onScrollBeginDrag={Keyboard.dismiss}
           onScroll={({ nativeEvent }) => {
             const indice = Math.round(
               nativeEvent.contentOffset.x / largura
@@ -287,57 +281,12 @@ export default function TelaAutenticacao() {
             </View>
 
             <View style={styles.grupo}>
-              <Text style={styles.label}>Função</Text>
-
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={`Função: ${funcao}`}
-                accessibilityState={{ expanded: seletorAberto }}
-                onPress={() => {
-                  Keyboard.dismiss();
-                  setSeletorAberto((aberto) => !aberto);
-                }}
-                style={[styles.input, styles.seletor]}
-              >
-                <Text style={styles.textoFuncao}>{funcao}</Text>
-
-                <Text style={styles.seta}>
-                  {seletorAberto ? '⌃' : '⌄'}
-                </Text>
-              </Pressable>
-
-              {seletorAberto && (
-                <View style={styles.opcoes}>
-                  {(['Nutricionista', 'Gestor'] as const).map(
-                    (opcao) => (
-                      <Pressable
-                        key={opcao}
-                        accessibilityRole="button"
-                        accessibilityState={{
-                          selected: funcao === opcao,
-                        }}
-                        onPress={() => {
-                          setFuncao(opcao);
-                          setSeletorAberto(false);
-                        }}
-                        style={[
-                          styles.opcao,
-                          funcao === opcao &&
-                            styles.opcaoSelecionada,
-                        ]}
-                      >
-                        <Text style={styles.textoFuncao}>
-                          {opcao}
-                        </Text>
-
-                        {funcao === opcao && (
-                          <Text style={styles.marcador}>✓</Text>
-                        )}
-                      </Pressable>
-                    )
-                  )}
-                </View>
-              )}
+              <Select
+                label="Função"
+                options={["Nutricionista", "Gestor"]}
+                value={funcao}
+                onChange={(valor) => setFuncao(valor as Funcao)}
+              />
             </View>
 
             <View style={styles.grupoSenha}>
