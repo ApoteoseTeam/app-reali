@@ -1,9 +1,16 @@
 import { StyleSheet } from "react-native";
+import { spacing } from "../../theme/spacing";
 
 export const styles = StyleSheet.create({
-    container: {
+    mainWrapper: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#FFFFFF'
+    },
+
+    container: {
+        padding: spacing.md,
+        paddingBottom: spacing.xxl,
+        gap: spacing.lg,
     },
 
     header: {
@@ -186,10 +193,13 @@ export const styles = StyleSheet.create({
     },
 
     adicionar: {
-        backgroundColor: '#E8F3E9',
-        borderRadius: 20,
-        padding: 8,
-        marginTop: 2,
+        backgroundColor: 'transparent',
+        borderWidth: 1,
+        borderColor: '#888888',
+        borderRadius: 10,
+        padding: 12,
+        alignItems: 'center',
+        marginTop: 10,
     },
 
     textoAdicionar: {

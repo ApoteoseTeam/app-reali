@@ -7,15 +7,15 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#E6F0DF",
     borderRadius: 12,
-    padding: 4,
-    gap: 4,
+    padding: 3,
+    gap: 2,
   },
   opcao: {
     flex: 1,
     paddingVertical: 10,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 10,
+    borderRadius: 7,
   },
   opcaoAtiva: {
     backgroundColor: colors.primary,

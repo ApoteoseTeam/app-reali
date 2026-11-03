@@ -28,7 +28,7 @@ import { Chip } from "../components/Chip/Chip";
 import { PreparationRow } from "../components/PreparationRow/PreparationRow";
 import { Header } from '../components/Header/Header';
 import { Banner } from "../components/Banner/Banner";
-import { SegmentedControl } from '../components/SegmentedControl/SegmentedControl';
+import { SegmentedControl } from '../components/segmentedControl/SegmentedControl';
 
 export default function testPage() {
   const [checked, setChecked] = useState(false);
