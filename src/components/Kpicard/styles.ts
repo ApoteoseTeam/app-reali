@@ -38,12 +38,6 @@ export const kpicardStyles = StyleSheet.create({
         fontWeight: typography.weights.bold,
         color: colors.text,
     },
-
-    kpicardUnit: {
-        fontSize: typography.sizes.small,
-        color: colors.textSecondary
-    },
-
     kpicardChangeContainer: {
         flexDirection: "row",
         alignItems: "center",
@@ -56,8 +50,8 @@ export const kpicardStyles = StyleSheet.create({
     },
 
     kpicardChangeUnfavorable: {
-        color: colors.favorable,
-    },
+    color: colors.unfavorable,
+},
 
     kpicardChangeNeutral: {
         color: colors.neutral,
