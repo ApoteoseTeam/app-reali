@@ -1,5 +1,5 @@
 import { Text, Pressable, View, } from "react-native"
-import { globalStyles } from "../theme/global";
+import { globalStyles } from "../../theme/global"
 
 type CheckboxProps = {
     text: string

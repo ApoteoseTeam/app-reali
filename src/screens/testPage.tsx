@@ -4,7 +4,7 @@ import { View, Text, ScrollView } from 'react-native';
 import { globalStyles } from '../theme/global';
 import { Chart } from '../components/Chart/Chart';
 
-import { Stepper } from "../components/Stepper/index";
+import { Stepper } from "../components/Stepper/Stepper";
 
 // Ícones
 import {
@@ -17,18 +17,18 @@ import {
 } from 'lucide-react-native';
 
 // Componentes
-import { Button } from '../components/button';
-import { Input } from '../components/input';
-import { Checkbox } from '../components/Checkbox';
-import { IconButton } from '../components/iconbuttons/IconButton';
-import { Logo } from '../components/Logo';
-import { Select } from '../components/select/Select';
-import { Skeleton } from "../components/Skeleton/skeleton";
+import { Button } from '../components/Button/Button';
+import { Input } from '../components/Input/Input';
+import {Checkbox} from '../components/CheckBox/CheckBox';
+import { IconButton } from '../components/IconButton/IconButton';
+import { Logo } from '../components/Logo/Logo';
+import { Select } from '../components/Select/Select';
+import { Skeleton } from "../components/Skeleton/Skeleton";
 import { Chip } from "../components/Chip/Chip";
 import { PreparationRow } from "../components/PreparationRow/PreparationRow";
-import { Header } from '../components/header/header';
+import { Header } from '../components/Header/Header';
 import { Banner } from "../components/Banner/Banner";
-import { SegmentedControl } from '../components/segmentedControl/segmentedControl';
+import { SegmentedControl } from '../components/SegmentedControl/SegmentedControl';
 
 export default function testPage() {
   const [checked, setChecked] = useState(false);

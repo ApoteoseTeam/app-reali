@@ -1,7 +1,7 @@
-import { StyleSheet, View, Text, Image } from 'react-native'
-import { styles } from './styles'
+import { View, Text, Image } from 'react-native'
+import { styles} from './styles'
 
-import { Button } from '../../components/button'
+import { Button } from '../../components/Button/Button'
 
 export default function TelaInicial() {
     return (

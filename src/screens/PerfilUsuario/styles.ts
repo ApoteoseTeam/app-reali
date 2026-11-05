@@ -9,23 +9,29 @@ export const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         overflow: 'hidden',
     },
-    fundoVerde: {
-        position: 'absolute',
-        top: -418,
-        left: '50%',
-        marginLeft: -315,
-        width: 630,
-        height: 630,
-        borderRadius: 315,
-        backgroundColor: '#3E6B5B',
-    },
 
     topo: {
+        alignSelf: 'stretch',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 24,
-        paddingTop: 56,
+        paddingTop: 48,
+        paddingBottom: 8,
+    },
+    perfilTopo: {
+        position: 'relative',
+    },
+
+    fundoVerde: {
+        position: 'absolute',
+        top: 0,
+        left: '-20%',
+        right: '-20%',
+        bottom: 75,
+        borderBottomLeftRadius: 220,
+        borderBottomRightRadius: 220,
+        backgroundColor: '#3E6B5B',
     },
     titulo: {
         fontFamily: FONT,

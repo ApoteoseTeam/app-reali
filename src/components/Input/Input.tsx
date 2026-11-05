@@ -1,5 +1,5 @@
 import { TextInput, TextInputProps } from "react-native"
-import { globalStyles } from "../theme/global"
+import { globalStyles } from "../../theme/global"
 
 type InputProps = TextInputProps;
 
