@@ -1,9 +1,7 @@
 import { View, Text, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
-import { style } from "./style"
+import { style } from "./styles";
 import { IconButton } from '../IconButton/IconButton';
 import type { ReactNode } from 'react';
-
-
 
 import {
   Bell,

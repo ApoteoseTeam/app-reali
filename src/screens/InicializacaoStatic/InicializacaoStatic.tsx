@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
-import { stylesInicializacao } from './style';
+import { stylesInicializacao } from './styles';
 
 export default function TelaInicial() {
   return (
