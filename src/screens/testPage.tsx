@@ -5,6 +5,7 @@ import { globalStyles } from '../theme/global';
 import { Chart } from '../components/Chart/Chart';
 
 import { Stepper } from "../components/Stepper/Stepper";
+import { EmptyState } from "../components/EmpyState/EmpyState";
 
 // Ícones
 import {
@@ -16,10 +17,11 @@ import {
   Send,
 } from 'lucide-react-native';
 
+
 // Componentes
 import { Button } from '../components/Button/Button';
 import { Input } from '../components/Input/Input';
-import {Checkbox} from '../components/CheckBox/CheckBox';
+import { Checkbox } from '../components/CheckBox/CheckBox';
 import { IconButton } from '../components/IconButton/IconButton';
 import { Logo } from '../components/Logo/Logo';
 import { Select } from '../components/Select/Select';
@@ -34,7 +36,12 @@ export default function testPage() {
   const [checked, setChecked] = useState(false);
   const [categoria, setCategoria] = useState('');
   const [periodo, setPeriodo] = useState("Semana")
+  const historicoVazio = require('../../assets/historico-vazio.png');
 
+  function abrirFormulario() {
+    console.log('Clicou em Novo registro');
+  }
+  // Função para abrir o formulário de registro//
   return (
     <ScrollView>
       <View style={globalStyles.container}>
@@ -169,6 +176,16 @@ export default function testPage() {
           Selecionado: {categoria || 'Nenhum'}
         </Text>
 
+
+        <EmptyState
+          illustration={historicoVazio}
+          title="Nenhum registro ainda"
+          description="Registre a primeira refeição para ver o ranking de sobras e acompanhar a evolução."
+          buttonLabel="Novo registro"
+          onButtonPress={abrirFormulario}
+        />
+
+
         <Chart
           style={{ marginVertical: 24, borderRadius: 20 }}
           variant="line"
@@ -177,8 +194,8 @@ export default function testPage() {
               name: "Este mês",
               color: "#315F52",
               points: [
-                { label: "Seg", value: 0.8, color: "#FFB627",accessibilityLabel: "segunda-feira", },
-                { label: "Ter", value: 0.7,accessibilityLabel: "terça-feira",},
+                { label: "Seg", value: 0.8, color: "#FFB627", accessibilityLabel: "segunda-feira", },
+                { label: "Ter", value: 0.7, accessibilityLabel: "terça-feira", },
               ],
             },
             {
