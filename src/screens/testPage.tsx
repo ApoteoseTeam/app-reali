@@ -25,11 +25,11 @@ import { Checkbox } from '../components/CheckBox/CheckBox';
 import { IconButton } from '../components/IconButton/IconButton';
 import { Logo } from '../components/Logo/Logo';
 import { Select } from '../components/Select/Select';
-import { Skeleton } from "../components/Skeleton/Skeleton";
-import { Chip } from "../components/Chip/Chip";
+import { Skeleton } from '../components/Skeleton/Skeleton';
+import { Chip } from '../components/Chip/Chip';
 import { PreparationRow } from "../components/PreparationRow/PreparationRow";
 import { Header } from '../components/Header/Header';
-import { Banner } from "../components/Banner/Banner";
+import { Banner } from '../components/Banner/Banner';
 import { SegmentedControl } from '../components/SegmentedControl/SegmentedControl';
 
 export default function testPage() {

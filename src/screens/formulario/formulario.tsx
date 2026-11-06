@@ -1,7 +1,6 @@
 import { View, Text, ScrollView } from 'react-native';
 import { styles } from './styles';
 
-
 export default function Formulario() {
   return (
     <View style={styles.container}>

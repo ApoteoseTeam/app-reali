@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
 
-import { styles } from './style';
+import { styles } from './styles';
 
 import { Logo } from '../../components/Logo/Logo';
 import { Button } from '../../components/Button/Button';
