@@ -28,15 +28,16 @@ import { Select } from '../components/Select/Select';
 import { Skeleton } from "../components/Skeleton/Skeleton";
 import { Chip } from "../components/Chip/Chip";
 import { PreparationRow } from "../components/PreparationRow/PreparationRow";
-import { Header } from '../components/Header/header';
+import { Header } from '../components/Header/Header';
 import { Banner } from "../components/Banner/Banner";
 import { SegmentedControl } from '../components/SegmentedControl/SegmentedControl';
+import { MenuDayCard } from '../components/MenuDayCard/MenuDayCard';
 
 export default function testPage() {
   const [checked, setChecked] = useState(false);
   const [categoria, setCategoria] = useState('');
   const [periodo, setPeriodo] = useState("Semana")
-  const historicoVazio = require('../../assets/historico-vazio.png');
+  const historicoVazio = require("../../assets/historico-vazio.png");
 
   function abrirFormulario() {
     console.log('Clicou em Novo registro');
@@ -185,6 +186,23 @@ export default function testPage() {
           onButtonPress={abrirFormulario}
         />
 
+        <MenuDayCard
+          dia="Segunda-feira"
+          refeicoes={[
+            {
+              nome: "Almoço",
+              preparacoes: [
+                "Arroz - 12%",
+                "Feijão - 10%",
+                "Carne - 4%",
+              ],
+            },
+            {
+              nome: "Lanche",
+              preparacoes: ["Fruta - 17%"],
+            },
+          ]}
+        />
 
         <Chart
           style={{ marginVertical: 24, borderRadius: 20 }}
