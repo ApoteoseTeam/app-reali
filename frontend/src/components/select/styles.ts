@@ -3,7 +3,7 @@ import { colors } from "../../theme/colors";
 import { spacing } from "../../theme/spacing";
 import { typography } from "../../theme/typography";
 
-export const selectStyles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     gap: 8,
     width: "100%",

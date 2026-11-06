@@ -3,7 +3,7 @@ import { useState } from "react";
 import {View, Text, Pressable, Modal, FlatList } from "react-native";
 
 import { ChevronDown, Check } from "lucide-react-native";
-import { selectStyles as styles } from "./styles";
+import { styles } from "./styles";
 
 type SelectProps = {
   label: string;
