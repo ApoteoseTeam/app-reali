@@ -41,7 +41,7 @@ export default function testPage() {
   function abrirFormulario() {
     console.log('Clicou em Novo registro');
   }
-  
+  // Função para abrir o formulário de registro//
   return (
     <ScrollView>
       <View style={globalStyles.container}>
