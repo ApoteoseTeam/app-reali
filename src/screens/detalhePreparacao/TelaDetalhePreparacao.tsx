@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { ScrollView, Text, View } from 'react-native';
 
-import { Header } from '../../components/header/header';
+import { Header } from '../../components/Header/header';
 import { SegmentedControl } from
   '../../components/segmentedControl/segmentedControl';
 import { Kpicard } from '../../components/Kpicard/Kpicard';

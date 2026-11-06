@@ -22,11 +22,11 @@ import { Input } from '../components/input';
 import { Checkbox } from '../components/Checkbox';
 import { IconButton } from '../components/iconbuttons/IconButton';
 import { Logo } from '../components/Logo';
-import { Select } from '../components/select/Select';
-import { Skeleton } from "../components/Skeleton/skeleton";
+import { Select } from '../components/Select/Select';
+import { Skeleton } from "../components/Skeleton/Skeleton";
 import { Chip } from "../components/Chip/Chip";
 import { PreparationRow } from "../components/PreparationRow/PreparationRow";
-import { Header } from '../components/header/header';
+import { Header } from '../components/Header/header';
 import { Banner } from "../components/Banner/Banner";
 import { SegmentedControl } from '../components/segmentedControl/segmentedControl';
 

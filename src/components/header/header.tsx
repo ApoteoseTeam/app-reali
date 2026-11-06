@@ -3,7 +3,7 @@ import { Bell, ChevronLeft } from 'lucide-react-native';
 
 import { IconButton } from '../iconbuttons/IconButton';
 import { colors } from '../../theme/colors';
-import { style } from './style';
+import {style} from './style';
 
 type HeaderProps = {
   name: string;
