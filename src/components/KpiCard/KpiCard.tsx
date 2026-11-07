@@ -3,7 +3,7 @@ import { kpicardStyles } from "./styles";
 import { Feather } from "@expo/vector-icons";
 import { colors } from "../../theme/colors";
 
-type KpicardVariant = "primary" | "secondary";
+type KpicardVariant = "primary" | "secondary" | "summary";
 
 type KpicardProps = {
     variant?: KpicardVariant
@@ -12,9 +12,10 @@ type KpicardProps = {
     unit?: string
     change?: number
     lowerIsBetter?: boolean;
+    description?: string;
 }
 
-export const Kpicard = ({ title, value, unit, variant = "primary", change, lowerIsBetter = false, }: KpicardProps) => {
+export const Kpicard = ({ title, value, unit, variant = "primary", change, lowerIsBetter = false, description }: KpicardProps) => {
     const isFavorable =
         change !== undefined &&
         change !== 0 &&
@@ -43,6 +44,24 @@ export const Kpicard = ({ title, value, unit, variant = "primary", change, lower
         (change !== undefined
             ? `. ${changeDirection} de ${Math.abs(change)} por cento, ${changeStatus}.`
             : ".");
+
+
+    if (variant === "summary") {
+        const formattedValue = value.toLocaleString("pt-BR");
+        return (
+            <View style={kpicardStyles.summaryBox}>
+                <Text style={kpicardStyles.summaryValue}>
+                    {formattedValue} {unit}
+                </Text>
+                {description ? (
+                    <Text style={kpicardStyles.summaryDescription}>
+                        {description}
+                    </Text>
+                ) : null}
+            </View>
+        );
+    }
+
     return (
         <View accessible={true}
             accessibilityLabel={accessibilityDescription}
