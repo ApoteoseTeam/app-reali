@@ -1,2 +1,14 @@
 .venv
 .env
+
+# Dependências
+node_modules/
+
+# Cache e arquivos gerados pelo Expo
+.expo/
+dist/
+web-build/
+
+# Pastas nativas geradas na raiz antiga
+/android/
+/ios/
