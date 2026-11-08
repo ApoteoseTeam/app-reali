@@ -32,7 +32,6 @@ export function EmptyState({
                 resizeMode="contain"
                 accessible={false}
             />
-            
 
             <Text accessibilityRole="header" style={styles.title}>
                 {title}
