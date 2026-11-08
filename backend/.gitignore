@@ -1,0 +1,71 @@
+
+# =========================
+# PYTHON
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# =========================
+# AMBIENTE VIRTUAL
+# =========================
+venv/
+.venv/
+env/
+ENV/
+
+# =========================
+# DJANGO
+# =========================
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# =========================
+# VARIÁVEIS DE AMBIENTE
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# IDE / EDITOR
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# TESTES E COBERTURA
+# =========================
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+.nox/
+
+# =========================
+# DISTRIBUIÇÃO
+# =========================
+build/
+dist/
+*.egg-info/
+
+# =========================
+# SISTEMA OPERACIONAL
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# TYPE CHECKING
+# =========================
+.mypy_cache/
+.pyright/
+.ruff_cache/
