@@ -19,16 +19,12 @@ import {
 // Componentes
 import { Button } from '../components/Button/Button';
 import { Input } from '../components/Input/Input';
-import {Checkbox} from '../components/CheckBox/CheckBox';
+import { Checkbox } from '../components/CheckBox/CheckBox';
 import { IconButton } from '../components/IconButton/IconButton';
-import { Logo } from '../components/Logo/Logo';
-import { Select } from '../components/select/Select';
-import { Skeleton } from "../components/Skeleton/Skeleton";
+import { Logo } from '../components/Logo/Logo';;
 import { Chip } from "../components/Chip/Chip";
 import { PreparationRow } from "../components/PreparationRow/PreparationRow";
-import { Header } from '../components/Header/Header';
 import { Banner } from "../components/Banner/Banner";
-import { SegmentedControl } from '../components/segmentedControl/SegmentedControl';
 
 export default function testPage() {
   const [checked, setChecked] = useState(false);
@@ -38,10 +34,6 @@ export default function testPage() {
   return (
     <ScrollView>
       <View style={globalStyles.container}>
-        <Header name="Dashboard" />
-        <Text style={globalStyles.title}>
-          Essa Página é para testar componentes criados
-        </Text>
 
         <Text style={globalStyles.subtitle}>
           Nosso projeto Demo Day!
@@ -102,17 +94,6 @@ export default function testPage() {
 
         <Text style={globalStyles.title}>Select:</Text>
 
-        <Select
-          label="Categoria do alimento"
-          options={[
-            'Grãos e cereais',
-            'Frutas',
-            'Hortaliças',
-            'Carnes',
-          ]}
-          value={categoria}
-          onChange={setCategoria}
-        />
 
         <Banner
           tipo="info"
@@ -144,12 +125,6 @@ export default function testPage() {
           <Chip texto="Outubro - 2026" />
         </View>
 
-        <Skeleton largura={100} altura={20} />
-        <br />
-        <Skeleton largura={200} altura={40} />
-        <br />
-        <Skeleton largura={300} altura={100} />
-
         <PreparationRow
           refeicao="Almoço"
           preparacoes={[
@@ -157,12 +132,6 @@ export default function testPage() {
             "Feijão - 10%",
             "Carne - 4%"
           ]}
-        />
-
-        <SegmentedControl
-          opcoes={["Semana", "Mês"]}
-          selecionado={periodo}
-          aoSelecionar={setPeriodo}
         />
 
         <Text style={globalStyles.subtitle}>
@@ -177,8 +146,8 @@ export default function testPage() {
               name: "Este mês",
               color: "#315F52",
               points: [
-                { label: "Seg", value: 0.8, color: "#FFB627",accessibilityLabel: "segunda-feira", },
-                { label: "Ter", value: 0.7,accessibilityLabel: "terça-feira",},
+                { label: "Seg", value: 0.8, color: "#FFB627", accessibilityLabel: "segunda-feira", },
+                { label: "Ter", value: 0.7, accessibilityLabel: "terça-feira", },
               ],
             },
             {
