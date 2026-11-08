@@ -62,4 +62,21 @@ export const kpicardStyles = StyleSheet.create({
     kpicardChangeNeutral: {
         color: colors.neutral,
     },
+
+    summaryBox: {
+        backgroundColor: "#F4F8EF",
+        borderRadius: 12,
+        paddingHorizontal: 20,
+        paddingVertical: 20,
+        gap: 6,
+    },
+    summaryValue: {
+        color: "#315F52",
+        fontSize: 26,
+        fontWeight: "700",
+    },
+    summaryDescription: {
+        color: "#59635C",
+        fontSize: 14,
+    },
 });
