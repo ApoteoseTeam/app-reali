@@ -1,5 +1,5 @@
 import { Text, Pressable, View, } from "react-native"
-import { globalStyles } from "../../theme/global"
+import { styles } from "./styles";
 
 type CheckboxProps = {
     text: string
@@ -9,14 +9,14 @@ type CheckboxProps = {
 }
 export const Checkbox = ({ text, checked, onChange }: CheckboxProps) => {
     return (
-        <Pressable style={globalStyles.checkboxContainer}
+        <Pressable style={styles.checkboxContainer}
             accessibilityRole="checkbox"
             accessibilityLabel={text}
             accessibilityState={{ checked }} onPress={() => onChange(!checked)}>
-            <View style={[globalStyles.checkboxBox, checked && globalStyles.checkboxChecked]}>
-                {checked && (<Text style={globalStyles.checkboxIcon}>✓</Text>)}
+            <View style={[styles.checkboxBox, checked && styles.checkboxChecked]}>
+                {checked && (<Text style={styles.checkboxIcon}>✓</Text>)}
             </View>
-            <Text style={globalStyles.checkboxText}>{text}</Text>
+            <Text style={styles.checkboxText}>{text}</Text>
         </Pressable>
     )
 };
