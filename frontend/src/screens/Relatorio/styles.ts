@@ -109,4 +109,89 @@ export const styles = StyleSheet.create({
     desabilitado: {
         opacity: 0.5,
     },
+
+    comparacao: {
+        color: '#3A6B24',
+        fontSize: 12,
+        fontWeight: '600',
+        lineHeight: 18,
+    },
+
+    diario: {
+        gap: 8,
+    },
+
+    rotuloDiario: {
+        color: colors.secondary,
+        fontSize: 14,
+        fontWeight: '600',
+    },
+
+    inputDiario: {
+        minHeight: 44,
+        backgroundColor: colors.secondary,
+        borderRadius: 10,
+        paddingHorizontal: 14,
+        paddingVertical: 10,
+        color: '#FFFFFF',
+    },
+
+    ajudaDiario: {
+        color: '#465950',
+        fontSize: 12,
+        lineHeight: 17,
+    },
+
+    cardMargem: {
+        marginVertical: 8,
+        padding: 14,
+        gap: 4,
+        borderWidth: 0,
+        borderRadius: 12,
+        backgroundColor: '#E6F2DA',
+    },
+
+    tituloMargem: {
+        color: azulGestao,
+        fontSize: 15,
+        fontWeight: '700',
+    },
+
+    inputExtras: {
+        minHeight: 44,
+        backgroundColor: '#E6F2DA',
+        borderWidth: 1,
+        borderColor: colors.surface,
+        borderRadius: 10,
+        paddingHorizontal: 14,
+        paddingVertical: 10,
+        color: azulGestao,
+    },
+
+    totalDiario: {
+        marginTop: 24,
+        padding: 14,
+        borderRadius: 12,
+        backgroundColor: colors.secondary,
+    },
+
+    totalLegenda: {
+        color: '#FFFFFF',
+        fontSize: 13,
+    },
+
+    totalValor: {
+        color: '#FFFFFF',
+        fontSize: 22,
+        fontWeight: '700',
+    },
+
+    salvarDiario: {
+        marginTop: 20,
+        minHeight: 44,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: azulGestao,
+        borderRadius: 10,
+    },
 });
