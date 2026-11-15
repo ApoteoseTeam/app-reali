@@ -2,7 +2,7 @@ import { Text, View, type StyleProp, type ViewStyle } from "react-native"
 import { globalStyles } from "../../theme/global"
 import type { ReactNode } from "react";
 type CardProps = {
-    title: string
+    title?: string
     description?: string
     children?: ReactNode
     style?: StyleProp<ViewStyle>

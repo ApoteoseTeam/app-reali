@@ -25,18 +25,18 @@ import { Checkbox } from '../components/CheckBox/CheckBox';
 import { IconButton } from '../components/IconButton/IconButton';
 import { Logo } from '../components/Logo/Logo';
 import { Select } from '../components/Select/Select';
-import { Skeleton } from "../components/Skeleton/Skeleton";
+import { Skeleton } from '../components/Skeleton/skeleton';
 import { Chip } from "../components/Chip/Chip";
 import { PreparationRow } from "../components/PreparationRow/PreparationRow";
-import { Header } from '../components/Header/header';
+import { Header } from "../components/Header/header";
 import { Banner } from "../components/Banner/Banner";
 import { SegmentedControl } from '../components/SegmentedControl/SegmentedControl';
-
+import { RecordCard } from '../components/RecordCard/RecordCard';
 export default function testPage() {
   const [checked, setChecked] = useState(false);
   const [categoria, setCategoria] = useState('');
   const [periodo, setPeriodo] = useState("Semana")
-  const historicoVazio = require('../../assets/historico-vazio.png');
+  const historicoVazio = require('../assets/historico-vazio.png');
 
   function abrirFormulario() {
     console.log('Clicou em Novo registro');
@@ -207,6 +207,16 @@ export default function testPage() {
               ],
             },
           ]}
+        />
+
+        <RecordCard
+          dia="16"
+          mes="out"
+          refeicao="Almoço"
+          resumo="180 refeições · sobra 4,5 kg"
+          indicador="25 g por refeição"
+          onEditar={() => console.log('Editar registro')}
+          onExcluir={() => console.log('Excluir registro')}
         />
       </View>
     </ScrollView>
