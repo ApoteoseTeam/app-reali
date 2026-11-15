@@ -1,5 +1,6 @@
-import { View, Text } from "react-native";
+import { View, Text, Image } from "react-native";
 import { ProgressBar } from "../../components/Progressbar/Progressbar";
+import { styles } from "./SplashScreen.styles";
 
 type SplashScreenProps = {
     progress: number;
@@ -7,13 +8,13 @@ type SplashScreenProps = {
 
 export const SplashScreen = ({ progress }: SplashScreenProps) => {
     return (
-        <View style={{ flex: 1, justifyContent: "flex-end", padding: 32 }}>
-            {/* Logo e slogan ficam posicionados pelos estilos da tela */}
-
+        <View style={styles.container}>
+            <Image
+                source={require("../../assets/logo.png")}
+                style={styles.logo}
+            />
             <ProgressBar progress={progress} />
-            <Text style={{ textAlign: "center", marginTop: 12 }}>
-                Iniciando...
-            </Text>
+            <Text style={styles.texto}>Iniciando...</Text>
         </View>
     );
 };
