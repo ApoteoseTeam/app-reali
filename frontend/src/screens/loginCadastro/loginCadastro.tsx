@@ -14,7 +14,7 @@ import { styles } from './styles';
 import { Checkbox } from '../../components/CheckBox/CheckBox';
 import { Input } from '../../components/Input/Input';
 import { Button } from '../../components/Button/Button';
-import { Select } from "../../components/select/Select";
+import { Select } from "../../components/Select/Select";
 // import { Header } from '../components/header';
 
 type Funcao = 'Nutricionista' | 'Gestor';

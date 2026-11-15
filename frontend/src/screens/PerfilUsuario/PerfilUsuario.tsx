@@ -15,7 +15,7 @@ import {
 import { Button } from '../../components/Button/Button';
 import { Card } from '../../components/Card/Card';
 import { IconButton } from '../../components/IconButton/IconButton';
-import { Header } from '../../components/header/header';
+import { Header } from '../../components/Header/header';
 import { styles } from './styles';
 
 const ABAS: { nome: string; icone: LucideIcon; ativa?: boolean }[] = [
