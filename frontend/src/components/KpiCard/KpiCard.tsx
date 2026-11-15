@@ -74,7 +74,9 @@ export const Kpicard = ({ title, value, unit, variant = "primary", change, lower
             <Text style={kpicardStyles.kpicardTitle}>{title}</Text>
             <View style={kpicardStyles.kpicardValueContainer}>
                 <Text style={kpicardStyles.kpicardValue}>{value.toLocaleString("pt-BR")}</Text>
-                <Text style={kpicardStyles.kpicardUnit}>{unit}</Text>
+                {unit ? (
+                    <Text style={kpicardStyles.kpicardUnit}>{unit}</Text>
+                ) : null}
             </View>
             {change !== undefined && (
                 <View style={kpicardStyles.kpicardChangeContainer}>

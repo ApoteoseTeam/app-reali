@@ -71,4 +71,15 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.text,
   },
+
+  inputRelatorio: {
+    backgroundColor: colors.secondary,
+    borderColor: colors.secondary,
+    borderRadius: 12,
+  },
+
+  textoRelatorio: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+  },
 });
