@@ -1,4 +1,5 @@
 import { registerRootComponent } from 'expo';
+import { createElement } from 'react';
 import testPage from './src/screens/testPage'
 import TelaInicial from './src/screens/TelaInicial/TelaInicial';
 import PerfilUsuario from './src/screens/PerfilUsuario/PerfilUsuario';

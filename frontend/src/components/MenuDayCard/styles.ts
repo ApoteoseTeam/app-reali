@@ -18,11 +18,21 @@ export const styles = StyleSheet.create({
     color: colors.primary,
   },
 
-  cardContainer: {
-    backgroundColor: colors.background,
-    padding: spacing.md,
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: colors.border
+  destaque: {
+    backgroundColor: colors.secondary,
+    borderColor: '#102B53',
+    borderWidth: 3,
+  },
+  preparacoes: {
+    color: '#102B53',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  situacao: {
+    color: '#102B53',
+    fontSize: 12,
+  },
+  textoClaro: {
+    color: '#FFFFFF',
   },
 })
