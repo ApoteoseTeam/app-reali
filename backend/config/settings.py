@@ -49,12 +49,12 @@ INSTALLED_APPS = [
     "accounts",
     "foods",
     "ingredients",
-    "meals",
     "consumption",
     "waste",
     "inventory",
     "reports",
     "integrations",
+    "menus",
 ]
 
 MIDDLEWARE = [
@@ -155,3 +155,5 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ],
 }
+
+AUTH_USER_MODEL = "users.User"
