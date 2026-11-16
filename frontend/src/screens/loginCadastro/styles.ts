@@ -15,35 +15,35 @@ export const styles = StyleSheet.create({
   },
 
   cabecalho: {
-    backgroundColor: "#E7F2D9",
+    backgroundColor: "#14385F",
     alignItems: "center",
-    paddingTop: 30,
-    paddingBottom: 18,
+    paddingTop: 36,
+    paddingBottom: 24,
     paddingHorizontal: 18,
   },
 
   logo: {
-    fontSize: 30,
+    fontSize: 34,
     fontWeight: typography.weights.bold,
-    color: "#315E52",
+    color: "#FFFFFF",
     letterSpacing: -0.8,
   },
 
   logoDestaque: {
-    color: "#3D821C",
+    color: "#FFFFFF",
   },
 
   subtitulo: {
-    marginTop: 5,
+    marginTop: 8,
     fontSize: 11,
-    color: "#52665C",
+    color: "#FFFFFF",
     textAlign: "center",
   },
 
   abas: {
     flexDirection: "row",
     borderBottomWidth: 1,
-    borderBottomColor: "#D7E4CC",
+    borderBottomColor: "#E3E8E5",
   },
 
   aba: {
@@ -56,16 +56,16 @@ export const styles = StyleSheet.create({
   },
 
   abaSelecionada: {
-    borderBottomColor: "#315E52",
+    borderBottomColor: "#2F6B3A",
   },
 
   textoAba: {
-    fontSize: 15,
-    color: "#60746A",
+    fontSize: 13,
+    color: "#667B70",
   },
 
   textoAbaSelecionada: {
-    color: "#315E52",
+    color: "#14385F",
     fontWeight: typography.weights.bold,
   },
 
@@ -91,8 +91,8 @@ export const styles = StyleSheet.create({
   label: {
     marginBottom: 6,
     fontSize: typography.sizes.small,
-    fontWeight: "600",
-    color: "#315E52",
+    fontWeight: "700",
+    color: "#14385F",
   },
 
   input: {
@@ -102,9 +102,9 @@ export const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 9,
     borderWidth: 1,
-    borderColor: "#B4D1A5",
-    backgroundColor: colors.background,
-    color: "#263B32",
+    borderColor: "#2F6B3A",
+    backgroundColor: "#F5F9F1",
+    color: "#14385F",
     fontSize: 14,
   },
 
@@ -116,7 +116,7 @@ export const styles = StyleSheet.create({
   ajuda: {
     marginTop: 6,
     fontSize: 11,
-    color: "#60746A",
+    color: "#667B70",
   },
 
   textoErro: {
@@ -133,15 +133,15 @@ export const styles = StyleSheet.create({
     minHeight: 46,
     paddingVertical: 12,
     borderRadius: 10,
-    backgroundColor: "#315E52",
+    backgroundColor: "#14385F",
     justifyContent: "center",
   },
 
   nota: {
     marginTop: 12,
     fontSize: 11,
-    color: "#6C7D73",
+    color: "#667B70",
     textAlign: "center",
     lineHeight: 16,
   },
-})
+}) 
