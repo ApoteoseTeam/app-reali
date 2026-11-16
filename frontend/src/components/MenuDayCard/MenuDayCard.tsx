@@ -1,6 +1,4 @@
 import { View, Text } from "react-native"
-import { PreparationRow } from "../PreparationRow/PreparationRow"
-import { globalStyles } from "../../theme/global"
 import { styles } from "./styles"
 
 type Refeicao = {
@@ -11,20 +9,34 @@ type Refeicao = {
 type Props = {
   dia: string
   refeicoes: Refeicao[]
+  variante?: 'cozinha';
+  planejamento?: number;
 }
 
-export const MenuDayCard = ({ dia, refeicoes }: Props) => {
-  return (
-    <View style={[styles.cardContainer, styles.container]}>
-      <Text style={styles.dia}>{dia}</Text>
+export const MenuDayCard = ({ dia, refeicoes, variante, planejamento }: Props) => {
 
-      {refeicoes.map((refeicao, index) => (
-        <PreparationRow
-          key={index}
-          refeicao={refeicao.nome}
-          preparacoes={refeicao.preparacoes}
-        />
-      ))}
-    </View>
-  )
+  if (variante === 'cozinha') {
+    const destaque = planejamento !== undefined;
+    const preparacoes = refeicoes
+      .flatMap((refeicao) => refeicao.preparacoes)
+      .join(', ');
+      
+    return (
+      <View style={[styles.container, destaque && styles.destaque]}>
+        <Text style={[styles.dia, destaque && styles.textoClaro]}>
+          {dia}
+        </Text>
+
+        <Text style={[styles.preparacoes, destaque && styles.textoClaro]}>
+          {preparacoes}
+        </Text>
+
+        <Text style={[styles.situacao, destaque && styles.textoClaro]}>
+          {destaque
+            ? `Hoje · planejamento para ${planejamento.toLocaleString('pt-BR')} alunos`
+            : 'Presença do dia ainda não informada'}
+        </Text>
+      </View>
+    );
+  }
 }
