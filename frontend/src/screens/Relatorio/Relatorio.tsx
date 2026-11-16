@@ -10,6 +10,7 @@ import { SegmentedControl } from '../../components/SegmentedControl/SegmentedCon
 import { Select } from '../../components/Select/Select';
 import { Logo } from '../../components/Logo/Logo';
 import { Input } from '../../components/Input/Input';
+import { CompartilharRelatorioModal } from '../CompartilhaRelatorio/CompartilhaRelatorio';
 
 import { styles } from './styles';
 
@@ -63,6 +64,7 @@ export default function Relatorio({
     const [mes, setMes] = useState(MESES[0]);
     const [dia, setDia] = useState(DIAS[0]);
     const [diaRefeicao, setDiaRefeicao] = useState(OPCOES_DIARIAS[0]);
+    const [compartilharAberto, setCompartilharAberto] = useState(false);
 
     const [rascunhos, setRascunhos] = useState<Record<string, Planejamento>>({
         [OPCOES_DIARIAS[0]]: PLANEJAMENTO_INICIAL,
@@ -306,30 +308,34 @@ export default function Relatorio({
                     </View>
                 )}
             </ScrollView>
-            {mensal &&(
-            <View style={styles.acoes}>
-                <Button
-                    label="Compartilhar"
-                    accessibilityRole="button"
-                    disabled={!onCompartilhar}
-                    onPress={() => onCompartilhar?.(relatorio)}
-                    style={[
-                        styles.botao,
-                        styles.botaoSecundario,
-                        !onCompartilhar && styles.desabilitado,
-                    ]}
-                    textStyle={styles.textoSecundario}
-                />
+            {mensal && (
+                <View style={styles.acoes}>
+                    <Button
+                        label="Compartilhar"
+                        accessibilityRole="button"
+                        onPress={() => setCompartilharAberto(true)}
+                        style={[
+                            styles.botao,
+                            styles.botaoSecundario,
+                        ]}
+                        textStyle={styles.textoSecundario}
 
-                <Button
-                    label="Baixar PDF"
-                    accessibilityRole="button"
-                    disabled={!onBaixarPdf}
-                    onPress={() => onBaixarPdf?.(relatorio)}
-                    style={[styles.botao, !onBaixarPdf && styles.desabilitado]}
-                />
-            </View>
+                    />
+
+                    <Button
+                        label="Baixar PDF"
+                        accessibilityRole="button"
+                        disabled={!onBaixarPdf}
+                        onPress={() => onBaixarPdf?.(relatorio)}
+                        style={[styles.botao, !onBaixarPdf && styles.desabilitado]}
+                    />
+                </View>
             )}
+            <CompartilharRelatorioModal
+                visivel={compartilharAberto}
+                periodo={relatorio.periodo.toLocaleLowerCase('pt-BR')}
+                onFechar={() => setCompartilharAberto(false)}
+            />
         </View>
     );
 }
