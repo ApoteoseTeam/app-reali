@@ -79,4 +79,21 @@ export const kpicardStyles = StyleSheet.create({
         color: "#59635C",
         fontSize: 14,
     },
+
+    gestaoBox: {
+        minHeight: 108,
+        padding: 14,
+        gap: 3,
+        borderRadius: 12,
+        backgroundColor: colors.secondary,
+    },
+    gestaoTitulo: {
+        color: '#FFFFFF',
+        fontSize: 17,
+    },
+    gestaoValor: {
+        color: '#FFFFFF',
+        fontSize: 34,
+        fontWeight: '700',
+    },
 });

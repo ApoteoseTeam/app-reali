@@ -15,7 +15,7 @@ type Props = {
 
 export const MenuDayCard = ({ dia, refeicoes }: Props) => {
   return (
-    <View style={[globalStyles.cardContainer, styles.container]}>
+    <View style={[styles.cardContainer, styles.container]}>
       <Text style={styles.dia}>{dia}</Text>
 
       {refeicoes.map((refeicao, index) => (

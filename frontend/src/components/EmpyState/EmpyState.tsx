@@ -6,7 +6,6 @@ import {
 } from 'react-native';
 
 import { Button } from '../Button/Button';
-import { globalStyles } from '../../theme/global';
 import { styles } from './styles';
 
 type EmptyStateProps = {
@@ -43,7 +42,7 @@ export function EmptyState({
                 label={buttonLabel}
                 onPress={onButtonPress}
                 accessibilityRole="button"
-                style={[globalStyles.button, styles.button]}
+                style={[styles.button, styles.button]}
                 textStyle={styles.buttonText}
             />
         </View>

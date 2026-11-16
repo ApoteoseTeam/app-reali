@@ -3,7 +3,7 @@ import { kpicardStyles } from "./styles";
 import { Feather } from "@expo/vector-icons";
 import { colors } from "../../theme/colors";
 
-type KpicardVariant = "primary" | "secondary" | "summary";
+type KpicardVariant = 'primary' | 'secondary' | 'summary' | 'gestao';
 
 type KpicardProps = {
     variant?: KpicardVariant
@@ -58,6 +58,21 @@ export const Kpicard = ({ title, value, unit, variant = "primary", change, lower
                         {description}
                     </Text>
                 ) : null}
+            </View>
+        );
+    }
+
+    if (variant === 'gestao') {
+        return (
+            <View
+                accessible
+                accessibilityLabel={accessibilityDescription}
+                style={kpicardStyles.gestaoBox}
+            >
+                <Text style={kpicardStyles.gestaoTitulo}>{title}</Text>
+                <Text style={kpicardStyles.gestaoValor}>
+                    {value.toLocaleString('pt-BR')}{unit ? ` ${unit}` : ''}
+                </Text>
             </View>
         );
     }
