@@ -1,10 +1,10 @@
-import { Image, StyleSheet } from "react-native";
+import { Image, StyleSheet, type StyleProp, type ImageStyle } from 'react-native';
 
-export function Logo() {
+export function Logo({ style}: { style?: StyleProp<ImageStyle>}) {
   return (
     <Image
-      source={require("../../assets/logo.png")}
-      style={styles.logo}
+      source={require("../../assets/logo-reali.png")}
+      style={[styles.logo, style]}
       resizeMode="contain"
     />
   );

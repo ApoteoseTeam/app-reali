@@ -1,7 +1,5 @@
-
 import { useState } from "react";
-import {View, Text, Pressable, Modal, FlatList } from "react-native";
-
+import { View, Text, Pressable, Modal, FlatList } from "react-native";
 import { ChevronDown, Check } from "lucide-react-native";
 import { styles } from "./styles";
 
@@ -11,15 +9,10 @@ type SelectProps = {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  variant?: 'default' | 'relatorio';
 };
 
-export function Select({
-  label,
-  options,
-  value,
-  onChange,
-  placeholder = "Selecione uma opção",
-}: SelectProps) {
+export function Select({ label, options, value, onChange, placeholder = "Selecione uma opção", variant = "default" }: SelectProps) {
   const [visible, setVisible] = useState(false);
 
   function handleSelect(option: string) {
@@ -27,21 +20,28 @@ export function Select({
     setVisible(false);
   }
 
+  const isRelatorio = variant === 'relatorio';
+
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>{label}</Text>
+      {!isRelatorio && <Text style={styles.label}>{label}</Text>}
 
       <Pressable
-        style={styles.input}
+        style={[styles.input, isRelatorio && styles.inputRelatorio]}
         onPress={() => setVisible(true)}
         accessibilityRole="button"
-        accessibilityLabel={label}
+        accessibilityLabel={value ? `${label}, ${value}` : label}
       >
-        <Text style={value ? styles.value : styles.placeholder}>
+        <Text
+          style={[
+            value ? styles.value : styles.placeholder,
+            isRelatorio && styles.textoRelatorio,
+          ]}
+        >
           {value || placeholder}
         </Text>
 
-        <ChevronDown size={20} color="#64748B" />
+        <ChevronDown size={20} color={isRelatorio ? '#FFFFFF' : '#64748B'} />
       </Pressable>
 
       <Modal

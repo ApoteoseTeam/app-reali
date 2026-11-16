@@ -12,7 +12,6 @@ export const styles = StyleSheet.create({
         borderRadius: 8,
         borderWidth: 2,
         borderColor: colors.border
-
     },
 
     cardTitle: {

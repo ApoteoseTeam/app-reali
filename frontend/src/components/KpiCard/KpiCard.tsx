@@ -3,7 +3,7 @@ import { kpicardStyles } from "./styles";
 import { Feather } from "@expo/vector-icons";
 import { colors } from "../../theme/colors";
 
-type KpicardVariant = "primary" | "secondary" | "summary";
+type KpicardVariant = 'primary' | 'secondary' | 'summary' | 'gestao';
 
 type KpicardProps = {
     variant?: KpicardVariant
@@ -62,6 +62,21 @@ export const Kpicard = ({ title, value, unit, variant = "primary", change, lower
         );
     }
 
+    if (variant === 'gestao') {
+        return (
+            <View
+                accessible
+                accessibilityLabel={accessibilityDescription}
+                style={kpicardStyles.gestaoBox}
+            >
+                <Text style={kpicardStyles.gestaoTitulo}>{title}</Text>
+                <Text style={kpicardStyles.gestaoValor}>
+                    {value.toLocaleString('pt-BR')}{unit ? ` ${unit}` : ''}
+                </Text>
+            </View>
+        );
+    }
+
     return (
         <View accessible={true}
             accessibilityLabel={accessibilityDescription}
@@ -74,7 +89,9 @@ export const Kpicard = ({ title, value, unit, variant = "primary", change, lower
             <Text style={kpicardStyles.kpicardTitle}>{title}</Text>
             <View style={kpicardStyles.kpicardValueContainer}>
                 <Text style={kpicardStyles.kpicardValue}>{value.toLocaleString("pt-BR")}</Text>
-                <Text style={kpicardStyles.kpicardUnit}>{unit}</Text>
+                {unit ? (
+                    <Text style={kpicardStyles.kpicardUnit}>{unit}</Text>
+                ) : null}
             </View>
             {change !== undefined && (
                 <View style={kpicardStyles.kpicardChangeContainer}>
