@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 
 import { BarList } from '../../components/BarList/BarList';
@@ -10,7 +10,8 @@ import { SegmentedControl } from '../../components/SegmentedControl/SegmentedCon
 import { Select } from '../../components/Select/Select';
 import { Logo } from '../../components/Logo/Logo';
 import { Input } from '../../components/Input/Input';
-import { CompartilharRelatorioModal } from '../CompartilhaRelatorio/CompartilhaRelatorio';
+import { CompartilharRelatorioModal } from '../../components/CompartilhaRelatorioModal/CompartilhaRelatorioModal';
+import { PdfStatusModal, type ArquivoPdf, type EstadoPdf } from '../../components/PdfStatusModal/PdfStatusModal';
 
 import { styles } from './styles';
 
@@ -35,8 +36,13 @@ type DadosRelatorio = {
 };
 
 type FormularioResumoProps = {
-    onCompartilhar?: (relatorio: DadosRelatorio) => void;
-    onBaixarPdf?: (relatorio: DadosRelatorio) => void;
+    onBaixarPdf?: (
+        relatorio: DadosRelatorio,
+        opcoes: {
+            signal: AbortSignal;
+            onProgresso: (percentual: number) => void;
+        }
+    ) => Promise<ArquivoPdf>;
 };
 
 const OPCOES_DIARIAS = [
@@ -56,15 +62,14 @@ const PLANEJAMENTO_INICIAL: Planejamento = {
     extras: '',
 };
 
-export default function Relatorio({
-    onCompartilhar,
-    onBaixarPdf,
-}: FormularioResumoProps = {}) {
+export default function Relatorio({onBaixarPdf}: FormularioResumoProps = {}) {
     const [modo, setModo] = useState('Mensal');
     const [mes, setMes] = useState(MESES[0]);
     const [dia, setDia] = useState(DIAS[0]);
     const [diaRefeicao, setDiaRefeicao] = useState(OPCOES_DIARIAS[0]);
     const [compartilharAberto, setCompartilharAberto] = useState(false);
+    const [estadoPdf, setEstadoPdf] = useState<EstadoPdf | null>(null);
+    const exportacao = useRef<AbortController | null>(null);
 
     const [rascunhos, setRascunhos] = useState<Record<string, Planejamento>>({
         [OPCOES_DIARIAS[0]]: PLANEJAMENTO_INICIAL,
@@ -157,6 +162,64 @@ export default function Relatorio({
             ...anteriores,
             [diaRefeicao]: planejamento,
         }));
+    }
+
+    async function baixarPdf() {
+        if (!onBaixarPdf || exportacao.current) return;
+
+        const controle = new AbortController();
+        const periodo = relatorio.periodo.toLocaleLowerCase('pt-BR');
+
+        exportacao.current = controle;
+        setEstadoPdf({ tipo: 'gerando', periodo, progresso: null });
+
+        try {
+            const arquivo = await onBaixarPdf(relatorio, {
+                signal: controle.signal,
+                onProgresso: (percentual) => {
+                    if (controle.signal.aborted || exportacao.current !== controle) return;
+                    if (!Number.isFinite(percentual)) return;
+
+                    const progresso = Math.min(100, Math.max(0, Math.round(percentual)));
+                    setEstadoPdf({ tipo: 'gerando', periodo, progresso });
+                },
+            });
+
+            if (!controle.signal.aborted && exportacao.current === controle) {
+                setEstadoPdf({ tipo: 'pronto', arquivo });
+            }
+        } catch {
+            if (!controle.signal.aborted && exportacao.current === controle) {
+                setEstadoPdf({ tipo: 'erro' });
+            }
+        } finally {
+            if (exportacao.current === controle) {
+                exportacao.current = null;
+            }
+        }
+    }
+
+    function fecharPdf() {
+        const controle = exportacao.current;
+        exportacao.current = null;
+        controle?.abort();
+        setEstadoPdf(null);
+    }
+
+    async function abrirPdf() {
+        if (estadoPdf?.tipo !== 'pronto') return;
+
+        const { arquivo } = estadoPdf;
+
+        try {
+            await arquivo.abrir();
+        } catch {
+            setEstadoPdf((atual) =>
+                atual?.tipo === 'pronto' && atual.arquivo === arquivo
+                    ? { ...atual, erroAoAbrir: 'Não foi possível abrir o PDF.' }
+                    : atual
+            );
+        }
     }
 
     return (
@@ -325,8 +388,8 @@ export default function Relatorio({
                     <Button
                         label="Baixar PDF"
                         accessibilityRole="button"
-                        disabled={!onBaixarPdf}
-                        onPress={() => onBaixarPdf?.(relatorio)}
+                        disabled={!onBaixarPdf || estadoPdf?.tipo === 'gerando'}
+                        onPress={baixarPdf}
                         style={[styles.botao, !onBaixarPdf && styles.desabilitado]}
                     />
                 </View>
@@ -335,6 +398,13 @@ export default function Relatorio({
                 visivel={compartilharAberto}
                 periodo={relatorio.periodo.toLocaleLowerCase('pt-BR')}
                 onFechar={() => setCompartilharAberto(false)}
+            />
+
+            <PdfStatusModal
+                estado={estadoPdf}
+                onFechar={fecharPdf}
+                onTentarNovamente={baixarPdf}
+                onAbrirPdf={abrirPdf}
             />
         </View>
     );
