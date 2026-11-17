@@ -22,12 +22,7 @@ type Props = {
 
 const azul = '#102B53';
 
-export function PdfStatusModal({
-    estado,
-    onFechar,
-    onTentarNovamente,
-    onAbrirPdf,
-}: Props) {
+export function PdfStatusModal({estado, onFechar, onTentarNovamente, onAbrirPdf}: Props) {
     if (!estado) return null;
 
     const gerando = estado.tipo === 'gerando';

@@ -62,9 +62,7 @@ const PLANEJAMENTO_INICIAL: Planejamento = {
     extras: '',
 };
 
-export default function Relatorio({
-    onBaixarPdf,
-}: FormularioResumoProps = {}) {
+export default function Relatorio({onBaixarPdf}: FormularioResumoProps = {}) {
     const [modo, setModo] = useState('Mensal');
     const [mes, setMes] = useState(MESES[0]);
     const [dia, setDia] = useState(DIAS[0]);
