@@ -6,7 +6,7 @@ import { Button } from '../../components/Button/Button';
 import { DateField } from '../../components/DateField/DateField';
 import { Header } from '../../components/Header/header';
 import { IconButton } from '../../components/IconButton/IconButton';
-import { Select } from '../../components/Select/Select';
+import { Select } from '../../components/select/Select';
 import { styles } from './styles';
 
 const REFEICOES = ['Café da manhã', 'Almoço', 'Lanche', 'Jantar'];

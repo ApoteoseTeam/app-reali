@@ -7,11 +7,12 @@ import { Card } from '../../components/Card/Card';
 import { Header } from '../../components/Header/header';
 import { Kpicard } from '../../components/KpiCard/KpiCard';
 import { SegmentedControl } from '../../components/SegmentedControl/SegmentedControl';
-import { Select } from '../../components/Select/Select';
+import { Select } from '../../components/select/Select';
 import { Logo } from '../../components/Logo/Logo';
 import { Input } from '../../components/Input/Input';
 import { CompartilharRelatorioModal } from '../../components/CompartilhaRelatorioModal/CompartilhaRelatorioModal';
 import { PdfStatusModal, type ArquivoPdf, type EstadoPdf } from '../../components/PdfStatusModal/PdfStatusModal';
+import { StatusModal, type StatusPlanejamento, } from '../../components/StatusModal/StatusModal';
 
 import { styles } from './styles';
 
@@ -62,7 +63,7 @@ const PLANEJAMENTO_INICIAL: Planejamento = {
     extras: '',
 };
 
-export default function Relatorio({onBaixarPdf}: FormularioResumoProps = {}) {
+export default function Relatorio({ onBaixarPdf }: FormularioResumoProps = {}) {
     const [modo, setModo] = useState('Mensal');
     const [mes, setMes] = useState(MESES[0]);
     const [dia, setDia] = useState(DIAS[0]);
@@ -70,6 +71,10 @@ export default function Relatorio({onBaixarPdf}: FormularioResumoProps = {}) {
     const [compartilharAberto, setCompartilharAberto] = useState(false);
     const [estadoPdf, setEstadoPdf] = useState<EstadoPdf | null>(null);
     const exportacao = useRef<AbortController | null>(null);
+    const [modalPlanejamentoAberto, setModalPlanejamentoAberto] = useState(false);
+
+    const [statusPlanejamento, setStatusPlanejamento] =
+        useState<StatusPlanejamento>("loading");
 
     const [rascunhos, setRascunhos] = useState<Record<string, Planejamento>>({
         [OPCOES_DIARIAS[0]]: PLANEJAMENTO_INICIAL,
@@ -158,10 +163,19 @@ export default function Relatorio({onBaixarPdf}: FormularioResumoProps = {}) {
     function salvarPlanejamento() {
         if (!podeSalvar) return;
 
+        setStatusPlanejamento("loading");
+        setModalPlanejamentoAberto(true);
+
         setPlanejamentosSalvos((anteriores) => ({
             ...anteriores,
             [diaRefeicao]: planejamento,
         }));
+
+        setStatusPlanejamento("success");
+    }
+
+    function tentarSalvarNovamente() {
+        salvarPlanejamento();
     }
 
     async function baixarPdf() {
@@ -405,6 +419,16 @@ export default function Relatorio({onBaixarPdf}: FormularioResumoProps = {}) {
                 onFechar={fecharPdf}
                 onTentarNovamente={baixarPdf}
                 onAbrirPdf={abrirPdf}
+            />
+
+            <StatusModal
+                visible={modalPlanejamentoAberto}
+                status={statusPlanejamento}
+                totalAlunos={totalPlanejado}
+                dataRefeicao={diaRefeicao}
+                onClose={() => setModalPlanejamentoAberto(false)}
+                onRetry={tentarSalvarNovamente}
+                onViewHistory={() => { }}
             />
         </View>
     );
