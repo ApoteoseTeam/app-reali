@@ -1,7 +1,7 @@
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { Mail, MessageSquare, X } from 'lucide-react-native';
 
-import { IconButton } from '../../components/IconButton/IconButton';
+import { IconButton } from '../IconButton/IconButton';
 import { styles } from './styles';
 
 type Props = {
