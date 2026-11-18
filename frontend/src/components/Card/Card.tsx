@@ -1,21 +1,29 @@
-import { Text, View, } from "react-native"
-import { globalStyles } from "../../theme/global"
-import type { ReactNode, } from "react";
+import { Text, View, type StyleProp, type ViewStyle } from "react-native"
+import type { ReactNode } from "react";
+import { styles } from './styles';
 type CardProps = {
-    title: string
+    title?: string
     description?: string
     children?: ReactNode
-
+    style?: StyleProp<ViewStyle>
 }
 
-export const Card = ({ title, description, children }: CardProps) => {
+export const Card = ({ title, description, children, style }: CardProps) => {
     return (
-        <View style={globalStyles.cardContainer}>
-            <Text style={globalStyles.cardTitle} accessibilityRole="header">{title}</Text>
-            {description ? (
-                <Text style={globalStyles.cardDescription}> {description}</Text>
+        <View style={[styles.cardContainer, style]}>
+            {title ? (
+                <Text style={styles.cardTitle} accessibilityRole="header">
+                    {title}
+                </Text>
             ) : null}
+
+            {description ? (
+                <Text style={styles.cardDescription}>
+                    {description}
+                </Text>
+            ) : null}   
+
             {children}
         </View>
-    )
-}
+    );
+};

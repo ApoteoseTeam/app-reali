@@ -37,7 +37,6 @@ export function Header({ name, left, right, containerStyle, titleStyle }: Header
       ) : (
         title
       )}
-      
       {right === undefined ? (
         <View style={style.icon}>
           <IconButton

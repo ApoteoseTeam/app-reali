@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, Pressable, Platform } from 'react-native';
+import { View, Text, Image, Pressable, Platform } from 'react-native';
 import {
   Undo2,
   Settings,
@@ -15,7 +15,8 @@ import {
 import { Button } from '../../components/Button/Button';
 import { Card } from '../../components/Card/Card';
 import { IconButton } from '../../components/IconButton/IconButton';
-import { Header } from '../../components/header/header';
+import { Header } from '../../components/Header/header';
+import { colors } from '../../theme/colors';
 import { styles } from './styles';
 
 const ABAS: { nome: string; icone: LucideIcon; ativa?: boolean }[] = [
@@ -27,7 +28,7 @@ const ABAS: { nome: string; icone: LucideIcon; ativa?: boolean }[] = [
 
 const Linha = ({ icone: Icone, texto }: { icone: LucideIcon; texto: string }) => (
   <View style={styles.linha}>
-    <Icone size={22} color="#000" />
+    <Icone size={22} color={colors.text} />
     <Text style={styles.linhaTexto}>{texto}</Text>
   </View>
 );
@@ -36,7 +37,7 @@ export default function PerfilUsuario() {
   return (
     <View style={styles.container}>
       <View style={styles.perfilTopo}>
-        <View style={styles.fundoVerde} />
+        <View style={styles.fundoTopo} />
 
         <Header
           name="MEU PERFIL"
@@ -45,9 +46,9 @@ export default function PerfilUsuario() {
           left={
             <IconButton
               icon={Undo2}
-              color="#FFF"
+              color={colors.white}
               size={24}
-              style={{ padding: 4 }}
+              style={styles.iconeTopo}
               accessibilityLabel="Voltar"
               onPress={() => console.log('Voltar')}
             />
@@ -55,50 +56,38 @@ export default function PerfilUsuario() {
           right={
             <IconButton
               icon={Settings}
-              color="#FFF"
+              color={colors.white}
               size={24}
-              style={{ padding: 4 }}
+              style={styles.iconeTopo}
               accessibilityLabel="Configurações"
               onPress={() => console.log('Configurações')}
             />
           }
         />
-        {/*onPress precisa ser passada funcoes de navegacao ou edicao*/}
+
         <View style={styles.avatarArea}>
           <View style={styles.avatarBorda}>
             <Image source={require('../../assets/perfil.jpeg')} style={styles.avatar} />
           </View>
           <IconButton
             icon={Pencil}
-            color="#FFF"
+            color={colors.white}
             size={18}
             style={styles.editar}
             accessibilityLabel="Editar foto do perfil"
             onPress={() => console.log('Editar foto do perfil')}
           />
-          {/*onPress precisa ser passada funcoes de navegacao ou edicao*/}
         </View>
       </View>
 
-      <Text style={styles.nome}>Leticia Neves Eduardo</Text>
-      <Text style={styles.cargo}>Nutricionista</Text>
+      <Text style={styles.nome}>Horlando da Silva</Text>
+      <Text style={styles.cargo}>Diretor</Text>
 
       <View style={styles.conteudo}>
         <Card title="Dados pessoais">
-          <Linha
-            icone={CircleUser}
-            texto="leticia@gmail.com"
-          />
-
-          <Linha
-            icone={Phone}
-            texto="(11) 98765-4321"
-          />
-
-          <Linha
-            icone={MapPin}
-            texto="Escola Municipal Novo Horizonte"
-          />
+          <Linha icone={CircleUser} texto="horlandodiretor@gmail.com" />
+          <Linha icone={Phone} texto="(11) 98765-4321" />
+          <Linha icone={MapPin} texto="Escola Municipal Novo Horizonte" />
         </Card>
 
         <Card title="Minha conta">
@@ -109,20 +98,19 @@ export default function PerfilUsuario() {
         <Button
           label="Sair da conta"
           style={styles.botaoSair}
-          textStyle={styles.cardTitulo}
+          textStyle={styles.botaoSairTexto}
           onPress={() => {
             if (Platform.OS === 'web') {
-              window.location.href = '/'; {/*A funcao logout verdadeira precisa ser adicionada*/ }
+              window.location.href = '/';
             }
           }}
         />
       </View>
 
-      {/*O componente footer precisa ser inserido e substituir todas essa View style.abas*/}
       <View style={styles.abas}>
         {ABAS.map(({ nome, icone: Icone, ativa }) => (
           <Pressable key={nome} style={styles.aba}>
-            <Icone size={24} color="#000" strokeWidth={ativa ? 2.6 : 2} />
+            <Icone size={24} color={colors.text} strokeWidth={ativa ? 2.6 : 2} />
             <Text style={styles.abaTexto}>{nome}</Text>
           </Pressable>
         ))}
@@ -130,4 +118,3 @@ export default function PerfilUsuario() {
     </View>
   );
 }
-

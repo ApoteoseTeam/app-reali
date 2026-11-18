@@ -1,157 +1,147 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from "react-native"
+import { colors } from "../../theme/colors"
+import { spacing } from "../../theme/spacing"
+import { typography } from "../../theme/typography"
+import { globalStyles } from "../../theme/global"
 
 export const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#FFFFFF',
-    },
-    conteudo: {
-        flex: 1,
-    },
-    cabecalho: {
-        backgroundColor: '#E7F2D9',
-        alignItems: 'center',
-        paddingTop: 30,
-        paddingBottom: 18,
-        paddingHorizontal: 18,
-    },
-    logo: {
-        fontSize: 30,
-        fontWeight: '700',
-        color: '#315E52',
-        letterSpacing: -0.8,
-    },
-    logoDestaque: {
-        color: '#3D821C',
-    },
-    subtitulo: {
-        marginTop: 5,
-        fontSize: 11,
-        color: '#52665C',
-        textAlign: 'center',
-    },
-    abas: {
-        flexDirection: 'row',
-        borderBottomWidth: 1,
-        borderBottomColor: '#D7E4CC',
-    },
-    aba: {
-        flex: 1,
-        minHeight: 48,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderBottomWidth: 2,
-        borderBottomColor: 'transparent',
-    },
-    abaSelecionada: {
-        borderBottomColor: '#315E52',
-    },
-    textoAba: {
-        fontSize: 15,
-        color: '#60746A',
-    },
-    textoAbaSelecionada: {
-        color: '#315E52',
-        fontWeight: '700',
-    },
-    paginas: {
-        flex: 1,
-    },
-    formulario: {
-        flexGrow: 1,
-        paddingHorizontal: 22,
-        paddingTop: 18,
-        paddingBottom: 32,
-    },
-    grupo: {
-        marginBottom: 14,
-    },
-    grupoSenha: {
-        marginBottom: 4,
-    },
-    label: {
-        marginBottom: 6,
-        fontSize: 12,
-        fontWeight: '600',
-        color: '#315E52',
-    },
-    input: {
-        minHeight: 44,
-        paddingHorizontal: 12,
-        paddingVertical: 10,
-        borderRadius: 9,
-        borderWidth: 1,
-        borderColor: '#B4D1A5',
-        backgroundColor: '#F6FAF2',
-        color: '#263B32',
-        fontSize: 14,
-    },
-    inputErro: {
-        borderColor: '#C93B2B',
-        backgroundColor: '#FFFFFF',
-    },
-    seletor: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-    textoFuncao: {
-        fontSize: 14,
-        color: '#263B32',
-    },
-    seta: {
-        fontSize: 22,
-        color: '#315E52',
-    },
-    opcoes: {
-        marginTop: 5,
-        borderWidth: 1,
-        borderColor: '#B4D1A5',
-        borderRadius: 9,
-        overflow: 'hidden',
-        backgroundColor: '#FFFFFF',
-    },
-    opcao: {
-        minHeight: 44,
-        paddingHorizontal: 12,
-        paddingVertical: 10,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-    opcaoSelecionada: {
-        backgroundColor: '#E7F2D9',
-    },
-    marcador: {
-        color: '#315E52',
-        fontWeight: '700',
-    },
-    ajuda: {
-        marginTop: 6,
-        fontSize: 11,
-        color: '#60746A',
-    },
-    textoErro: {
-        color: '#C93B2B',
-    },
-    termos: {
-        marginTop: 10,
-        marginBottom: 10,
-    },
-    botao: {
-        minHeight: 46,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderRadius: 10,
-        backgroundColor: '#315E52',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    nota: {
-        marginTop: 12,
-        fontSize: 11,
-        color: '#6C7D73',
-        textAlign: 'center',
-        lineHeight: 16,
-    },
-});
+  container: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+  },
+
+  conteudo: {
+    flex: 1,
+  },
+
+  cabecalho: {
+    backgroundColor: "#14385F",
+    alignItems: "center",
+    paddingTop: 36,
+    paddingBottom: 24,
+    paddingHorizontal: 18,
+  },
+
+  logo: {
+    fontSize: 34,
+    fontWeight: typography.weights.bold,
+    color: "#FFFFFF",
+    letterSpacing: -0.8,
+  },
+
+  logoDestaque: {
+    color: "#FFFFFF",
+  },
+
+  subtitulo: {
+    marginTop: 8,
+    fontSize: 11,
+    color: "#FFFFFF",
+    textAlign: "center",
+  },
+
+  abas: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E3E8E5",
+  },
+
+  aba: {
+    flex: 1,
+    minHeight: spacing.xxl,
+    alignItems: "center",
+    justifyContent: "center",
+    borderBottomWidth: 2,
+    borderBottomColor: "transparent",
+  },
+
+  abaSelecionada: {
+    borderBottomColor: "#2F6B3A",
+  },
+
+  textoAba: {
+    fontSize: 13,
+    color: "#667B70",
+  },
+
+  textoAbaSelecionada: {
+    color: "#14385F",
+    fontWeight: typography.weights.bold,
+  },
+
+  paginas: {
+    flex: 1,
+  },
+
+  formulario: {
+    flexGrow: 1,
+    paddingHorizontal: 22,
+    paddingTop: 18,
+    paddingBottom: spacing.xl,
+  },
+
+  grupo: {
+    marginBottom: 14,
+  },
+
+  grupoSenha: {
+    marginBottom: spacing.xs,
+  },
+
+  label: {
+    marginBottom: 6,
+    fontSize: typography.sizes.small,
+    fontWeight: "700",
+    color: "#14385F",
+  },
+
+  input: {
+    ...globalStyles.input,
+    minHeight: 44,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 9,
+    borderWidth: 1,
+    borderColor: "#2F6B3A",
+    backgroundColor: "#F5F9F1",
+    color: "#14385F",
+    fontSize: 14,
+  },
+
+  inputErro: {
+    borderColor: colors.error,
+    backgroundColor: "#FFFFFF",
+  },
+
+  ajuda: {
+    marginTop: 6,
+    fontSize: 11,
+    color: "#667B70",
+  },
+
+  textoErro: {
+    color: colors.error,
+  },
+
+  termos: {
+    marginTop: 10,
+    marginBottom: 10,
+  },
+
+  botao: {
+    ...globalStyles.button,
+    minHeight: 46,
+    paddingVertical: 12,
+    borderRadius: 10,
+    backgroundColor: "#14385F",
+    justifyContent: "center",
+  },
+
+  nota: {
+    marginTop: 12,
+    fontSize: 11,
+    color: "#667B70",
+    textAlign: "center",
+    lineHeight: 16,
+  },
+}) 

@@ -62,4 +62,38 @@ export const kpicardStyles = StyleSheet.create({
     kpicardChangeNeutral: {
         color: colors.neutral,
     },
+
+    summaryBox: {
+        backgroundColor: "#F4F8EF",
+        borderRadius: 12,
+        paddingHorizontal: 20,
+        paddingVertical: 20,
+        gap: 6,
+    },
+    summaryValue: {
+        color: "#315F52",
+        fontSize: 26,
+        fontWeight: "700",
+    },
+    summaryDescription: {
+        color: "#59635C",
+        fontSize: 14,
+    },
+
+    gestaoBox: {
+        minHeight: 108,
+        padding: 14,
+        gap: 3,
+        borderRadius: 12,
+        backgroundColor: colors.secondary,
+    },
+    gestaoTitulo: {
+        color: '#FFFFFF',
+        fontSize: 17,
+    },
+    gestaoValor: {
+        color: '#FFFFFF',
+        fontSize: 34,
+        fontWeight: '700',
+    },
 });

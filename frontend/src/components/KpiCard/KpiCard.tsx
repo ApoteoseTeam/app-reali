@@ -3,7 +3,7 @@ import { kpicardStyles } from "./styles";
 import { Feather } from "@expo/vector-icons";
 import { colors } from "../../theme/colors";
 
-type KpicardVariant = "primary" | "secondary";
+type KpicardVariant = 'primary' | 'secondary' | 'summary' | 'gestao';
 
 type KpicardProps = {
     variant?: KpicardVariant
@@ -12,9 +12,10 @@ type KpicardProps = {
     unit?: string
     change?: number
     lowerIsBetter?: boolean;
+    description?: string;
 }
 
-export const Kpicard = ({ title, value, unit, variant = "primary", change, lowerIsBetter = false, }: KpicardProps) => {
+export const Kpicard = ({ title, value, unit, variant = "primary", change, lowerIsBetter = false, description }: KpicardProps) => {
     const isFavorable =
         change !== undefined &&
         change !== 0 &&
@@ -43,6 +44,39 @@ export const Kpicard = ({ title, value, unit, variant = "primary", change, lower
         (change !== undefined
             ? `. ${changeDirection} de ${Math.abs(change)} por cento, ${changeStatus}.`
             : ".");
+
+
+    if (variant === "summary") {
+        const formattedValue = value.toLocaleString("pt-BR");
+        return (
+            <View style={kpicardStyles.summaryBox}>
+                <Text style={kpicardStyles.summaryValue}>
+                    {formattedValue} {unit}
+                </Text>
+                {description ? (
+                    <Text style={kpicardStyles.summaryDescription}>
+                        {description}
+                    </Text>
+                ) : null}
+            </View>
+        );
+    }
+
+    if (variant === 'gestao') {
+        return (
+            <View
+                accessible
+                accessibilityLabel={accessibilityDescription}
+                style={kpicardStyles.gestaoBox}
+            >
+                <Text style={kpicardStyles.gestaoTitulo}>{title}</Text>
+                <Text style={kpicardStyles.gestaoValor}>
+                    {value.toLocaleString('pt-BR')}{unit ? ` ${unit}` : ''}
+                </Text>
+            </View>
+        );
+    }
+
     return (
         <View accessible={true}
             accessibilityLabel={accessibilityDescription}
@@ -55,7 +89,9 @@ export const Kpicard = ({ title, value, unit, variant = "primary", change, lower
             <Text style={kpicardStyles.kpicardTitle}>{title}</Text>
             <View style={kpicardStyles.kpicardValueContainer}>
                 <Text style={kpicardStyles.kpicardValue}>{value.toLocaleString("pt-BR")}</Text>
-                <Text style={kpicardStyles.kpicardUnit}>{unit}</Text>
+                {unit ? (
+                    <Text style={kpicardStyles.kpicardUnit}>{unit}</Text>
+                ) : null}
             </View>
             {change !== undefined && (
                 <View style={kpicardStyles.kpicardChangeContainer}>
