@@ -274,3 +274,7 @@ Após a configuração inicial:
 
 > O objetivo deste fluxo é manter o desenvolvimento colaborativo organizado e permitir que todos trabalhem no Realimenta utilizando apenas o computador e o navegador, sem necessidade de emuladores.
 </div>
+
+## Backend Django
+
+Veja o [guia do backend](backend/README.md) para instalação, PostgreSQL, migrations e documentação da API.
