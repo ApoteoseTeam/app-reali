@@ -7,7 +7,7 @@ class Organization(BaseModel):
     legal_name = models.CharField(max_length=200, blank=True)
     cnpj = models.CharField(max_length=14, unique=True, null=True, blank=True)
     email = models.EmailField(blank=True)
-    phone = models.CharField(max_length=20, blank=True)
+    phone = models.CharField(max_length=30, blank=True)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):

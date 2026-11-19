@@ -1,5 +1,7 @@
 # Integração mobile Android/iOS
 
+Para sessões, seleção institucional e links de ativação, veja o [guia de autenticação para Expo](docs/MOBILE_AUTH_FLOW.md).
+
 - Use HTTPS e o mesmo contrato REST para Android e iOS.
 - Armazene refresh token em `expo-secure-store`/Keychain/Keystore. Access token preferencialmente em memória.
 - No header envie `Authorization: Bearer ...` e `X-Organization-ID: UUID` para dados institucionais.

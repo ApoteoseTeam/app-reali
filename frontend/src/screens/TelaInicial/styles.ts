@@ -2,7 +2,6 @@ import { StyleSheet } from "react-native"
 
 import { typography } from '../../theme/typography'
 import { colors } from '../../theme/colors'
-import { spacing } from '../../theme/spacing'
 
 export const styles = StyleSheet.create({
     container: {
@@ -61,18 +60,6 @@ export const styles = StyleSheet.create({
     buttonContainer: {
         width: '100%',
         gap: 12,
-    },
-    buttonTwo: {
-        backgroundColor: 'transparent',
-        borderWidth: 1,
-        borderColor: colors.primary,
-        borderRadius: 8,
-        paddingVertical: 14,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    buttonTwoText: {
-        color: colors.primary,
     },
     footer: {
         width: '100%',

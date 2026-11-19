@@ -31,7 +31,10 @@ class ApiRegressionTests(TestCase):
             "admin@example.com", "Long-test-password-572!", full_name="Admin"
         )
         cls.membership = Membership.objects.create(
-            user=cls.user, organization=cls.org, role=Membership.Role.ADMIN
+            user=cls.user,
+            organization=cls.org,
+            role=Membership.Role.ADMIN,
+            all_schools_access=True,
         )
         cls.camera = Camera.objects.create(
             school=cls.school, name="Cantina", camera_type=Camera.CameraType.CAFETERIA
@@ -206,7 +209,7 @@ class ApiRegressionTests(TestCase):
 
     def test_invitation_single_use_and_inactive_organization(self):
         raw, digest = UserInvitation.generate_token()
-        UserInvitation.objects.create(
+        invitation = UserInvitation.objects.create(
             organization=self.org,
             email="cook@example.com",
             role=Membership.Role.COOK,
@@ -214,6 +217,7 @@ class ApiRegressionTests(TestCase):
             expires_at=timezone.now() + timedelta(hours=1),
             invited_by=self.user,
         )
+        invitation.schools.add(self.school)
         self.org.is_active = False
         self.org.save()
         payload = {

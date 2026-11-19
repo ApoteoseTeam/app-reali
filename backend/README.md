@@ -35,8 +35,10 @@ O Django lê variáveis exportadas no processo. Use [`.env.example`](.env.exampl
 
 - API REST em `/api/v1/`. Consulte o [contrato das rotas](API_ENDPOINTS.md) e as [orientações para Android e iOS](MOBILE_REACT_NATIVE.md).
 - Com `DJANGO_DEBUG=true`, abra `/api/docs/` para Swagger ou `/api/schema/` para OpenAPI.
-- Use `python manage.py createsuperuser` para criar um operador do Django Admin. O provisionamento institucional ainda requer intervenção da equipe.
-- Use `REALI_ACTIVATION_URL` e as variáveis SMTP de `.env.example` antes de emitir convites. No desenvolvimento, um transporte local de e-mail permite inspecionar mensagens com contas de teste.
+- Use `python manage.py createsuperuser` para criar um operador interno de desenvolvimento. Consulte o [guia de autenticação e operação](docs/AUTHENTICATION.md) para provisionamento, permissões internas, SMTP e execução do worker de recuperação.
+- Configure `REALI_ACTIVATION_URL`, `REALI_PASSWORD_RESET_URL` e SMTP com base em `.env.example`. A referência de endpoints da Fase 2 está no [contrato de autenticação e acesso](docs/API_AUTH_ENDPOINTS.md).
+- Para câmeras e agentes, consulte [provisionamento](docs/EDGE_DEVICES.md), [heartbeat e retenção](docs/CAMERA_HEARTBEAT.md) e o [contrato HTTP](docs/CAMERA_API_ENDPOINTS.md).
+- Para integrar as contagens, consulte o [guia da equipe de visão](docs/VISION_INTEGRATION.md), os [contratos](docs/DEVICE_COUNT_API.md) e os [testes de ingestão](docs/COUNTING_TESTS.md).
 
 ```powershell
 python manage.py check
@@ -57,4 +59,4 @@ Defina explicitamente `DJANGO_DEBUG=false`, uma `DJANGO_SECRET_KEY` forte e excl
 
 Configure TLS no proxy. Habilite `DJANGO_TRUST_PROXY_HTTPS` somente se o proxy substituir o cabeçalho de protocolo e for a única entrada do serviço. Ajuste `DJANGO_THROTTLE_NUM_PROXIES` conforme a topologia confiável, mantenha limites no proxy e use cache compartilhado caso os limites do DRF precisem valer entre workers. Configure `DJANGO_CSRF_TRUSTED_ORIGINS` para origens web confiáveis quando necessário. O backend atende requisições nativas com JWT. Para uma implantação web, use a mesma origem ou configure uma lista explícita de origens no componente que aplicar a política CORS. HSTS depende da validação do domínio e do HTTPS.
 
-Consulte o [relatório de auditoria](docs/AUDIT_REPORT.md) para arquitetura, riscos e pendências.
+Consulte a [auditoria da Fase 1](docs/AUDIT_REPORT.md) e o [relatório da Fase 2](docs/PHASE2_REPORT.md).

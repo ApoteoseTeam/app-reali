@@ -128,9 +128,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Reali API - JWT para aplicativo mobile
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ),
+    "DEFAULT_AUTHENTICATION_CLASSES": ("apps.api.session_auth.SessionAuthentication",),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 50,
@@ -139,13 +137,35 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "institution-request": "10/hour",
         "invitation-activation": "30/hour",
+        "invitation-management": "60/hour",
+        "password-reset-request": "10/hour",
+        "password-reset-confirm": "30/hour",
+        "device-traffic": "120/min",
+        "device-counts": os.getenv("DEVICE_COUNT_RATE", "120/min"),
+        "device-credential-management": "20/hour",
         "login": "30/hour",
     },
 }
+COUNT_BATCH_LIMIT = int(os.getenv("COUNT_BATCH_LIMIT", "100"))
+COUNT_MAX_BODY_BYTES = int(os.getenv("COUNT_MAX_BODY_BYTES", "131072"))
+COUNT_MAX_DELAY_SECONDS = int(os.getenv("COUNT_MAX_DELAY_SECONDS", "86400"))
+COUNT_MAX_FUTURE_SECONDS = int(os.getenv("COUNT_MAX_FUTURE_SECONDS", "300"))
+if not (
+    1 <= COUNT_BATCH_LIMIT <= 500
+    and COUNT_MAX_BODY_BYTES > 0
+    and COUNT_MAX_DELAY_SECONDS > 0
+    and COUNT_MAX_FUTURE_SECONDS >= 0
+):
+    raise ImproperlyConfigured("Revise os limites de ingestão de contagens.")
 SPECTACULAR_SETTINGS = {
     "TITLE": "Reali API",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "ENUM_NAME_OVERRIDES": {
+        "InstitutionRequestStatus": "apps.api.serializers.INSTITUTION_STATUS_CHOICES",
+        "MealServiceStatus": "apps.api.serializers.MEAL_STATUS_CHOICES",
+        "CameraOperationalStatus": "apps.cameras.models.OPERATIONAL_STATUS_CHOICES",
+    },
 }
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
@@ -164,3 +184,38 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "true").lower() == "true"
 EMAIL_TIMEOUT = 10
 REALI_ACTIVATION_URL = os.getenv("REALI_ACTIVATION_URL", "")
+REALI_PASSWORD_RESET_URL = os.getenv("REALI_PASSWORD_RESET_URL", "")
+PASSWORD_RESET_TIMEOUT = 3600
+
+CAMERA_HEARTBEAT_INTERVAL_SECONDS = int(
+    os.getenv("CAMERA_HEARTBEAT_INTERVAL_SECONDS", "30")
+)
+CAMERA_OFFLINE_TIMEOUT_SECONDS = int(os.getenv("CAMERA_OFFLINE_TIMEOUT_SECONDS", "90"))
+CAMERA_HEARTBEAT_MAX_CLOCK_SKEW_SECONDS = int(
+    os.getenv("CAMERA_HEARTBEAT_MAX_CLOCK_SKEW_SECONDS", "30")
+)
+CAMERA_HEARTBEAT_MAX_AGE_SECONDS = int(
+    os.getenv("CAMERA_HEARTBEAT_MAX_AGE_SECONDS", "300")
+)
+CAMERA_MIN_PROCESSING_FPS = float(os.getenv("CAMERA_MIN_PROCESSING_FPS", "10"))
+CAMERA_PENDING_EVENTS_LIMIT = int(os.getenv("CAMERA_PENDING_EVENTS_LIMIT", "100"))
+CAMERA_HEALTH_RETENTION_DAYS = int(os.getenv("CAMERA_HEALTH_RETENTION_DAYS", "90"))
+DEVICE_AUTH_FAILURE_LIMIT = int(os.getenv("DEVICE_AUTH_FAILURE_LIMIT", "20"))
+CAMERA_LEGACY_AUTH_ENABLED = (
+    os.getenv("CAMERA_LEGACY_AUTH_ENABLED", "true").lower() == "true"
+)
+if not (
+    0 < CAMERA_HEARTBEAT_INTERVAL_SECONDS < CAMERA_OFFLINE_TIMEOUT_SECONDS
+    and CAMERA_HEARTBEAT_MAX_CLOCK_SKEW_SECONDS >= 0
+    and CAMERA_HEARTBEAT_MAX_AGE_SECONDS >= CAMERA_OFFLINE_TIMEOUT_SECONDS
+    and 0 <= CAMERA_MIN_PROCESSING_FPS <= 1000
+    and min(
+        CAMERA_PENDING_EVENTS_LIMIT,
+        CAMERA_HEALTH_RETENTION_DAYS,
+        DEVICE_AUTH_FAILURE_LIMIT,
+    )
+    > 0
+):
+    raise ImproperlyConfigured(
+        "Revise os limites de monitoramento e autenticação de câmeras."
+    )

@@ -30,7 +30,6 @@ export default function TelaInicial() {
 
                 <View style={styles.buttonContainer}>
                     <Button label="Entrar" />
-                    <Button label="Criar Conta" style={styles.buttonTwo} textStyle={styles.buttonTwoText} />
                 </View>
 
                 <View style={styles.footer}>

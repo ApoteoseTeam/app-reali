@@ -3,11 +3,14 @@ from decimal import Decimal
 from rest_framework import serializers
 from apps.users.models import User, Membership
 from apps.institutions.models import Organization, School
-from apps.cameras.models import Camera
 from apps.counting.models import StudentCount, PlateCount
 from apps.meals.models import MealService, AttendanceSnapshot, MealForecast
 from apps.analytics.models import DailyMetrics
 from .models import InstitutionRequest
+from .permissions import schools_for
+
+INSTITUTION_STATUS_CHOICES = InstitutionRequest.Status.choices
+MEAL_STATUS_CHOICES = MealService.Status.choices
 
 
 def validate_uuid(name, value):
@@ -28,11 +31,20 @@ class MembershipSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Membership
-        fields = ("id", "user", "organization", "role", "is_active")
+        fields = (
+            "id",
+            "user",
+            "organization",
+            "role",
+            "is_active",
+            "all_schools_access",
+        )
         read_only_fields = fields
 
 
 class InstitutionRequestSerializer(serializers.ModelSerializer):
+    message = serializers.CharField(max_length=4000, allow_blank=True, required=False)
+
     class Meta:
         model = InstitutionRequest
         fields = (
@@ -85,22 +97,19 @@ class SchoolSerializer(serializers.ModelSerializer):
         return code
 
 
-class CameraSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Camera
-        fields = (
-            "id",
-            "school",
-            "name",
-            "camera_type",
-            "location",
-            "is_active",
-            "last_seen_at",
-        )
-        read_only_fields = ("id", "last_seen_at")
+class ActiveSchoolField(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        if "authorized_schools" in self.context:
+            return self.context["authorized_schools"].filter(is_active=True)
+        membership = self.context.get("membership")
+        if membership is None:
+            return School.objects.none()
+        return schools_for(membership, active_only=True)
 
 
 class StudentCountSerializer(serializers.ModelSerializer):
+    received_at = serializers.DateTimeField(read_only=True)
+
     class Meta:
         model = StudentCount
         fields = (
@@ -111,11 +120,14 @@ class StudentCountSerializer(serializers.ModelSerializer):
             "source",
             "external_event_id",
             "created_at",
+            "received_at",
         )
         read_only_fields = fields
 
 
 class PlateCountSerializer(serializers.ModelSerializer):
+    received_at = serializers.DateTimeField(read_only=True)
+
     class Meta:
         model = PlateCount
         fields = (
@@ -127,11 +139,14 @@ class PlateCountSerializer(serializers.ModelSerializer):
             "source",
             "external_event_id",
             "created_at",
+            "received_at",
         )
         read_only_fields = fields
 
 
 class MealServiceSerializer(serializers.ModelSerializer):
+    school = ActiveSchoolField()
+
     class Meta:
         model = MealService
         fields = (
@@ -175,6 +190,9 @@ class ForecastSerializer(serializers.ModelSerializer):
 
 
 class DailyMetricsSerializer(serializers.ModelSerializer):
+    total_forecast_plates = serializers.IntegerField(allow_null=True, read_only=True)
+    total_served_plates = serializers.IntegerField(allow_null=True, read_only=True)
+
     class Meta:
         model = DailyMetrics
         fields = (
@@ -188,24 +206,12 @@ class DailyMetricsSerializer(serializers.ModelSerializer):
         )
         read_only_fields = fields
 
-
-class InviteSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    role = serializers.ChoiceField(choices=Membership.Role.choices)
-
-
-class InvitationAcceptSerializer(serializers.Serializer):
-    token = serializers.CharField()
-    full_name = serializers.CharField(max_length=160)
-    password = serializers.CharField(
-        write_only=True, min_length=12, trim_whitespace=False
-    )
-
-    def validate_password(self, password):
-        from django.contrib.auth.password_validation import validate_password
-
-        validate_password(password)
-        return password
+    def to_representation(self, instance):
+        result = super().to_representation(instance)
+        if self.context.get("entry_only"):
+            result["total_forecast_plates"] = None
+            result["total_served_plates"] = None
+        return result
 
 
 class DeviceEventSerializer(serializers.Serializer):

@@ -1,5 +1,4 @@
 import { StyleSheet } from "react-native"
-import { colors } from "../../theme/colors"
 import { spacing } from "../../theme/spacing"
 import { typography } from "../../theme/typography"
 import { globalStyles } from "../../theme/global"
@@ -40,35 +39,6 @@ export const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-  abas: {
-    flexDirection: "row",
-    borderBottomWidth: 1,
-    borderBottomColor: "#E3E8E5",
-  },
-
-  aba: {
-    flex: 1,
-    minHeight: spacing.xxl,
-    alignItems: "center",
-    justifyContent: "center",
-    borderBottomWidth: 2,
-    borderBottomColor: "transparent",
-  },
-
-  abaSelecionada: {
-    borderBottomColor: "#2F6B3A",
-  },
-
-  textoAba: {
-    fontSize: 13,
-    color: "#667B70",
-  },
-
-  textoAbaSelecionada: {
-    color: "#14385F",
-    fontWeight: typography.weights.bold,
-  },
-
   paginas: {
     flex: 1,
   },
@@ -82,10 +52,6 @@ export const styles = StyleSheet.create({
 
   grupo: {
     marginBottom: 14,
-  },
-
-  grupoSenha: {
-    marginBottom: spacing.xs,
   },
 
   label: {
@@ -106,21 +72,6 @@ export const styles = StyleSheet.create({
     backgroundColor: "#F5F9F1",
     color: "#14385F",
     fontSize: 14,
-  },
-
-  inputErro: {
-    borderColor: colors.error,
-    backgroundColor: "#FFFFFF",
-  },
-
-  ajuda: {
-    marginTop: 6,
-    fontSize: 11,
-    color: "#667B70",
-  },
-
-  textoErro: {
-    color: colors.error,
   },
 
   termos: {

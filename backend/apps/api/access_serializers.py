@@ -1,0 +1,188 @@
+from django.utils import timezone
+from rest_framework import serializers
+
+from apps.users.models import Membership
+
+from .models import UserInvitation
+from .serializers import (
+    InstitutionRequestSerializer,
+    MembershipSerializer,
+    UserSerializer,
+)
+
+
+class SessionSerializer(serializers.Serializer):
+    access = serializers.CharField()
+    refresh = serializers.CharField()
+    user = UserSerializer()
+
+
+class MeSerializer(serializers.Serializer):
+    user = UserSerializer()
+    memberships = MembershipSerializer(many=True)
+
+
+class MessageSerializer(serializers.Serializer):
+    message = serializers.CharField()
+
+
+class TokenSerializer(serializers.Serializer):
+    token = serializers.CharField(max_length=256, write_only=True)
+
+
+class PasswordInput(serializers.CharField):
+    def __init__(self, **kwargs):
+        super().__init__(
+            write_only=True, trim_whitespace=False, max_length=256, **kwargs
+        )
+
+
+class PasswordPairSerializer(serializers.Serializer):
+    password = PasswordInput(min_length=12)
+    password_confirmation = PasswordInput()
+
+    def validate(self, attrs):
+        if attrs.get("password") != attrs.get("password_confirmation"):
+            raise serializers.ValidationError(
+                {"password_confirmation": "As senhas devem coincidir."}
+            )
+        return attrs
+
+
+class ChangePasswordSerializer(PasswordPairSerializer):
+    current_password = PasswordInput()
+
+
+class ConfirmResetSerializer(TokenSerializer, PasswordPairSerializer):
+    pass
+
+
+class ResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class ActivateSerializer(TokenSerializer, PasswordPairSerializer):
+    full_name = serializers.CharField(max_length=160, required=False)
+    password = PasswordInput(min_length=12, required=False)
+    password_confirmation = PasswordInput(required=False)
+
+
+class LegacyActivateSerializer(ActivateSerializer):
+    def validate(self, attrs):
+        if "password" in attrs:
+            attrs.setdefault("password_confirmation", attrs["password"])
+        return super().validate(attrs)
+
+
+class SchoolGrantSerializer(serializers.Serializer):
+    school_ids = serializers.ListField(child=serializers.UUIDField(), max_length=200)
+    all_schools_access = serializers.BooleanField()
+
+    def validate_school_ids(self, ids):
+        if len(ids) != len(set(ids)):
+            raise serializers.ValidationError("Os IDs de escola devem ser únicos.")
+        return ids
+
+
+class InviteSerializer(SchoolGrantSerializer):
+    email = serializers.EmailField()
+    role = serializers.ChoiceField(choices=Membership.Role.choices)
+    school_ids = serializers.ListField(
+        child=serializers.UUIDField(), max_length=200, required=False, default=list
+    )
+    all_schools_access = serializers.BooleanField(required=False, default=False)
+
+
+class InvitationSerializer(serializers.ModelSerializer):
+    status = serializers.SerializerMethodField()
+    school_ids = serializers.PrimaryKeyRelatedField(
+        source="schools", many=True, read_only=True
+    )
+
+    class Meta:
+        model = UserInvitation
+        fields = (
+            "id",
+            "organization",
+            "email",
+            "role",
+            "invited_by",
+            "school_ids",
+            "all_schools_access",
+            "status",
+            "expires_at",
+            "accepted_at",
+            "revoked_at",
+            "created_at",
+            "delivery_status",
+            "last_sent_at",
+        )
+        read_only_fields = fields
+
+    def get_status(self, invite) -> str:
+        if (
+            invite.status == UserInvitation.Status.PENDING
+            and invite.expires_at <= timezone.now()
+        ):
+            return UserInvitation.Status.EXPIRED
+        return invite.status
+
+
+class ReviewedInstitutionSerializer(InstitutionRequestSerializer):
+    class Meta(InstitutionRequestSerializer.Meta):
+        fields = InstitutionRequestSerializer.Meta.fields + (
+            "reviewed_at",
+            "reviewed_by",
+            "rejection_reason",
+            "organization",
+            "initial_invitation",
+        )
+        read_only_fields = fields
+
+
+class ProvisionSchoolSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=160)
+    code = serializers.CharField(max_length=40)
+    address = serializers.CharField(max_length=250, allow_blank=True, required=False)
+    city = serializers.CharField(max_length=100, allow_blank=True, required=False)
+    state = serializers.CharField(max_length=2, allow_blank=True, required=False)
+    zip_code = serializers.CharField(max_length=9, allow_blank=True, required=False)
+
+
+class ApproveInstitutionSerializer(serializers.Serializer):
+    schools = ProvisionSchoolSerializer(many=True, allow_empty=False, max_length=200)
+    director_email = serializers.EmailField(required=False)
+
+    def validate_schools(self, schools):
+        if len({school["code"] for school in schools}) != len(schools):
+            raise serializers.ValidationError("Cada código de escola deve ser único.")
+        return schools
+
+
+class DirectProvisionSerializer(ApproveInstitutionSerializer):
+    name = serializers.CharField(max_length=160)
+    email = serializers.EmailField(required=False, default="")
+    phone = serializers.CharField(
+        max_length=30, allow_blank=True, required=False, default=""
+    )
+    director_email = serializers.EmailField()
+
+
+class ProvisionedSerializer(serializers.Serializer):
+    organization = serializers.UUIDField()
+    initial_invitation = serializers.UUIDField()
+
+
+class RejectInstitutionSerializer(serializers.Serializer):
+    rejection_reason = serializers.CharField(max_length=2000)
+
+
+class RoleUpdateSerializer(serializers.Serializer):
+    role = serializers.ChoiceField(choices=Membership.Role.choices)
+
+
+class MembershipFilterSerializer(serializers.Serializer):
+    organization = serializers.UUIDField(required=False)
+    school = serializers.UUIDField(required=False)
+    role = serializers.ChoiceField(choices=Membership.Role.choices, required=False)
+    is_active = serializers.BooleanField(required=False)
