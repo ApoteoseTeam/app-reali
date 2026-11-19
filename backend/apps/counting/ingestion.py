@@ -5,6 +5,8 @@ from datetime import UTC, timedelta
 
 from django.conf import settings
 from django.db import transaction
+from django.utils import timezone
+from apps.analytics.dirty import mark_dirty
 
 from apps.cameras.authentication import lock_authenticated_device, lock_legacy_camera
 from apps.cameras.models import Camera
@@ -239,6 +241,15 @@ def process_events(cameras, events, received_at, *, legacy=False):
             "updated_at",
         ],
     )
+    keys = {
+        (row.camera.school_id, timezone.localdate(row.recorded_at))
+        for rows in counts.values()
+        for row in rows
+    }
+    keys.update(
+        (row.camera.school_id, row.meal_service.date) for row in counts[PlateCount]
+    )
+    mark_dirty(keys)
     return results
 
 

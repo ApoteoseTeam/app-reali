@@ -17,6 +17,8 @@ O [contrato de câmeras e agentes](docs/CAMERA_API_ENDPOINTS.md) detalha status,
 | GET/PUT/PATCH | cameras/{id}/ | Membro autorizado / direção grava | Estado cadastral da câmera |
 
 **Refeições, contagens e relatórios**
+
+O [contrato de planejamento](docs/FORECAST_API.md) detalha programações, políticas, snapshots, previsões e transições.
 | Método | Rota | Permissão | Objetivo |
 |---|---|---|---|
 | GET/POST | meal-services/ | Papel autorizado / direção ou gestão grava | Serviços |
@@ -42,7 +44,7 @@ Veja o [contrato de eventos, lotes, filtros e resumos](docs/DEVICE_COUNT_API.md)
 
 ### Exemplos legados e planejamento
 
-`POST /api/v1/meal-services/{id}/start/`
+`POST /api/v1/meal-services/{id}/start/` com taxa explícita de direção ou gestão
 ```json
 {"estimated_plates_per_entry":"0.930"}
 ```
@@ -66,5 +68,9 @@ Veja o [contrato de eventos, lotes, filtros e resumos](docs/DEVICE_COUNT_API.md)
 - Atualizações da escola ou do tipo de uma câmera com histórico retornam `400`. O estado ativo e os demais campos cadastrais continuam editáveis.
 - No contrato legado de contagens, eventos são incrementos inteiros entre 1 e 100.000. Envie o mesmo `event_id`, quantidade, instante e serviço em reenvios. A primeira gravação retorna `201`; um reenvio igual retorna `200` com o mesmo ID, inclusive após a finalização. Alterar o conteúdo de um ID existente retorna `400`.
 - Para uma primeira gravação da cantina pelo contrato legado, informe o serviço da escola em distribuição. Com token de agente, eventos tardios podem ser recebidos após o encerramento se ocorreram durante a distribuição e ainda estão na janela configurada. Envie `recorded_at` com offset e use o heartbeat para atualizar `last_seen_at`.
-- A previsão congela as entradas da data local do serviço registradas até o início do preparo. A razão padrão é `1.000`. A consolidação diária pode ser recalculada por administradores e gestores. Entradas não medem presença individual, e a diferença entre previsto e servido não mede desperdício.
+- O preparo congela as entradas da escola dentro da janela configurada e disponíveis até o corte. O motor usa histórico comparável ou uma taxa inicial explícita. Sem dados suficientes, a previsão pode retornar `null`. A consolidação diária pode ser recalculada por administradores e gestores. Entradas não medem presença individual, e a diferença entre previsto e servido não mede desperdício.
 - Swagger e schema ficam disponíveis em desenvolvimento em `/api/docs/` e `/api/schema/`. Consulte o [relatório da Fase 2](docs/PHASE2_REPORT.md) para os resultados e as pendências de integração.
+
+### Indicadores e relatórios
+
+Consulte [API de relatórios](docs/REPORTING_API.md), [histórico](docs/HISTORY_API.md) e [permissões analíticas](docs/ANALYTICS_PERMISSIONS.md). O recálculo usa `POST /api/v1/analytics/daily/rebuild/`, com o alias legado `POST /api/v1/analytics/rebuild/`.

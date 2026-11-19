@@ -10,7 +10,7 @@ from rest_framework.test import APIClient
 from apps.cameras.models import Camera
 from apps.counting.models import PlateCount, StudentCount
 from apps.institutions.models import Organization, School
-from apps.meals.models import MealService
+from apps.meals.models import MealForecast, MealService
 from apps.users.models import Membership, User
 
 from .models import CameraCredential, UserInvitation
@@ -205,7 +205,9 @@ class ApiRegressionTests(TestCase):
             f"/api/v1/meal-services/{self.meal.pk}/start/", {}, format="json"
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(self.meal.forecast.forecast_plates, 0)
+        self.assertEqual(self.meal.attendance_snapshot.total_student_entries, 0)
+        self.assertIsNone(self.meal.forecast.forecast_plates)
+        self.assertEqual(self.meal.forecast.method, MealForecast.Method.UNAVAILABLE)
 
     def test_invitation_single_use_and_inactive_organization(self):
         raw, digest = UserInvitation.generate_token()

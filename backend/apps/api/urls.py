@@ -1,6 +1,16 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
+from apps.analytics.views import (
+    DailyMetricsView,
+    DashboardView,
+    ExportView,
+    HistoryView,
+    MealMetricsView,
+    OrganizationSummaryView,
+    RebuildMetricsView,
+    SchoolComparisonView,
+)
 from apps.cameras.views import (
     CameraViewSet,
     DeviceConfigurationView,
@@ -18,6 +28,13 @@ from apps.counting.views import (
     PlateSummaryView,
     StudentCountView,
     StudentSummaryView,
+)
+
+from apps.meals.views import (
+    ForecastListView,
+    ForecastPolicyViewSet,
+    MealServiceViewSet,
+    ScheduleViewSet,
 )
 
 from .access_views import (
@@ -41,15 +58,13 @@ from .access_views import (
     RecoverDirectorView,
     VerifyInvitationView,
 )
-from .views import (
-    DailyMetricsView,
-    MealServiceViewSet,
-    OrganizationsView,
-    RebuildMetricsView,
-    SchoolViewSet,
-)
+from .views import OrganizationsView, SchoolViewSet
 
 router = DefaultRouter(use_regex_path=False)
+router.register("analytics/daily", DailyMetricsView, basename="analytics-daily")
+router.register(
+    "analytics/meal-services", MealMetricsView, basename="analytics-meal-services"
+)
 router.register("schools", SchoolViewSet, basename="schools")
 router.register("cameras", CameraViewSet, basename="cameras")
 router.register(
@@ -61,6 +76,10 @@ router.register(
     "admin/edge-devices", SupportEdgeDeviceViewSet, basename="support-edge-devices"
 )
 router.register("meal-services", MealServiceViewSet, basename="meal-services")
+router.register("meal-schedules", ScheduleViewSet, basename="meal-schedules")
+router.register(
+    "meal-forecast-policies", ForecastPolicyViewSet, basename="meal-forecast-policies"
+)
 router.register("memberships", MembershipViewSet, basename="memberships")
 router.register("invitations", InvitationViewSet, basename="invitations")
 router.register(
@@ -108,11 +127,20 @@ urlpatterns = [
         {"operation": "deactivate"},
     ),
     path("organizations/", OrganizationsView.as_view()),
+    path("meal-forecasts/", ForecastListView.as_view()),
     path("student-counts/", StudentCountView.as_view()),
     path("plate-counts/", PlateCountView.as_view()),
     path("student-counts/summary/", StudentSummaryView.as_view()),
     path("plate-counts/summary/", PlateSummaryView.as_view()),
-    path("analytics/daily/", DailyMetricsView.as_view()),
+    path("analytics/daily/rebuild/", RebuildMetricsView.as_view()),
+    path("analytics/dashboard/", DashboardView.as_view()),
+    path("analytics/history/", HistoryView.as_view()),
+    path("analytics/history/daily/", HistoryView.as_view(group="daily")),
+    path("analytics/history/weekly/", HistoryView.as_view(group="weekly")),
+    path("analytics/history/monthly/", HistoryView.as_view(group="monthly")),
+    path("analytics/organizations/summary/", OrganizationSummaryView.as_view()),
+    path("analytics/schools/comparison/", SchoolComparisonView.as_view()),
+    path("analytics/reports/export/", ExportView.as_view()),
     path("analytics/rebuild/", RebuildMetricsView.as_view()),
     path("device/heartbeat/", DeviceHeartbeatView.as_view()),
     path("device/configuration/", DeviceConfigurationView.as_view()),

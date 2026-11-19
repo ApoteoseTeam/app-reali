@@ -39,6 +39,7 @@ O Django lê variáveis exportadas no processo. Use [`.env.example`](.env.exampl
 - Configure `REALI_ACTIVATION_URL`, `REALI_PASSWORD_RESET_URL` e SMTP com base em `.env.example`. A referência de endpoints da Fase 2 está no [contrato de autenticação e acesso](docs/API_AUTH_ENDPOINTS.md).
 - Para câmeras e agentes, consulte [provisionamento](docs/EDGE_DEVICES.md), [heartbeat e retenção](docs/CAMERA_HEARTBEAT.md) e o [contrato HTTP](docs/CAMERA_API_ENDPOINTS.md).
 - Para integrar as contagens, consulte o [guia da equipe de visão](docs/VISION_INTEGRATION.md), os [contratos](docs/DEVICE_COUNT_API.md) e os [testes de ingestão](docs/COUNTING_TESTS.md).
+- Para programar refeições e integrar previsões, consulte [serviços de merenda](docs/MEAL_SERVICES.md), o [motor de previsão](docs/FORECAST_ENGINE.md) e o [contrato para React Native](docs/FORECAST_API.md).
 
 ```powershell
 python manage.py check
@@ -60,3 +61,7 @@ Defina explicitamente `DJANGO_DEBUG=false`, uma `DJANGO_SECRET_KEY` forte e excl
 Configure TLS no proxy. Habilite `DJANGO_TRUST_PROXY_HTTPS` somente se o proxy substituir o cabeçalho de protocolo e for a única entrada do serviço. Ajuste `DJANGO_THROTTLE_NUM_PROXIES` conforme a topologia confiável, mantenha limites no proxy e use cache compartilhado caso os limites do DRF precisem valer entre workers. Configure `DJANGO_CSRF_TRUSTED_ORIGINS` para origens web confiáveis quando necessário. O backend atende requisições nativas com JWT. Para uma implantação web, use a mesma origem ou configure uma lista explícita de origens no componente que aplicar a política CORS. HSTS depende da validação do domínio e do HTTPS.
 
 Consulte a [auditoria da Fase 1](docs/AUDIT_REPORT.md) e o [relatório da Fase 2](docs/PHASE2_REPORT.md).
+
+### Indicadores e relatórios
+
+Após migrar, agende `python manage.py reconcile_daily_metrics` no ambiente de implantação. Consulte [operação e reprocessamento](docs/ANALYTICS_RECONCILIATION.md), [contratos para o app](docs/REPORTING_API.md) e [validação da Fase 6](docs/ANALYTICS_TESTS.md).

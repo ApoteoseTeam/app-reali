@@ -1,11 +1,8 @@
-from decimal import Decimal
-
 from rest_framework import serializers
 from apps.users.models import User, Membership
 from apps.institutions.models import Organization, School
 from apps.counting.models import StudentCount, PlateCount
-from apps.meals.models import MealService, AttendanceSnapshot, MealForecast
-from apps.analytics.models import DailyMetrics
+from apps.meals.models import MealService
 from .models import InstitutionRequest
 from .permissions import schools_for
 
@@ -144,93 +141,8 @@ class PlateCountSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
-class MealServiceSerializer(serializers.ModelSerializer):
-    school = ActiveSchoolField()
-
-    class Meta:
-        model = MealService
-        fields = (
-            "id",
-            "school",
-            "date",
-            "meal_type",
-            "scheduled_time",
-            "status",
-            "preparation_started_at",
-            "serving_started_at",
-            "finished_at",
-        )
-        read_only_fields = (
-            "id",
-            "status",
-            "preparation_started_at",
-            "serving_started_at",
-            "finished_at",
-        )
-
-
-class SnapshotSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AttendanceSnapshot
-        fields = ("id", "meal_service", "reference_time", "total_student_entries")
-        read_only_fields = fields
-
-
-class ForecastSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MealForecast
-        fields = (
-            "id",
-            "meal_service",
-            "attendance_snapshot",
-            "forecast_plates",
-            "estimated_plates_per_entry",
-        )
-        read_only_fields = fields
-
-
-class DailyMetricsSerializer(serializers.ModelSerializer):
-    total_forecast_plates = serializers.IntegerField(allow_null=True, read_only=True)
-    total_served_plates = serializers.IntegerField(allow_null=True, read_only=True)
-
-    class Meta:
-        model = DailyMetrics
-        fields = (
-            "id",
-            "school",
-            "reference_date",
-            "total_student_entries",
-            "total_forecast_plates",
-            "total_served_plates",
-            "calculated_at",
-        )
-        read_only_fields = fields
-
-    def to_representation(self, instance):
-        result = super().to_representation(instance)
-        if self.context.get("entry_only"):
-            result["total_forecast_plates"] = None
-            result["total_served_plates"] = None
-        return result
-
-
 class DeviceEventSerializer(serializers.Serializer):
     event_id = serializers.CharField(max_length=120)
     recorded_at = serializers.DateTimeField()
     quantity = serializers.IntegerField(min_value=1, max_value=100000)
     meal_service = serializers.UUIDField(required=False)
-
-
-class StartMealSerializer(serializers.Serializer):
-    estimated_plates_per_entry = serializers.DecimalField(
-        max_digits=6,
-        decimal_places=3,
-        min_value=Decimal(0),
-        max_value=Decimal(5),
-        default=Decimal("1.000"),
-    )
-
-
-class RebuildMetricsSerializer(serializers.Serializer):
-    school = serializers.UUIDField()
-    date = serializers.DateField()

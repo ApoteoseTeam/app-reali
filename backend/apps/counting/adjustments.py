@@ -1,6 +1,7 @@
 from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
+from apps.analytics.dirty import mark_dirty
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 
 from apps.api.audit import audit
@@ -96,6 +97,10 @@ def persist_adjustment(
             "reversal_of": str(reversal_of.pk) if reversal_of else None,
         },
     )
+    keys = [(camera.school_id, timezone.localdate(recorded_at))]
+    if meal_service_id:
+        keys.append((camera.school_id, adjustment.meal_service.date))
+    mark_dirty(keys)
     return adjustment
 
 

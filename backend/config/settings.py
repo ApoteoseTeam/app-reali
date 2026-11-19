@@ -144,6 +144,8 @@ REST_FRAMEWORK = {
         "device-counts": os.getenv("DEVICE_COUNT_RATE", "120/min"),
         "device-credential-management": "20/hour",
         "login": "30/hour",
+        "analytics-rebuild": "12/hour",
+        "analytics-export": "20/hour",
     },
 }
 COUNT_BATCH_LIMIT = int(os.getenv("COUNT_BATCH_LIMIT", "100"))
@@ -165,6 +167,7 @@ SPECTACULAR_SETTINGS = {
         "InstitutionRequestStatus": "apps.api.serializers.INSTITUTION_STATUS_CHOICES",
         "MealServiceStatus": "apps.api.serializers.MEAL_STATUS_CHOICES",
         "CameraOperationalStatus": "apps.cameras.models.OPERATIONAL_STATUS_CHOICES",
+        "MealDataQuality": "apps.meals.models.DATA_QUALITY_CHOICES",
     },
 }
 SIMPLE_JWT = {

@@ -37,6 +37,11 @@ def count_querysets(kind, schools, filters):
         lo, hi = day_bounds(filters["date"])
         counts = counts.filter(recorded_at__range=(lo, hi))
         adjustments = adjustments.filter(recorded_at__range=(lo, hi))
+    if "known_at" in filters:
+        counts = counts.annotate(
+            available_at=Coalesce("deviceingestionevent__received_at", "created_at")
+        ).filter(available_at__lte=filters["known_at"])
+        adjustments = adjustments.filter(created_at__lte=filters["known_at"])
     for name, lookup in (
         ("start_at", "recorded_at__gte"),
         ("end_at", "recorded_at__lte"),
@@ -66,6 +71,9 @@ def summarize_counts(organization_id, kind, schools, filters):
                 output_field=BigIntegerField(),
             ),
             latest_raw=Max("updated_at"),
+            last_source_event_at=Max(
+                "recorded_at", filter=Q(source=StudentCount.Source.AUTOMATIC)
+            ),
         )
     )
     manual = (
@@ -97,9 +105,15 @@ def summarize_counts(organization_id, kind, schools, filters):
             ),
             latest_raw=Subquery(raw.values("latest_raw")),
             latest_manual=Subquery(manual.values("latest_manual")),
+            last_source_event_at=Subquery(raw.values("last_source_event_at")),
         )
         .values(
-            "automatic", "legacy_manual", "adjustment", "latest_raw", "latest_manual"
+            "automatic",
+            "legacy_manual",
+            "adjustment",
+            "latest_raw",
+            "latest_manual",
+            "last_source_event_at",
         )
         .get()
     )
