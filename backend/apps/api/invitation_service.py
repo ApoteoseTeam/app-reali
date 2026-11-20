@@ -8,6 +8,8 @@ from django.utils import timezone
 from rest_framework.exceptions import APIException, NotFound, ValidationError
 
 from apps.institutions.models import Organization
+from apps.notifications.events import invitation_event
+from apps.notifications.models import Kind
 from apps.users.models import Membership, SchoolAccess, User, normalize_email
 
 from .account_mail import account_link, send_account_mail
@@ -99,6 +101,14 @@ def rotate_token(invite, event, actor):
     transaction.on_commit(lambda: deliver_invitation(invite.pk, digest, link, actor))
 
 
+def expire_invitation(invite):
+    # The caller holds the organization lock.
+    invite.status = UserInvitation.Status.EXPIRED
+    invite.save(update_fields=["status", "updated_at"])
+    audit("INVITATION_EXPIRED", invite, organization=invite.organization)
+    invitation_event(invite, Kind.INVITATION_CLOSED, "expired")
+
+
 def ensure_invitable(organization, email, *, exclude=None):
     if Membership.objects.filter(organization=organization, user__email=email).exists():
         raise ValidationError(
@@ -111,9 +121,8 @@ def ensure_invitable(organization, email, *, exclude=None):
         email=email,
         status=UserInvitation.Status.PENDING,
     ).exclude(pk=exclude)
-    pending.filter(expires_at__lte=timezone.now()).update(
-        status=UserInvitation.Status.EXPIRED
-    )
+    for invite in pending.filter(expires_at__lte=timezone.now()):
+        expire_invitation(invite)
     if pending.exists():
         raise ValidationError(
             {"email": "Já existe convite pendente. Use o reenvio ou revogue o convite."}
@@ -133,6 +142,7 @@ def issue_invitation(organization, actor, *, email, role, all_schools_access, sc
     )
     rotate_token(invite, "INVITATION_CREATED", actor)
     invite.schools.set(schools)
+    invitation_event(invite, Kind.INVITATION_CREATED, "created")
     return invite
 
 
@@ -187,6 +197,7 @@ def update_invitation(invite_id, operation, *, actor=None, internal_user=None):
         audit(
             "INVITATION_REVOKED", invite, actor=user, organization=invite.organization
         )
+        invitation_event(invite, Kind.INVITATION_CLOSED, "revoked")
     elif operation == "resend" and invite.status in {
         UserInvitation.Status.PENDING,
         UserInvitation.Status.EXPIRED,
@@ -196,6 +207,7 @@ def update_invitation(invite_id, operation, *, actor=None, internal_user=None):
         invitation_schools(invite)
         ensure_invitable(invite.organization, invite.email, exclude=invite.pk)
         rotate_token(invite, "INVITATION_RESENT", user)
+        invitation_event(invite, Kind.INVITATION_CREATED, "resent")
     else:
         raise ValidationError("O estado atual do convite impede esta operação.")
     return invite
@@ -282,6 +294,7 @@ def accept_invitation(request_user, *, token, full_name=None, password=None):
         organization=invite.organization,
         details={"membership_id": str(membership.pk)},
     )
+    invitation_event(invite, Kind.INVITATION_CLOSED, "accepted")
     if created:
         transaction.on_commit(
             lambda: send_account_mail(

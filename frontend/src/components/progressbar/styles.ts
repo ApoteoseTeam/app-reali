@@ -1,6 +1,4 @@
-import { typography } from "../../theme/typography";
 import { colors } from "../../theme/colors";
-import { spacing } from "../../theme/spacing";
 import { StyleSheet } from "react-native";
 
 

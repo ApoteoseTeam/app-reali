@@ -2,26 +2,19 @@
   "expo": {
     "name": "realimenta",
     "slug": "app-realimenta",
-    "owener": "apoteose-team",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./src/assets/r-logotipo-black (1).png",
     "userInterfaceStyle": "light",
     "web": {
       "bundler": "metro",
       "output": "single",
-      "favicon": "./assets/favicon.png"
+      "favicon": "./src/assets/logo-reali.png"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
-      },
       "predictiveBackGestureEnabled": false,
       "package": "com.guilhermesandrade.apprealimenta"
     },
@@ -35,11 +28,16 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#F7FAF3",
-          "image": "./assets/splash-icon.png",
+          "image": "./src/assets/logo-reali.png",
           "imageWidth": 200
         }
       ],
-      "expo-asset"
+      "expo-asset",
+      "expo-router",
+      "expo-secure-store",
+      ["expo-notifications", { "defaultChannel": "reali" }],
+      "expo-sharing",
+      "expo-font"
     ]
   }
 }

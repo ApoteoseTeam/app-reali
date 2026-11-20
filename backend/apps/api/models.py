@@ -105,12 +105,22 @@ class AuditLog(BaseModel):
     organization = models.ForeignKey(
         "institutions.Organization", null=True, blank=True, on_delete=models.SET_NULL
     )
+    school = models.ForeignKey(
+        "institutions.School", null=True, blank=True, on_delete=models.SET_NULL
+    )
     action = models.CharField(max_length=50)
     object_id = models.CharField(max_length=64)
+    target_type = models.CharField(max_length=64, blank=True)
+    request_id = models.UUIDField(null=True, editable=False)
     details = models.JSONField(default=dict, blank=True)
 
     class Meta:
-        indexes = [models.Index(fields=["organization", "created_at"])]
+        indexes = [
+            models.Index(fields=["organization", "created_at"]),
+            models.Index(
+                fields=["school", "-created_at"], name="audit_school_created_idx"
+            ),
+        ]
         permissions = [
             (
                 "manage_account_sessions",

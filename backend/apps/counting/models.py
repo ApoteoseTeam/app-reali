@@ -173,6 +173,9 @@ class CountAdjustment(BaseModel):
     reason = models.CharField(max_length=500)
     recorded_at = models.DateTimeField()
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    audit_log = models.OneToOneField("api.AuditLog", null=True, on_delete=models.PROTECT)
+    idempotency_key = models.UUIDField(null=True, editable=False)
+    input_digest = models.CharField(max_length=64, blank=True, editable=False)
 
     class Meta:
         indexes = [
@@ -182,6 +185,11 @@ class CountAdjustment(BaseModel):
             )
         ]
         constraints = [
+            models.UniqueConstraint(
+                fields=["actor", "school", "idempotency_key"],
+                condition=Q(idempotency_key__isnull=False),
+                name="unique_count_adjustment_operation",
+            ),
             models.CheckConstraint(condition=~Q(delta=0), name="count_adjust_nonzero"),
             models.CheckConstraint(
                 condition=Q(

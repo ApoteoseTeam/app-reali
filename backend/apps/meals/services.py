@@ -16,6 +16,8 @@ from apps.api.permissions import require_role, schools_for
 from apps.cameras.models import Camera
 from apps.counting.models import CountAdjustment
 from apps.institutions.models import Organization
+from apps.notifications.events import meal_event
+from apps.notifications.models import Kind
 from apps.users.models import Membership
 
 from .forecasting import camera_quality, create_forecast, create_snapshot
@@ -404,6 +406,9 @@ def start_preparation(actor, meal_id, override_rate=None):
             "plates": forecast.forecast_plates,
         },
     )
+    meal_event(meal, Kind.MEAL_SERVICE_STARTED)
+    if forecast.forecast_plates is None:
+        meal_event(meal, Kind.FORECAST_UNAVAILABLE)
     return meal
 
 
@@ -430,6 +435,7 @@ def start_serving(actor, meal_id):
         previous_status=MealService.Status.PREPARING,
         status=meal.status,
     )
+    meal_event(meal, Kind.MEAL_SERVING_STARTED)
     return meal
 
 
@@ -470,6 +476,7 @@ def finish_service(actor, meal_id):
         serving_data_quality=quality,
         cameras=observations,
     )
+    meal_event(meal, Kind.MEAL_SERVICE_FINISHED)
     return meal
 
 
@@ -509,4 +516,5 @@ def cancel_service(actor, meal_id, reason):
         status=meal.status,
         reason=reason,
     )
+    meal_event(meal, Kind.MEAL_SERVICE_CANCELLED)
     return meal

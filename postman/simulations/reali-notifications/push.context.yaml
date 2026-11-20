@@ -1,0 +1,8 @@
+simulation: reali-notifications
+purpose: Verificar o protocolo de envio e recibo do Expo por HTTP local.
+scenarios:
+  - Ticket confirmado por recibo.
+  - HTTP 503 do provedor convertido em retentativa.
+limitations:
+  - A simulação representa o contrato HTTP do Expo.
+  - APNs, FCM, credenciais reais e apresentação no aparelho exigem teste nativo separado.

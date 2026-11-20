@@ -3,6 +3,7 @@ from django.db.models import Exists, OuterRef
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 
 from apps.institutions.models import Organization
+from apps.notifications.events import membership_event
 from apps.users.models import Membership, SchoolAccess
 
 from .account_mail import send_account_mail
@@ -174,4 +175,5 @@ def update_membership(actor, membership_id, *, role=None, is_active=None, grant=
             )
     if changes:
         membership.save(update_fields=[*changes, "updated_at"])
+        membership_event(membership)
     return membership

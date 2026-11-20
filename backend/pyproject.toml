@@ -2,6 +2,13 @@
 DJANGO_SETTINGS_MODULE = "config.settings"
 python_files = ["test_*.py"]
 
+[tool.coverage.run]
+source = ["apps", "config"]
+omit = ["*/migrations/*", "*/test_*.py", "*/asgi.py", "*/wsgi.py"]
+
+[tool.coverage.report]
+show_missing = true
+
 [tool.ruff]
 extend-exclude = ["migrations"]
 

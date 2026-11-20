@@ -1,16 +1,7 @@
 import { View, Text, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
 import { style } from "./styles"
-import { IconButton } from '../IconButton/IconButton';
 import type { ReactNode } from 'react';
-
-import {
-  Bell,
-  Pencil,
-  Trash2,
-  ChevronLeft,
-  ChevronRight,
-  Send,
-} from 'lucide-react-native';
+import { NotificationBell } from '../../features/Notifications';
 
 type HeaderProps = {
   name: string;
@@ -39,11 +30,7 @@ export function Header({ name, left, right, containerStyle, titleStyle }: Header
       )}
       {right === undefined ? (
         <View style={style.icon}>
-          <IconButton
-            icon={Bell}
-            accessibilityLabel="Notificações"
-            onPress={() => console.log('Notificações')}
-          />
+          <NotificationBell />
         </View>
       ) : (
         right

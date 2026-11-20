@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
-  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -9,22 +8,27 @@ import {
   View,
 } from 'react-native';
 import { styles } from './styles';
-import { Checkbox } from '../../components/CheckBox/CheckBox';
 import { Input } from '../../components/Input/Input';
 import { Button } from '../../components/Button/Button';
 
-export default function TelaAutenticacao() {
+type LoginProps = {onLogin:(email:string,password:string)=>Promise<void>;onReset:()=>void;sessionError:string|null};
+export default function TelaAutenticacao({onLogin,onReset,sessionError}:LoginProps) {
   const [emailLogin, setEmailLogin] = useState('');
   const [senhaLogin, setSenhaLogin] = useState('');
-  const [termosLogin, setTermosLogin] = useState(false);
+  const running=useRef(false);
+  const [busy,setBusy]=useState(false);
+  const [error,setError]=useState<string|null>(null);
 
-  function handleLogin() {
+  async function handleLogin() {
+    if(running.current)return;
+    if(!emailLogin.trim().includes("@")||!senhaLogin){setError("Informe seu e-mail institucional e a senha.");return;}
     Keyboard.dismiss();
-
-    Alert.alert(
-      'Demonstração',
-      'A integração de login ainda será implementada.'
-    );
+    running.current=true;
+    setBusy(true);
+    setError(null);
+    try { await onLogin(emailLogin.trim(),senhaLogin); }
+    catch (cause) { setError(cause instanceof Error?cause.message:"Não foi possível entrar."); }
+    finally { running.current=false;setBusy(false); }
   }
 
   return (
@@ -39,7 +43,7 @@ export default function TelaAutenticacao() {
           </Text>
 
           <Text style={styles.subtitulo}>
-            Mais controle. Menos desperdício.
+            Gestão da merenda escolar
           </Text>
         </View>
 
@@ -54,6 +58,8 @@ export default function TelaAutenticacao() {
 
             <Input
               accessibilityLabel="E-mail para entrar"
+              testID="login-email"
+              editable={!busy}
               style={styles.input}
               placeholder="voce@escola.gov.br"
               placeholderTextColor="#667B70"
@@ -70,6 +76,8 @@ export default function TelaAutenticacao() {
 
             <Input
               accessibilityLabel="Senha para entrar"
+              testID="login-password"
+              editable={!busy}
               style={styles.input}
               placeholder="••••••"
               placeholderTextColor="#667B70"
@@ -81,19 +89,9 @@ export default function TelaAutenticacao() {
             />
           </View>
 
-          <View style={styles.termos}>
-            <Checkbox
-              text="Li e aceito os termos e a política de privacidade."
-              checked={termosLogin}
-              onChange={setTermosLogin}
-            />
-          </View>
-
-          <Button
-            label="Entrar"
-            style={styles.botao}
-            onPress={handleLogin}
-          />
+          {(error||sessionError)&&<Text accessibilityRole="alert" style={styles.nota}>{error??sessionError}</Text>}
+          <Button label={busy?"Entrando…":"Entrar"} style={styles.botao} disabled={busy} onPress={()=>{void handleLogin();}}/>
+          <Button label="Esqueci minha senha" disabled={busy} onPress={onReset}/>
 
           <Text style={styles.nota}>
             O acesso ao Reali é feito por convite da instituição.

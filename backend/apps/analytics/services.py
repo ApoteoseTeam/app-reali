@@ -12,6 +12,8 @@ from apps.counting.models import CountKind
 from apps.counting.queries import day_bounds, summarize_counts
 from apps.meals.models import MealService
 from apps.institutions.models import Organization, School
+from apps.notifications.events import forecast_difference, metrics_event
+from apps.notifications.models import Kind
 
 from .models import DailyMetrics, PendingDailyMetrics
 from .selectors import meal_metrics, meal_rows
@@ -88,8 +90,9 @@ def rebuild_daily_metrics(school, day, *, actor=None):
         # Acquire the audit FK's key lock first to keep the same lock order.
         table = connection.ops.quote_name(Organization._meta.db_table)
         with connection.cursor() as cursor:
+            # The identifier is Django model metadata and the organization ID is bound.
             cursor.execute(
-                f"SELECT id FROM {table} WHERE id = %s FOR KEY SHARE",
+                f"SELECT id FROM {table} WHERE id = %s FOR KEY SHARE",  # nosec B608
                 [school.organization_id],
             )
     School.objects.select_for_update(no_key=True).get(pk=school.pk)
@@ -147,6 +150,11 @@ def rebuild_daily_metrics(school, day, *, actor=None):
                 "after": values,
             },
         )
+    if old and (changed or old.is_complete != row.is_complete):
+        metrics_event(row, Kind.DATA_RECONCILED, key=f"daily-reconciled:{row.pk}:{at.isoformat()}")
+    if row.is_complete and row.compared_services:
+        for meal in meal_rows([school.pk]).filter(date=day, status=MealService.Status.FINISHED):
+            forecast_difference(meal, meal_metrics(meal))
     pending.delete()
     return row
 

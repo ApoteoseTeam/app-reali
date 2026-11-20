@@ -65,3 +65,15 @@ Consulte a [auditoria da Fase 1](docs/AUDIT_REPORT.md) e o [relatório da Fase 2
 ### Indicadores e relatórios
 
 Após migrar, agende `python manage.py reconcile_daily_metrics` no ambiente de implantação. Consulte [operação e reprocessamento](docs/ANALYTICS_RECONCILIATION.md), [contratos para o app](docs/REPORTING_API.md) e [validação da Fase 6](docs/ANALYTICS_TESTS.md).
+
+### RealInova
+
+Instale as dependências, aplique as migrações e configure a conta do provedor para habilitar o chat. Agende `python manage.py prune_realinova` para aplicar retenção e recuperar execuções interrompidas. Consulte [provedores](docs/REALINOVA_PROVIDERS.md), [API](docs/REALINOVA_API.md) e [relatório da Fase 7](docs/PHASE7_REPORT.md).
+
+### Notificações e operações administrativas
+
+Aplique as migrações, configure os canais habilitados e agende `python manage.py process_notifications` no ambiente PostgreSQL. O Django atende a central mesmo sem provedor push. [Arquitetura](docs/NOTIFICATIONS_ARCHITECTURE.md) · [Agendamento](docs/NOTIFICATIONS_SCHEDULING.md) · [Relatório da Fase 9](docs/PHASE9_REPORT.md)
+
+### Segurança e qualidade
+
+O [relatório da Fase 10](docs/QUALITY_FINAL_REPORT.md) reúne resultados de segurança, integridade, cobertura e desempenho. Consulte o [pipeline](docs/CI_PIPELINE.md) e a [auditoria de configuração](docs/SECURITY_AUDIT.md).

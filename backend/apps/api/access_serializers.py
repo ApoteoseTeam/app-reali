@@ -4,6 +4,7 @@ from rest_framework import serializers
 from apps.users.models import Membership
 
 from .models import UserInvitation
+from .permissions import ROLE_PERMISSIONS
 from .serializers import (
     InstitutionRequestSerializer,
     MembershipSerializer,
@@ -17,9 +18,26 @@ class SessionSerializer(serializers.Serializer):
     user = UserSerializer()
 
 
+class SessionMembershipSerializer(MembershipSerializer):
+    capabilities = serializers.SerializerMethodField()
+
+    class Meta(MembershipSerializer.Meta):
+        fields = MembershipSerializer.Meta.fields + ("capabilities",)
+        read_only_fields = fields
+
+    def get_capabilities(self, membership) -> list[str]:
+        return sorted(
+            name for name, roles in ROLE_PERMISSIONS.items() if membership.role in roles
+        )
+
+
 class MeSerializer(serializers.Serializer):
     user = UserSerializer()
-    memberships = MembershipSerializer(many=True)
+    memberships = SessionMembershipSerializer(many=True)
+
+
+class UpdateProfileSerializer(serializers.Serializer):
+    full_name = serializers.CharField(max_length=160)
 
 
 class MessageSerializer(serializers.Serializer):

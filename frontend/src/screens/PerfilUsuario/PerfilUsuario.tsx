@@ -1,120 +1,51 @@
-import { View, Text, Image, Pressable, Platform } from 'react-native';
-import {
-  Undo2,
-  Settings,
-  Pencil,
-  CircleUser,
-  Phone,
-  MapPin,
-  Lock,
-  House,
-  ClipboardList,
-  LayoutDashboard,
-  type LucideIcon,
-} from 'lucide-react-native';
-import { Button } from '../../components/Button/Button';
-import { Card } from '../../components/Card/Card';
-import { IconButton } from '../../components/IconButton/IconButton';
-import { Header } from '../../components/Header/header';
-import { colors } from '../../theme/colors';
-import { styles } from './styles';
+import { useState } from "react";
+import { useRouter } from "expo-router";
+import { Text, View } from "react-native";
+import { CircleUser } from "lucide-react-native";
+import { Card } from "../../components/Card/Card";
+import { colors } from "../../theme/colors";
+import { useAction } from "../../hooks/useAction";
+import { api, useSession } from "../../session/provider";
+import { roleNames } from "../../api/reali";
+import { Action, Feedback, Field, Page, Panel, ui } from "../../features/ui";
+import { styles } from "./styles";
 
-const ABAS: { nome: string; icone: LucideIcon; ativa?: boolean }[] = [
-  { nome: 'Home', icone: House },
-  { nome: 'Formulário', icone: ClipboardList },
-  { nome: 'Dashboard', icone: LayoutDashboard },
-  { nome: 'Perfil', icone: CircleUser, ativa: true },
-];
-
-const Linha = ({ icone: Icone, texto }: { icone: LucideIcon; texto: string }) => (
-  <View style={styles.linha}>
-    <Icone size={22} color={colors.text} />
-    <Text style={styles.linhaTexto}>{texto}</Text>
-  </View>
-);
-
-export default function PerfilUsuario() {
-  return (
-    <View style={styles.container}>
-      <View style={styles.perfilTopo}>
-        <View style={styles.fundoTopo} />
-
-        <Header
-          name="MEU PERFIL"
-          containerStyle={styles.topo}
-          titleStyle={styles.titulo}
-          left={
-            <IconButton
-              icon={Undo2}
-              color={colors.white}
-              size={24}
-              style={styles.iconeTopo}
-              accessibilityLabel="Voltar"
-              onPress={() => console.log('Voltar')}
-            />
-          }
-          right={
-            <IconButton
-              icon={Settings}
-              color={colors.white}
-              size={24}
-              style={styles.iconeTopo}
-              accessibilityLabel="Configurações"
-              onPress={() => console.log('Configurações')}
-            />
-          }
-        />
-
-        <View style={styles.avatarArea}>
-          <View style={styles.avatarBorda}>
-            <Image source={require('../../assets/perfil.jpeg')} style={styles.avatar} />
-          </View>
-          <IconButton
-            icon={Pencil}
-            color={colors.white}
-            size={18}
-            style={styles.editar}
-            accessibilityLabel="Editar foto do perfil"
-            onPress={() => console.log('Editar foto do perfil')}
-          />
-        </View>
-      </View>
-
-      <Text style={styles.nome}>Horlando da Silva</Text>
-      <Text style={styles.cargo}>Diretor</Text>
-
-      <View style={styles.conteudo}>
-        <Card title="Dados pessoais">
-          <Linha icone={CircleUser} texto="horlandodiretor@gmail.com" />
-          <Linha icone={Phone} texto="(11) 98765-4321" />
-          <Linha icone={MapPin} texto="Escola Municipal Novo Horizonte" />
-        </Card>
-
-        <Card title="Minha conta">
-          <Linha icone={Settings} texto="Editar perfil" />
-          <Linha icone={Lock} texto="Alterar Senha" />
-        </Card>
-
-        <Button
-          label="Sair da conta"
-          style={styles.botaoSair}
-          textStyle={styles.botaoSairTexto}
-          onPress={() => {
-            if (Platform.OS === 'web') {
-              window.location.href = '/';
-            }
-          }}
-        />
-      </View>
-
-      <View style={styles.abas}>
-        {ABAS.map(({ nome, icone: Icone, ativa }) => (
-          <Pressable key={nome} style={styles.aba}>
-            <Icone size={24} color={colors.text} strokeWidth={ativa ? 2.6 : 2} />
-            <Text style={styles.abaTexto}>{nome}</Text>
-          </Pressable>
-        ))}
-      </View>
-    </View>
-  );
+export default function PerfilUsuario(){
+  const session=useSession();
+  const workspace=session.workspace!;
+  const member=workspace.member;
+  const router=useRouter();
+  const [name,setName]=useState(session.me?.user.full_name??"");
+  const [current,setCurrent]=useState("");
+  const [password,setPassword]=useState("");
+  const [confirm,setConfirm]=useState("");
+  const [edit,setEdit]=useState(false);
+  const [change,setChange]=useState(false);
+  const [notice,setNotice]=useState("");
+  const action=useAction();
+  return <Page title="Meu perfil">
+    <View style={styles.avatarArea}><View style={styles.avatarBorda}><CircleUser size={52} color={colors.primary}/></View></View>
+    <Text style={styles.nome}>{session.me?.user.full_name}</Text>
+    <Text style={styles.cargo}>{roleNames[member.role]??member.role}</Text>
+    <Card title="Dados da conta"><Text style={ui.text}>{session.me?.user.email}</Text><Text style={ui.text}>{workspace.organization.name}</Text>
+      {workspace.schools.map(school=><Text key={school.id} style={ui.subdued}>{school.name}</Text>)}
+    </Card>
+    <Feedback error={action.error||session.error} loading={action.busy}/>
+    {notice&&<Text accessibilityRole="alert" style={ui.text}>{notice}</Text>}
+    <Action title="Editar nome" variant="flat" onPress={()=>setEdit(!edit)}/>
+    {edit&&<Panel><Field label="Nome completo" value={name} onChangeText={setName} maxLength={160}/>
+      <Action title="Salvar nome" disabled={action.busy||!name.trim()} onPress={()=>void action.run(async()=>{await api.profile(name.trim());await session.revalidate();setNotice("Nome atualizado.");setEdit(false);})}/>
+    </Panel>}
+    <Action title="Alterar senha" variant="flat" onPress={()=>setChange(!change)}/>
+    {change&&<Panel><Field label="Senha atual" value={current} onChangeText={setCurrent} secureTextEntry/><Field label="Nova senha" value={password} onChangeText={setPassword} secureTextEntry/>
+      <Field label="Confirmar nova senha" value={confirm} onChangeText={setConfirm} secureTextEntry/>
+      <Action title="Confirmar alteração" disabled={action.busy} onPress={()=>void action.run(async()=>{
+        if(!current||password.length<12||password!==confirm)throw new Error("Preencha a senha atual e confirme uma nova senha de pelo menos 12 caracteres.");
+        await api.changePassword({current_password:current,password,password_confirmation:confirm});
+        setPassword("");setConfirm("");setCurrent("");await session.signOut();
+      })}/>
+    </Panel>}
+    <Action title="Trocar escola" variant="flat" onPress={()=>router.push("/contexto")}/>
+    <Action title="Sair da conta" variant="danger" disabled={action.busy} onPress={()=>void session.signOut()}/>
+  </Page>;
 }

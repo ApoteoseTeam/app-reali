@@ -29,6 +29,15 @@ if not DEBUG:
 SECURE_SSL_REDIRECT = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
+SECURE_HSTS_SECONDS = 0 if DEBUG else int(os.getenv("DJANGO_HSTS_SECONDS", "0"))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = bool(SECURE_HSTS_SECONDS) and (
+    os.getenv("DJANGO_HSTS_INCLUDE_SUBDOMAINS", "false").lower() == "true"
+)
+SECURE_HSTS_PRELOAD = SECURE_HSTS_INCLUDE_SUBDOMAINS and (
+    os.getenv("DJANGO_HSTS_PRELOAD", "false").lower() == "true"
+)
+if SECURE_HSTS_SECONDS < 0:
+    raise ImproperlyConfigured("DJANGO_HSTS_SECONDS deve ser maior ou igual a zero.")
 if os.getenv("DJANGO_TRUST_PROXY_HTTPS", "false").lower() == "true":
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
@@ -48,11 +57,14 @@ INSTALLED_APPS = [
     "apps.meals",
     "apps.counting",
     "apps.analytics",
+    "apps.ai",
     "apps.api",
+    "apps.notifications",
     "rest_framework_simplejwt.token_blacklist",
 ]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "apps.api.audit.AuditRequestMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -134,6 +146,7 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 50,
     "NUM_PROXIES": int(os.getenv("DJANGO_THROTTLE_NUM_PROXIES", "0")),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "EXCEPTION_HANDLER": "apps.api.exceptions.audit_exception_handler",
     "DEFAULT_THROTTLE_RATES": {
         "institution-request": "10/hour",
         "invitation-activation": "30/hour",
@@ -144,8 +157,13 @@ REST_FRAMEWORK = {
         "device-counts": os.getenv("DEVICE_COUNT_RATE", "120/min"),
         "device-credential-management": "20/hour",
         "login": "30/hour",
+        "session-refresh": "600/hour",
+        "session-logout": "600/hour",
         "analytics-rebuild": "12/hour",
         "analytics-export": "20/hour",
+        "realinova-chat": "30/min",
+        "realinova-conversation": "90/hour",
+        "push-registration": "60/hour",
     },
 }
 COUNT_BATCH_LIMIT = int(os.getenv("COUNT_BATCH_LIMIT", "100"))
@@ -166,6 +184,10 @@ SPECTACULAR_SETTINGS = {
     "ENUM_NAME_OVERRIDES": {
         "InstitutionRequestStatus": "apps.api.serializers.INSTITUTION_STATUS_CHOICES",
         "MealServiceStatus": "apps.api.serializers.MEAL_STATUS_CHOICES",
+        "RealInovaConversationStatus": "apps.ai.models.CONVERSATION_STATUS_CHOICES",
+        "RealInovaExecutionStatus": "apps.ai.models.EXECUTION_STATUS_CHOICES",
+        "RealInovaMessageRole": "apps.ai.models.MESSAGE_ROLE_CHOICES",
+        "InstitutionMembershipRole": "apps.users.models.MEMBERSHIP_ROLE_CHOICES",
         "CameraOperationalStatus": "apps.cameras.models.OPERATIONAL_STATUS_CHOICES",
         "MealDataQuality": "apps.meals.models.DATA_QUALITY_CHOICES",
     },
@@ -186,6 +208,25 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "true").lower() == "true"
 EMAIL_TIMEOUT = 10
+NOTIFICATION_PUSH_KEYS = env_list("NOTIFICATION_PUSH_KEYS")
+NOTIFICATION_EXPO_ACCESS_TOKEN = os.getenv("NOTIFICATION_EXPO_ACCESS_TOKEN", "")
+NOTIFICATION_PUSH_PROXY = os.getenv("NOTIFICATION_PUSH_PROXY") or None
+NOTIFICATION_ALERT_DELAY_SECONDS = int(os.getenv("NOTIFICATION_ALERT_DELAY_SECONDS", "120"))
+NOTIFICATION_ESCALATION_SECONDS = int(os.getenv("NOTIFICATION_ESCALATION_SECONDS", "1800"))
+NOTIFICATION_REMINDER_MINUTES = int(os.getenv("NOTIFICATION_REMINDER_MINUTES", "20"))
+NOTIFICATION_STALE_MINUTES = int(os.getenv("NOTIFICATION_STALE_MINUTES", "60"))
+NOTIFICATION_FORECAST_MIN_DIFFERENCE = int(os.getenv("NOTIFICATION_FORECAST_MIN_DIFFERENCE", "20"))
+NOTIFICATION_FORECAST_DIFFERENCE_PERCENT = int(os.getenv("NOTIFICATION_FORECAST_DIFFERENCE_PERCENT", "30"))
+NOTIFICATION_RETENTION_DAYS = int(os.getenv("NOTIFICATION_RETENTION_DAYS", "180"))
+ADMIN_AUDIT_RETENTION_DAYS = int(os.getenv("ADMIN_AUDIT_RETENTION_DAYS", "730"))
+if not (
+    0 < NOTIFICATION_ALERT_DELAY_SECONDS < NOTIFICATION_ESCALATION_SECONDS
+    and NOTIFICATION_REMINDER_MINUTES <= 1440
+    and min(NOTIFICATION_REMINDER_MINUTES, NOTIFICATION_STALE_MINUTES,
+            NOTIFICATION_FORECAST_MIN_DIFFERENCE, NOTIFICATION_FORECAST_DIFFERENCE_PERCENT,
+            NOTIFICATION_RETENTION_DAYS, ADMIN_AUDIT_RETENTION_DAYS) > 0
+):
+    raise ImproperlyConfigured("Confira os limites de alertas e retenção.")
 REALI_ACTIVATION_URL = os.getenv("REALI_ACTIVATION_URL", "")
 REALI_PASSWORD_RESET_URL = os.getenv("REALI_PASSWORD_RESET_URL", "")
 PASSWORD_RESET_TIMEOUT = 3600
@@ -222,3 +263,33 @@ if not (
     raise ImproperlyConfigured(
         "Revise os limites de monitoramento e autenticação de câmeras."
     )
+
+
+# Resolve configuration for the agent only when the feature is used.
+REALINOVA = {
+    key.removeprefix("REALINOVA_"): value
+    for key, value in os.environ.items()
+    if key.startswith("REALINOVA_")
+}
+
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "realinova_console": {"class": "logging.StreamHandler"},
+        "notifications_console": {"class": "logging.StreamHandler"},
+    },
+    "loggers": {
+        "apps.ai": {
+            "handlers": ["realinova_console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "apps.notifications": {
+            "handlers": ["notifications_console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}

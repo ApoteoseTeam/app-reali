@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.functions import Now
+from django.utils import timezone
 from apps.core.models import BaseModel
 
 
@@ -45,6 +47,7 @@ class PendingDailyMetrics(models.Model):
     school = models.ForeignKey("institutions.School", on_delete=models.CASCADE)
     reference_date = models.DateField()
     queued_at = models.DateTimeField(db_index=True)
+    first_queued_at = models.DateTimeField(default=timezone.now, db_default=Now(), db_index=True)
 
     class Meta:
         constraints = [

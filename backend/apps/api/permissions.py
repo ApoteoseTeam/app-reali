@@ -12,6 +12,7 @@ FULL_REPORT_ROLES = MANAGEMENT_ROLES | {Role.NUTRITIONIST, Role.SECRETARIAT}
 ROLE_PERMISSIONS = {
     "config": DIRECTORS,
     "staff": DIRECTORS,
+    "audit_logs": DIRECTORS,
     "manage_meals": MANAGEMENT_ROLES,
     "forecast_policy": DIRECTORS,
     "rebuild_metrics": MANAGEMENT_ROLES,

@@ -1,0 +1,70 @@
+appId: ${APP_ID}
+---
+- launchApp:
+    clearState: true
+- assertVisible: "Entrar"
+- tapOn:
+    id: "login-email"
+- inputText: "mobile-smoke@example.test"
+- tapOn:
+    id: "login-password"
+- inputText: ${REALI_SMOKE_PASSWORD}
+- hideKeyboard
+- tapOn: "Entrar"
+- runFlow:
+    when:
+      visible: "Organização e escola"
+    commands:
+      - tapOn: "Escola Mobile"
+      - tapOn: "Continuar para o início"
+- extendedWaitUntil:
+    visible: "Olá, Direção"
+    timeout: 30000
+- assertVisible: "Escola Mobile"
+- scrollUntilVisible:
+    element: "Contagens"
+    direction: DOWN
+- tapOn: "Contagens"
+- extendedWaitUntil:
+    visible: "Total de entradas"
+    timeout: 30000
+- tapOn: "Voltar"
+- scrollUntilVisible:
+    element: "Merenda"
+    direction: DOWN
+- tapOn: "Merenda"
+- tapOn: "Detalhes do serviço"
+- extendedWaitUntil:
+    visible: "Iniciar preparo"
+    timeout: 30000
+- tapOn: "Iniciar preparo"
+- extendedWaitUntil:
+    visible: "Pratos previstos 20"
+    timeout: 30000
+- tapOn: "Iniciar distribuição"
+- tapOn: "Finalizar serviço"
+- tapOn: "Confirmar"
+- assertVisible: ".*Finalizado.*"
+- tapOn: "Voltar"
+- tapOn: "Voltar"
+- tapOn: "Relatórios"
+- assertVisible: "Relatório diário"
+- tapOn: "Voltar"
+- scrollUntilVisible:
+    element: "RealInova"
+    direction: DOWN
+- tapOn: "RealInova"
+- tapOn: "Nova conversa"
+- tapOn:
+    id: "chat-message"
+- inputText: "Quantos pratos foram servidos ontem?"
+- hideKeyboard
+- tapOn: "Enviar mensagem"
+- extendedWaitUntil:
+    visible: ".*pratos servidos 19.*"
+    timeout: 45000
+- tapOn: "Voltar"
+- tapOn: "Voltar"
+- tapOn: "Abrir perfil"
+- tapOn: "Sair da conta"
+- assertVisible: "Entrar"

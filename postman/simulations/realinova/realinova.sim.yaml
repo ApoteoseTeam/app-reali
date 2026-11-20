@@ -1,0 +1,7 @@
+simulation: realinova
+routing: path
+mocks:
+  - name: Provider fixture
+    routeKey: llm
+    path: postman/mocks/realinova-provider/config.yaml
+

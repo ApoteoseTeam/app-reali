@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", "module": "Node16", "moduleResolution": "Node16", "types": [],
+    "lib": ["ES2022", "DOM"], "strict": true, "skipLibCheck": true, "rootDir": "src", "outDir": ".test-build"
+  },
+  "include": ["src/api/*.ts", "src/session/tokens.ts", "src/session/links.ts"]
+}

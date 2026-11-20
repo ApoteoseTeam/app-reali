@@ -1,18 +1,53 @@
+import hashlib
+import json
+
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
 from apps.analytics.dirty import mark_dirty
-from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
+from rest_framework.exceptions import (
+    APIException,
+    NotFound,
+    PermissionDenied,
+    ValidationError,
+)
 
 from apps.api.audit import audit
 from apps.api.permissions import require_role, schools_for
 from apps.cameras.models import Camera
 from apps.institutions.models import Organization
 from apps.meals.models import MealService
+from apps.notifications.events import adjustment_event
 from apps.users.models import Membership
 
 from .ingestion import camera_kind
 from .models import CountAdjustment, CountKind, PlateCount, StudentCount
+
+
+class AdjustmentConflict(APIException):
+    status_code = 409
+    default_detail = "A chave de idempotência já foi utilizada em outra correção."
+    default_code = "adjustment_idempotency_conflict"
+
+
+def replay(member, schools, key, data):
+    if key is None:
+        return None, ""
+    fingerprint = hashlib.sha256(
+        json.dumps(data, sort_keys=True, cls=DjangoJSONEncoder).encode()
+    ).hexdigest()
+    previous = CountAdjustment.objects.filter(
+        actor_id=member.user_id,
+        school__organization_id=member.organization_id,
+        idempotency_key=key,
+    ).first()
+    if previous is not None:
+        if not schools.filter(pk=previous.school_id).exists():
+            raise NotFound("Ajuste não encontrado no seu escopo.")
+        if previous.input_digest != fingerprint:
+            raise AdjustmentConflict()
+    return previous, fingerprint
 
 
 def lock_adjustment_scope(member):
@@ -73,6 +108,8 @@ def persist_adjustment(
     reason,
     reference,
     reversal_of=None,
+    idempotency_key=None,
+    input_digest="",
 ):
     adjustment = CountAdjustment.objects.create(
         actor=actor,
@@ -84,29 +121,37 @@ def persist_adjustment(
         delta=delta,
         reason=reason,
         reversal_of=reversal_of,
+        idempotency_key=idempotency_key,
+        input_digest=input_digest,
         **reference,
     )
-    audit(
+    adjustment.audit_log = audit(
         "COUNT_ADJUSTMENT_REVERSED" if reversal_of else "COUNT_ADJUSTMENT_CREATED",
         adjustment,
         actor=actor,
         organization=camera.school.organization,
+        school_id=camera.school_id,
         details={
             "camera_id": str(camera.pk),
             "delta": delta,
             "reversal_of": str(reversal_of.pk) if reversal_of else None,
         },
     )
+    adjustment.save(update_fields=["audit_log", "updated_at"])
     keys = [(camera.school_id, timezone.localdate(recorded_at))]
     if meal_service_id:
         keys.append((camera.school_id, adjustment.meal_service.date))
     mark_dirty(keys)
+    adjustment_event(adjustment)
     return adjustment
 
 
 @transaction.atomic
-def create_adjustment(member, data):
+def create_adjustment(member, data, idempotency_key=None):
     schools = lock_adjustment_scope(member).filter(is_active=True)
+    previous, fingerprint = replay(member, schools, idempotency_key, data)
+    if previous is not None:
+        return previous
     kind = data["event_type"]
     count_id = data.get("count_id")
     reference = {}
@@ -159,12 +204,19 @@ def create_adjustment(member, data):
         delta=data["delta"],
         reason=data["reason"],
         reference=reference,
+        idempotency_key=idempotency_key,
+        input_digest=fingerprint,
     )
 
 
 @transaction.atomic
-def reverse_adjustment(member, adjustment_id, reason):
-    schools = lock_adjustment_scope(member)
+def reverse_adjustment(member, adjustment_id, reason, idempotency_key=None):
+    schools = lock_adjustment_scope(member).filter(is_active=True)
+    previous, fingerprint = replay(
+        member, schools, idempotency_key, {"reverse": adjustment_id, "reason": reason}
+    )
+    if previous is not None:
+        return previous
     original = CountAdjustment.objects.filter(
         pk=adjustment_id, school__in=schools, camera__school__in=schools
     ).first()
@@ -199,4 +251,6 @@ def reverse_adjustment(member, adjustment_id, reason):
         reason=reason,
         reference=reference,
         reversal_of=original,
+        idempotency_key=idempotency_key,
+        input_digest=fingerprint,
     )

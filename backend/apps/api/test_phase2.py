@@ -20,6 +20,8 @@ from django.db import (
 )
 from django.utils import timezone
 from rest_framework.test import APIClient
+from rest_framework.throttling import ScopedRateThrottle
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.analytics.models import DailyMetrics
 from apps.institutions.models import Organization, School
@@ -27,6 +29,7 @@ from apps.meals.models import MealService
 from apps.users.models import Membership, SchoolAccess, User
 
 from .models import AuditLog, InstitutionRequest, PasswordResetMail, UserInvitation
+from .session_auth import LoginSerializer
 
 ROOT = "/api/v1/"
 PASSWORD = "Correct-long-password-473!"
@@ -174,6 +177,75 @@ def test_session_contract_and_internal_revocation(tenant):
     person.is_active = False
     person.save(update_fields=["is_active"])
     assert login(person.email).status_code == 401
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("legacy", [False, True])
+def test_logout_terminates_the_rotated_session_only(tenant, legacy):
+    org, _, _, director = tenant
+    original = (
+        RefreshToken.for_user(director.user)
+        if legacy
+        else LoginSerializer.get_token(director.user)
+    )
+    independent = LoginSerializer.get_token(director.user)
+    auth = APIClient()
+    rotated = auth.post(
+        ROOT + "auth/refresh/", {"refresh": str(original)}, format="json"
+    )
+    assert rotated.status_code == 200
+    tokens = rotated.json()
+    client = client_for(org=org, access=tokens["access"])
+    assert client.get(ROOT + "auth/me/").status_code == 200
+    logout = ROOT + "auth/logout/"
+    assert (
+        auth.post(logout, {"refresh": str(original)}, format="json").status_code == 200
+    )
+    assert (
+        auth.post(logout, {"refresh": str(original)}, format="json").status_code == 200
+    )
+    assert client.get(ROOT + "auth/me/").status_code == 401
+    assert (
+        client_for(org=org, access=str(independent.access_token))
+        .get(ROOT + "auth/me/")
+        .status_code
+        == 200
+    )
+    assert (
+        auth.post(
+            ROOT + "auth/refresh/", {"refresh": tokens["refresh"]}, format="json"
+        ).status_code
+        == 401
+    )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("endpoint", ["refresh", "logout"])
+def test_session_endpoints_require_live_refresh_credentials(tenant, endpoint):
+    _, _, _, director = tenant
+    valid = LoginSerializer.get_token(director.user)
+    expired = LoginSerializer.get_token(director.user)
+    expired.set_exp(from_time=timezone.now() - timedelta(days=8))
+    api = APIClient()
+    for payload in (str(expired), str(valid.access_token), "invalid"):
+        assert (
+            api.post(
+                ROOT + f"auth/{endpoint}/", {"refresh": payload}, format="json"
+            ).status_code
+            == 401
+        )
+    assert (
+        client_for(access=str(valid.access_token)).get(ROOT + "auth/me/").status_code
+        == 200
+    )
+
+
+@pytest.mark.django_db
+def test_login_throttles_repeated_authentication_attempts(monkeypatch):
+    monkeypatch.setitem(ScopedRateThrottle.THROTTLE_RATES, "login", "2/min")
+    assert login("missing@example.test").status_code == 401
+    assert login("missing@example.test").status_code == 401
+    assert login("missing@example.test").status_code == 429
 
 
 @pytest.mark.django_db

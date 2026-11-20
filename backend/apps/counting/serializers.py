@@ -165,6 +165,7 @@ class ReverseAdjustmentSerializer(StrictSerializer):
 
 class CountAdjustmentSerializer(serializers.ModelSerializer):
     count_id = serializers.SerializerMethodField(allow_null=True)
+    state = serializers.SerializerMethodField()
 
     class Meta:
         model = CountAdjustment
@@ -181,12 +182,19 @@ class CountAdjustmentSerializer(serializers.ModelSerializer):
             "recorded_at",
             "created_at",
             "reversal_of",
+            "state",
+            "audit_log",
         )
         read_only_fields = fields
 
     def get_count_id(self, adjustment) -> str | None:
         count_id = adjustment.student_count_id or adjustment.plate_count_id
         return str(count_id) if count_id else None
+
+    def get_state(self, adjustment) -> str:
+        if adjustment.reversal_of_id:
+            return "REVERSAL"
+        return "REVERSED" if hasattr(adjustment, "reversal") else "APPLIED"
 
 
 class CountActivitySerializer(serializers.Serializer):

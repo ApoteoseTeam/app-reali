@@ -8,6 +8,8 @@ from django.db import DatabaseError, OperationalError
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiTypes,
     PolymorphicProxySerializer,
     extend_schema,
     extend_schema_view,
@@ -336,8 +338,23 @@ class PlateSummaryView(CountSummaryView):
         return self.summary()
 
 
-@extend_schema_view(list=extend_schema(parameters=[ORGANIZATION_HEADER]))
-class CountAdjustmentViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+def adjustment_key(request):
+    raw = request.headers.get("Idempotency-Key")
+    if raw is not None:
+        try:
+            return serializers.UUIDField().run_validation(raw)
+        except ValidationError as exc:
+            raise ValidationError({"Idempotency-Key": exc.detail}) from exc
+    return None
+
+
+@extend_schema_view(
+    list=extend_schema(parameters=[ORGANIZATION_HEADER]),
+    retrieve=extend_schema(parameters=[ORGANIZATION_HEADER]),
+)
+class CountAdjustmentViewSet(
+    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
     serializer_class = s.CountAdjustmentSerializer
     lookup_value_converter = "uuid"
     queryset = CountAdjustment.objects.none()
@@ -347,12 +364,21 @@ class CountAdjustmentViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
             return self.queryset
         member = require_role(membership_for(self.request), "adjust_counts")
         schools = schools_for(member)
-        return CountAdjustment.objects.filter(
-            school__in=schools, camera__school__in=schools
-        ).order_by("-created_at", "-id")
+        return (
+            CountAdjustment.objects.filter(
+                school__in=schools, camera__school__in=schools
+            )
+            .select_related("reversal")
+            .order_by("-created_at", "-id")
+        )
 
     @extend_schema(
-        parameters=[ORGANIZATION_HEADER],
+        parameters=[
+            ORGANIZATION_HEADER,
+            OpenApiParameter(
+                "Idempotency-Key", OpenApiTypes.UUID, OpenApiParameter.HEADER
+            ),
+        ],
         request=s.AdjustmentInputSerializer,
         responses={201: s.CountAdjustmentSerializer},
     )
@@ -362,13 +388,20 @@ class CountAdjustmentViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         serializer.is_valid(raise_exception=True)
         return Response(
             self.get_serializer(
-                create_adjustment(member, serializer.validated_data)
+                create_adjustment(
+                    member, serializer.validated_data, adjustment_key(request)
+                )
             ).data,
             status=201,
         )
 
     @extend_schema(
-        parameters=[ORGANIZATION_HEADER],
+        parameters=[
+            ORGANIZATION_HEADER,
+            OpenApiParameter(
+                "Idempotency-Key", OpenApiTypes.UUID, OpenApiParameter.HEADER
+            ),
+        ],
         request=s.ReverseAdjustmentSerializer,
         responses={201: s.CountAdjustmentSerializer},
     )
@@ -379,7 +412,12 @@ class CountAdjustmentViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         serializer.is_valid(raise_exception=True)
         return Response(
             self.get_serializer(
-                reverse_adjustment(member, pk, serializer.validated_data["reason"])
+                reverse_adjustment(
+                    member,
+                    pk,
+                    serializer.validated_data["reason"],
+                    adjustment_key(request),
+                )
             ).data,
             status=201,
         )

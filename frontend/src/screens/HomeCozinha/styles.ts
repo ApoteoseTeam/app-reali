@@ -11,7 +11,9 @@ export const styles = StyleSheet.create({
     },
     cabecalho: {
         minHeight: 64,
-        justifyContent: 'center',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         paddingHorizontal: 18,
         backgroundColor: azul,
     },

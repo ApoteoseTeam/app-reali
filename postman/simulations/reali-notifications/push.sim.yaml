@@ -1,0 +1,6 @@
+simulation: reali-notifications
+routing: path
+mocks:
+  - name: Expo Push Service
+    routeKey: expo
+    path: postman/mocks/reali-expo-push/config.yaml

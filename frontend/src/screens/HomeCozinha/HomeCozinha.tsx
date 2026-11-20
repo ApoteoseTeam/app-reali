@@ -1,98 +1,33 @@
-import { Image, Pressable, ScrollView, Text, View } from 'react-native';
-import { ClipboardList, House, UserRound } from 'lucide-react-native';
+import { useRouter } from "expo-router";
+import { RefreshControl, ScrollView, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Card } from "../../components/Card/Card";
+import { Logo } from "../../components/Logo/Logo";
+import { Action, Feedback, labels, stamp, ui, value } from "../../features/ui";
+import { NotificationBell } from "../../features/Notifications";
+import { mealStatuses, mealTypes, type Dashboard } from "../../api/reali";
+import { styles } from "./styles";
 
-import { Card } from '../../components/Card/Card';
-import { Logo } from '../../components/Logo/Logo';
-import { styles } from './styles';
-
-type HomeCozinhaProps = {
-    nome?: string;
-    dataTurno?: string;
-    presentes?: number;
-    totalPlanejado?: number;
-    onCardapioPress?: () => void;
-    onPerfilPress?: () => void;
-};
-
-export default function HomeCozinha({
-    nome = 'Letícia',
-    dataTurno = 'Segunda, 9 de novembro · Manhã',
-    presentes = 400,
-    totalPlanejado = 440,
-    onCardapioPress,
-    onPerfilPress,
-}: HomeCozinhaProps = {}) {
-    return (
-        <View style={styles.tela}>
-            <View style={styles.cabecalho}>
-                <Logo style={styles.logo} />
-            </View>
-
-            <ScrollView
-                style={styles.scroll}
-                contentContainerStyle={styles.conteudo}
-            >
-                <View style={styles.saudacao}>
-                    <Text accessibilityRole="header" style={styles.titulo}>
-                        Olá, {nome}
-                    </Text>
-                    <Text style={styles.data}>{dataTurno}</Text>
-                </View>
-
-                <Card style={styles.cartao}>
-                    <View>
-                        <Text style={styles.rotulo}>ALUNOS DE HOJE</Text>
-                        <Text style={styles.numero}>{presentes.toLocaleString('pt-BR')}</Text>
-                        <Text style={styles.presentes}>presentes</Text>
-                    </View>
-
-                    <Text style={styles.planejamento}>
-                        Preparar comida para {totalPlanejado.toLocaleString('pt-BR')} alunos
-                    </Text>
-
-                    <Image
-                        source={require('../../assets/pratoimg.png')} //alterar foto posteriomente, e adicionar fotos variaveis pelo turno e dia da semana
-                        style={styles.foto}
-                        resizeMode="cover"
-                        accessible={false}
-                    />
-                </Card>
-            </ScrollView>
-
-            <View style={styles.rodape}>
-                <View
-                    accessible
-                    accessibilityRole="tab"
-                    accessibilityLabel="Início"
-                    accessibilityState={{ selected: true }}
-                    style={styles.aba}
-                >
-                    <House size={22} color="#C8DFB9" />
-                    <Text style={[styles.textoAba, styles.abaAtiva]}>Início</Text>
-                </View>
-
-                <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel="Abrir cardápio"
-                    disabled={!onCardapioPress}
-                    onPress={onCardapioPress}
-                    style={styles.aba}
-                >
-                    <ClipboardList size={22} color="#FFFFFF" />
-                    <Text style={styles.textoAba}>Cardápio</Text>
-                </Pressable>
-
-                <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel="Abrir perfil"
-                    disabled={!onPerfilPress}
-                    onPress={onPerfilPress}
-                    style={styles.aba}
-                >
-                    <UserRound size={22} color="#FFFFFF" />
-                    <Text style={styles.textoAba}>Perfil</Text>
-                </Pressable>
-            </View>
-        </View>
-    );
+type Props={name:string;school:string;data?:Dashboard;loading:boolean;error?:Error;refresh:()=>void};
+export default function HomeCozinha({name,school,data,loading,error,refresh}:Props){
+  const router=useRouter();
+  return <SafeAreaView style={styles.tela}>
+    <View style={styles.cabecalho}><Logo style={styles.logo}/><NotificationBell color="#FFFFFF"/></View>
+    <ScrollView style={styles.scroll} contentContainerStyle={styles.conteudo} refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh}/>}>
+      <View style={styles.saudacao}><Text accessibilityRole="header" style={styles.titulo}>Olá, {name}</Text>
+      <Text style={styles.data}>{school} · {data?.reference_date}</Text></View>
+      <Feedback loading={loading&&!data} error={error} retry={refresh} empty={data?.data_status==="NO_DATA"} stale={Boolean(data?.stale)||data?.data_status==="PROVISIONAL"}/>
+      {data&&<Card style={styles.cartao}>
+        <Text style={styles.rotulo}>ENTRADAS REGISTRADAS</Text>
+        <Text style={styles.numero}>{value(data.total_student_entries)}</Text>
+        <Text style={styles.planejamento}>Previstos {value(data.total_forecast_plates)} · Servidos {value(data.total_served_plates)}</Text>
+        <Text style={ui.subdued}>Desvio {value(data.forecast_difference)} · {labels(data.data_status)} · {stamp(data.calculated_at)}</Text>
+      </Card>}
+      {data?.meal_services?.map(meal=><Card key={meal.id}><Text style={ui.title}>{mealTypes[meal.meal_type]} · {mealStatuses[meal.status]}</Text>
+        <Action title="Abrir serviço" variant="flat" onPress={()=>router.push({pathname:"/servico",params:{id:meal.id}})}/></Card>)}
+      <Action title="Trocar escola" variant="flat" onPress={()=>router.push("/contexto")}/>
+      <View style={ui.row}><Action title="Merenda" onPress={()=>router.push("/merenda")}/><Action title="Relatórios" onPress={()=>router.push("/relatorio")}/><Action title="Histórico" onPress={()=>router.push("/historico")}/><Action title="Câmeras" onPress={()=>router.push("/cameras")}/></View>
+    </ScrollView>
+    <View style={[styles.rodape,ui.row]}><Action title="RealInova" onPress={()=>router.push("/realinova")}/><Action title="Perfil" onPress={()=>router.push("/perfil")}/></View>
+  </SafeAreaView>;
 }

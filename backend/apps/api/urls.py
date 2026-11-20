@@ -36,6 +36,7 @@ from apps.meals.views import (
     MealServiceViewSet,
     ScheduleViewSet,
 )
+from apps.notifications.views import AuditViewSet, InboxViewSet, PlatformAuditViewSet, PreferenceView, PushDeviceViewSet
 
 from .access_views import (
     ActivateInvitationView,
@@ -61,6 +62,10 @@ from .access_views import (
 from .views import OrganizationsView, SchoolViewSet
 
 router = DefaultRouter(use_regex_path=False)
+router.register("notifications/push-devices", PushDeviceViewSet, basename="notification-push-devices")
+router.register("notifications", InboxViewSet, basename="notifications")
+router.register("audit-logs", AuditViewSet, basename="audit-logs")
+router.register("admin/audit-logs", PlatformAuditViewSet, basename="platform-audit-logs")
 router.register("analytics/daily", DailyMetricsView, basename="analytics-daily")
 router.register(
     "analytics/meal-services", MealMetricsView, basename="analytics-meal-services"
@@ -89,6 +94,8 @@ router.register(
 )
 
 urlpatterns = [
+    path("notifications/preferences/", PreferenceView.as_view()),
+    path("ai/", include("apps.ai.urls")),
     path("auth/login/", LoginView.as_view()),
     path("auth/refresh/", RefreshView.as_view()),
     path("auth/logout/", LogoutView.as_view()),

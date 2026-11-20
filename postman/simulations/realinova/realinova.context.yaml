@@ -1,0 +1,32 @@
+purpose:
+  stands_in_for: Provedor compatível com Chat Completions, com uso de ferramentas.
+  unblocks: Verificação local de seleção de dados e indisponibilidade do RealInova.
+
+assumptions:
+  - id: simulated-tool-roundtrip
+    status: supported
+    claim: O Agno recebe uma solicitação de ferramenta do cenário e repassa o resultado antes de montar a resposta.
+    reason: A integração executou get_plate_counts sobre uma projeção isolada. O Django montou a resposta com 375 pratos e a fonte correspondente.
+    verification: Em 19/11/2026, o log local registrou duas respostas 200 em /v1/chat/completions. O turno registrou 60 tokens de entrada e 18 de saída, definidos pelo cenário.
+    source: backend/apps/ai/provider.py e postman/mocks/realinova-provider/default.js
+    updated_at: "2026-11-19"
+  - id: simulated-provider-outage
+    status: supported
+    claim: O RealInova persiste uma falha explícita quando o cenário devolve 503.
+    reason: O endpoint respondeu 503 com AI_PROVIDER_UNAVAILABLE e gravou uma execução com uma chamada.
+    verification: Em 19/11/2026, uma chamada ao modelo fixture-unavailable devolveu o código configurado no cenário. A API retornou metadados próprios da falha.
+    source: backend/apps/ai/services.py e postman/mocks/realinova-provider/default.js
+    updated_at: "2026-11-19"
+  - id: approved-provider-runtime
+    status: unknown
+    claim: O modelo hospedado selecionado aceitará os mesmos parâmetros e produzirá decisões compatíveis.
+    reason: O teste usa um cenário local e uma chave sintética.
+    verification: O contrato do cliente OpenAI 2.54.0 foi exercitado localmente. A compatibilidade, a latência e o custo do modelo contratado precisam de validação com a conta aprovada.
+    source: backend/docs/REALINOVA_PROVIDERS.md
+    updated_at: "2026-11-19"
+
+fingerprints:
+  - id: realinova-local-2026-11-19
+    date: "2026-11-19"
+    commit: null
+    cli: "1.73.0"

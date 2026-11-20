@@ -653,6 +653,34 @@ def test_simultaneous_preparation_is_idempotent(site):
     assert AuditLog.objects.filter(action="MEAL_PREPARATION_STARTED").count() == 1
 
 
+@pytest.mark.django_db(transaction=True)
+def test_concurrent_finish_preserves_single_transition(site):
+    if connection.vendor != "postgresql":
+        pytest.skip("Teste de locks executado em PostgreSQL.")
+    org, school, _, _, _, cook, *_rest, at = site
+    meal = service(school, at, status=MealService.Status.SERVING, serving_started_at=at)
+    gate = Barrier(2)
+
+    def finish(_):
+        close_old_connections()
+        try:
+            gate.wait(timeout=10)
+            return human(cook, org).post(MEALS + f"{meal.pk}/finish/").status_code
+        finally:
+            connections.close_all()
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        assert sorted(pool.map(finish, range(2))) == [200, 409]
+    meal.refresh_from_db()
+    assert meal.status == MealService.Status.FINISHED
+    assert (
+        AuditLog.objects.filter(
+            action="MEAL_SERVICE_FINISHED", object_id=str(meal.pk)
+        ).count()
+        == 1
+    )
+
+
 def test_empirical_outlier_is_excluded_before_fitting(site):
     org, school, _, _, director, _, _, entrance, cafeteria, at = site
     meal = service(school, at)

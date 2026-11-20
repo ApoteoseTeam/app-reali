@@ -118,3 +118,6 @@ class SchoolAccess(BaseModel):
     def save(self, *args, **kwargs):
         self.clean()
         return super().save(*args, **kwargs)
+
+
+MEMBERSHIP_ROLE_CHOICES = Membership.Role.choices

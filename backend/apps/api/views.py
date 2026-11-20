@@ -7,6 +7,7 @@ from rest_framework import generics, viewsets
 from rest_framework.exceptions import PermissionDenied
 from apps.institutions.models import Organization
 from .access_views import ORGANIZATION_HEADER
+from .audit import audit
 from .permissions import (
     check_school,
     membership_for,
@@ -61,7 +62,8 @@ class SchoolViewSet(TenantViewSet):
             raise PermissionDenied("Criar uma escola exige acesso institucional.")
         serializer.context["membership"] = m
         serializer.validate_code(serializer.validated_data["code"])
-        serializer.save(organization=m.organization)
+        school = serializer.save(organization=m.organization)
+        audit("SCHOOL_CREATED", school, actor=m.user, organization=m.organization, school_id=school.pk)
 
     @transaction.atomic
     def perform_update(self, serializer):
@@ -71,7 +73,8 @@ class SchoolViewSet(TenantViewSet):
         serializer.context["membership"] = m
         if "code" in serializer.validated_data:
             serializer.validate_code(serializer.validated_data["code"])
-        serializer.save()
+        school = serializer.save()
+        audit("SCHOOL_UPDATED", school, actor=m.user, organization=m.organization, school_id=school.pk)
 
     def locked_configuration_actor(self):
         m = require_admin(self.request)

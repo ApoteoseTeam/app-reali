@@ -63,7 +63,7 @@ Veja o [contrato de eventos, lotes, filtros e resumos](docs/DEVICE_COUNT_API.md)
 
 - As listas de organizações, escolas, câmeras, serviços, equipe, contagens e métricas têm páginas de 50 itens e retornam `count`, `next`, `previous` e `results`. A lista de convites retorna até 100 itens como array.
 - O DRF retorna erros de validação como campos ou `detail`. Use `401` para sessão JWT inválida, `403` para falta de vínculo/permissão ou credencial de câmera inválida, `404` para recursos fora do escopo e `429` para limites de requisição.
-- Login recebe `email` e `password`. Refresh recebe `refresh` e devolve um novo par. Salve o novo refresh, pois o anterior entra na lista de revogação. Logout recebe `refresh` e revoga esse token. Access tokens já emitidos expiram em até 15 minutos.
+- Login recebe `email` e `password`. Refresh recebe `refresh` e devolve um novo par. Salve o novo refresh, pois o anterior entra na lista de revogação. Logout recebe `refresh` e revoga os tokens e inscrições de dispositivo vinculados à mesma sessão. Access tokens anteriores ao identificador de sessão têm validade residual de até 15 minutos.
 - Vínculos ativos veem as escolas concedidas. A direção configura escolas e câmeras. Direção, gestão e cozinha podem executar as transições de preparo e distribuição. Consulte a [matriz de permissões](docs/PERMISSIONS.md).
 - Atualizações da escola ou do tipo de uma câmera com histórico retornam `400`. O estado ativo e os demais campos cadastrais continuam editáveis.
 - No contrato legado de contagens, eventos são incrementos inteiros entre 1 e 100.000. Envie o mesmo `event_id`, quantidade, instante e serviço em reenvios. A primeira gravação retorna `201`; um reenvio igual retorna `200` com o mesmo ID, inclusive após a finalização. Alterar o conteúdo de um ID existente retorna `400`.
@@ -74,3 +74,15 @@ Veja o [contrato de eventos, lotes, filtros e resumos](docs/DEVICE_COUNT_API.md)
 ### Indicadores e relatórios
 
 Consulte [API de relatórios](docs/REPORTING_API.md), [histórico](docs/HISTORY_API.md) e [permissões analíticas](docs/ANALYTICS_PERMISSIONS.md). O recálculo usa `POST /api/v1/analytics/daily/rebuild/`, com o alias legado `POST /api/v1/analytics/rebuild/`.
+
+### RealInova
+
+A rota `POST ai/chat/` e as rotas `ai/conversations/`, `ai/conversations/{id}/messages/` e `ai/usage/` usam a sessão JWT e o cabeçalho institucional existentes. Consulte [contratos e erros](docs/REALINOVA_API.md).
+
+### Sessão do aplicativo mobile
+
+`GET /api/v1/auth/me/` também retorna `memberships[].capabilities`, com as capacidades de navegação calculadas a partir do vínculo do usuário. `PATCH /api/v1/auth/me/` aceita `full_name` e devolve o perfil autenticado. O e-mail usa o fluxo de identidade existente. [Integração do aplicativo](../frontend/docs/MOBILE_AUTHENTICATION.md)
+
+### Notificações, ajustes e auditoria
+
+A central em `/api/v1/notifications/` oferece lista, contador, leitura, arquivo e preferências no contexto institucional, além de registro e revogação de dispositivos na sessão autenticada. O logout revoga as inscrições push dessa sessão. Os ajustes ganham detalhe, estado, ID de auditoria e suporte a `Idempotency-Key`. A auditoria de direção e a de operadores da plataforma têm rotas próprias de consulta. [Notificações](docs/NOTIFICATIONS_API.md) · [Correções](docs/COUNT_ADJUSTMENTS.md) · [Auditoria](docs/ADMIN_AUDIT.md)

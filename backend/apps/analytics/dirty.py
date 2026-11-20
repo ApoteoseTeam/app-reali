@@ -7,7 +7,7 @@ def mark_dirty(keys):
     now = timezone.now()
     PendingDailyMetrics.objects.bulk_create(
         [
-            PendingDailyMetrics(school_id=school, reference_date=day, queued_at=now)
+            PendingDailyMetrics(school_id=school, reference_date=day, queued_at=now, first_queued_at=now)
             for school, day in sorted(set(keys))
         ],
         update_conflicts=True,

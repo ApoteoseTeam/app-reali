@@ -4,3 +4,7 @@ psycopg[binary]>=3.2,<4
 djangorestframework-simplejwt>=5.4,<6
 drf-spectacular>=0.28,<1
 reportlab>=4.4,<5
+agno==2.9.0
+openai>=2.54,<3
+httpx>=0.28,<1
+cryptography>=50,<51

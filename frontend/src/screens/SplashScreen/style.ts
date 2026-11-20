@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { colors } from "../../colors";
+import { colors } from "../../theme/colors";
 
 export const styles = StyleSheet.create({
     container: {
@@ -17,6 +17,6 @@ export const styles = StyleSheet.create({
     texto: {
         marginTop: 8,
         fontSize: 8,
-        color: colors.gray,
+        color: colors.neutral,
     },
 });

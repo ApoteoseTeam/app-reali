@@ -89,10 +89,14 @@ class LoginView(TokenObtainPairView):
 
 class RefreshView(TokenRefreshView):
     serializer_class = RefreshSerializer
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "session-refresh"
 
 
 class LogoutView(TokenBlacklistView):
     serializer_class = LogoutSerializer
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "session-logout"
 
 
 class MeView(APIView):
@@ -104,9 +108,19 @@ class MeView(APIView):
         return Response(
             {
                 "user": UserSerializer(request.user).data,
-                "memberships": MembershipSerializer(memberships, many=True).data,
+                "memberships": s.SessionMembershipSerializer(
+                    memberships, many=True
+                ).data,
             }
         )
+
+    @extend_schema(request=s.UpdateProfileSerializer, responses=UserSerializer)
+    def patch(self, request):
+        data = validated(s.UpdateProfileSerializer, request.data)
+        user = request.user
+        user.full_name = data["full_name"]
+        user.save(update_fields=["full_name"])
+        return Response(UserSerializer(user).data)
 
 
 class MySchoolsView(generics.ListAPIView):
