@@ -81,7 +81,7 @@ export class HttpClient {
   constructor(
     private readonly getBase: () => string,
     private readonly auth: AuthAdapter,
-    private readonly network: typeof fetch = fetch,
+    private readonly network: typeof fetch = (...args) => fetch(...args),
   ) {}
 
   next(value: string) {

@@ -27,6 +27,21 @@ function mock(handler){
 const sync=fixture=>fixture.tokens.accept({access:"first-access",refresh:"stored-refresh"},fixture.tokens.credentials().generation);
 const nextIteration=()=>new Promise(resolve=>setImmediate(resolve));
 
+test("cliente usa o fetch padrão com o receptor aceito pelo navegador",async()=>{
+  const original=globalThis.fetch;
+  globalThis.fetch=function(){
+    if(this!==globalThis&&this!==undefined)throw new TypeError("Illegal invocation");
+    return Promise.resolve(json({ok:true}));
+  };
+  try {
+    const tokens=new SessionTokens({read:async()=>null,write:async()=>undefined});
+    const http=new HttpClient(()=>base,tokens);
+    assert.deepEqual(await http.request("health/",{auth:false}),{ok:true});
+  } finally {
+    globalThis.fetch=original;
+  }
+});
+
 test("logout informa falha na remoção do SecureStore mesmo com resposta remota 401", async()=>{
   const tokens=new SessionTokens({
     read:async()=>null,
