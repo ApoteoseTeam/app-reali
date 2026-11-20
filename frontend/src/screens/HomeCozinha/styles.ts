@@ -4,6 +4,11 @@ import { colors } from '../../theme/colors';
 const azul = '#102B53';
 const branco = '#FFFFFF';
 
+export const coresRodape = {
+    ativa: '#C8DFB9',
+    inativa: '#FFFFFF',
+};
+
 export const styles = StyleSheet.create({
     tela: {
         flex: 1,
@@ -80,11 +85,13 @@ export const styles = StyleSheet.create({
     },
     rodape: {
         flexDirection: 'row',
+        paddingHorizontal: 8,
         backgroundColor: azul,
     },
     aba: {
         flex: 1,
         minHeight: 52,
+        paddingVertical: 6,
         alignItems: 'center',
         justifyContent: 'center',
         gap: 3,
@@ -93,8 +100,5 @@ export const styles = StyleSheet.create({
         color: branco,
         fontSize: 11,
         fontWeight: '600',
-    },
-    abaAtiva: {
-        color: '#C8DFB9',
     },
 });

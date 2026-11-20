@@ -1,12 +1,12 @@
 import { Pressable, ScrollView, Text, View } from 'react-native';
-import { ClipboardList, House, UserRound } from 'lucide-react-native';
+import { ClipboardList, House, TrendingUp, History} from 'lucide-react-native';
 
 import { Card } from '../../components/Card/Card';
-import { Header } from '../../components/Header/header';
+import { Header } from '../../components/Header/Header';
 import { MenuDayCard } from '../../components/MenuDayCard/MenuDayCard';
 import { styles } from './styles';
 
-const DIAS = [ 
+const DIAS = [
     { dia: 'SEG · 09/11', preparacoes: ['Arroz', 'feijão', 'omelete'] },
     { dia: 'TER · 10/11', preparacoes: ['Arroz', 'lentilha', 'carne e abóbora'] },
     { dia: 'QUA · 11/11', preparacoes: ['Macarrão', 'frango e legumes'] },
@@ -16,15 +16,24 @@ const DIAS = [
 
 type CardapioSemanaProps = {
     totalPlanejado?: number;
-    onInicioPress?: () => void;
-    onPerfilPress?: () => void;
+    onRelatoriosPress?: () => void;
+    onCardapioPress?: () => void;
+    onHistoricoPress?: () => void;
 };
 
-export default function CardapioSemana({
+export default function CardapioSemanaGestao({
     totalPlanejado = 440,
-    onInicioPress,
-    onPerfilPress,
+    onRelatoriosPress,
+    onCardapioPress,
+    onHistoricoPress
 }: CardapioSemanaProps = {}) {
+
+    const abas = [
+        { titulo: 'Início', Icone: House, ativa: true },
+        { titulo: 'Relatórios', Icone: TrendingUp, onPress: onRelatoriosPress },
+        { titulo: 'Cardápio', Icone: ClipboardList, onPress: onCardapioPress },
+        { titulo: 'Histórico', Icone: History, onPress: onHistoricoPress },
+    ];
     return (
         <View style={styles.tela}>
             <Header
@@ -60,35 +69,25 @@ export default function CardapioSemana({
                 </Card>
             </ScrollView>
 
+
             <View style={styles.rodape}>
-                <Pressable
-                    style={styles.aba}
-                    accessibilityRole="button"
-                    disabled={!onInicioPress}
-                    onPress={onInicioPress}
-                >
-                    <House size={22} color="#FFFFFF" />
-                    <Text style={styles.textoAba}>Início</Text>
-                </Pressable>
+                {abas.map(({ titulo, Icone, ativa, onPress }) => {
+                    const cor = ativa ? '#C8DFB9' : '#FFFFFF';  // adicionar navegação entre os icones do rodape
 
-                <View
-                    style={styles.aba}
-                    accessible
-                    accessibilityLabel="Cardápio, tela atual"
-                >
-                    <ClipboardList size={22} color="#C8DFB9" />
-                    <Text style={[styles.textoAba, styles.abaAtiva]}>Cardápio</Text>
-                </View>
-
-                <Pressable
-                    style={styles.aba}
-                    accessibilityRole="button"
-                    disabled={!onPerfilPress}
-                    onPress={onPerfilPress}
-                >
-                    <UserRound size={22} color="#FFFFFF" />
-                    <Text style={styles.textoAba}>Perfil</Text>
-                </Pressable>
+                    return (
+                        <Pressable
+                            key={titulo}
+                            accessibilityRole="tab"
+                            accessibilityState={{ selected: !!ativa, disabled: !ativa && !onPress }}
+                            disabled={!ativa && !onPress}
+                            onPress={onPress}
+                            style={styles.aba}
+                        >
+                            <Icone color={cor} size={22} />
+                            <Text style={[styles.textoAba, { color: cor }]}>{titulo}</Text>
+                        </Pressable>
+                    );
+                })}
             </View>
         </View>
     );

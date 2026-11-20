@@ -1,13 +1,14 @@
 import { useState, useRef } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, View, Pressable } from 'react-native';
+import { ClipboardList, History, House, TrendingUp, } from 'lucide-react-native';
 
 import { BarList } from '../../components/BarList/BarList';
 import { Button } from '../../components/Button/Button';
 import { Card } from '../../components/Card/Card';
-import { Header } from '../../components/Header/header';
+import { Header } from '../../components/Header/Header';
 import { Kpicard } from '../../components/KpiCard/KpiCard';
 import { SegmentedControl } from '../../components/SegmentedControl/SegmentedControl';
-import { Select } from '../../components/select/Select';
+import { Select } from '../../components/Select/Select';
 import { Logo } from '../../components/Logo/Logo';
 import { Input } from '../../components/Input/Input';
 import { CompartilharRelatorioModal } from '../../components/CompartilhaRelatorioModal/CompartilhaRelatorioModal';
@@ -44,6 +45,9 @@ type FormularioResumoProps = {
             onProgresso: (percentual: number) => void;
         }
     ) => Promise<ArquivoPdf>;
+    onRelatoriosPress?: () => void;
+    onCardapioPress?: () => void;
+    onHistoricoPress?: () => void;
 };
 
 const OPCOES_DIARIAS = [
@@ -63,7 +67,16 @@ const PLANEJAMENTO_INICIAL: Planejamento = {
     extras: '',
 };
 
-export default function Relatorio({ onBaixarPdf }: FormularioResumoProps = {}) {
+export default function Relatorio({ onBaixarPdf,
+    onRelatoriosPress,
+    onCardapioPress,
+    onHistoricoPress, }: FormularioResumoProps = {}) {
+    const abas = [
+        { titulo: 'Início', Icone: House, ativa: true },
+        { titulo: 'Relatórios', Icone: TrendingUp, onPress: onRelatoriosPress },
+        { titulo: 'Cardápio', Icone: ClipboardList, onPress: onCardapioPress },
+        { titulo: 'Histórico', Icone: History, onPress: onHistoricoPress },
+    ];
     const [modo, setModo] = useState('Mensal');
     const [mes, setMes] = useState(MESES[0]);
     const [dia, setDia] = useState(DIAS[0]);
@@ -430,6 +443,27 @@ export default function Relatorio({ onBaixarPdf }: FormularioResumoProps = {}) {
                 onRetry={tentarSalvarNovamente}
                 onViewHistory={() => { }}
             />
+
+            <View style={styles.rodape}>
+                {abas.map(({ titulo, Icone, ativa, onPress }) => {
+                    const cor = ativa ? '#C8DFB9' : '#FFFFFF';  // adicionar navegação entre os icones do rodape
+
+                    return (
+                        <Pressable
+                            key={titulo}
+                            accessibilityRole="tab"
+                            accessibilityState={{ selected: !!ativa, disabled: !ativa && !onPress }}
+                            disabled={!ativa && !onPress}
+                            onPress={onPress}
+                            style={styles.aba}
+                        >
+                            <Icone color={cor} size={22} />
+                            <Text style={[styles.textoAba, { color: cor }]}>{titulo}</Text>
+                        </Pressable>
+                    );
+                })}
+            </View>
+
         </View>
     );
 }

@@ -15,7 +15,7 @@ import {
 import { Button } from '../../components/Button/Button';
 import { Card } from '../../components/Card/Card';
 import { IconButton } from '../../components/IconButton/IconButton';
-import { Header } from '../../components/Header/header';
+import { Header } from '../../components/Header/Header';
 import { colors } from '../../theme/colors';
 import { styles } from './styles';
 
