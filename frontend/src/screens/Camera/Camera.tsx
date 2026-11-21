@@ -1,30 +1,15 @@
 import { useState } from "react";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { Text, View } from "react-native";
-import { ApiError } from "../api/client";
-import { useAction } from "../hooks/useAction";
-import { useRemote } from "../hooks/useRemote";
-import { api, useSession } from "../session/provider";
-import { Pagination } from "./Meals";
+import { ApiError } from "../../api/client";
+import { Action, Feedback, Field, labels, Page, Pagination, Panel, stamp, ui } from "../../features/ui";
+import { useAction } from "../../hooks/useAction";
+import { useRemote } from "../../hooks/useRemote";
+import { api, useSession } from "../../session/provider";
 import CameraSettings from "./CameraSettings";
-import { Action, Feedback, Field, labels, Page, Panel, stamp, ui } from "./ui";
 
-export function CameraList(){
-  const workspace=useSession().workspace!,router=useRouter();
-  const [page,setPage]=useState(1);
-  const cameras=useRemote(`cameras:${page}`,signal=>api.cameras(workspace.scope,{school:workspace.school!.id,page},signal));
-  return <Page title="Câmeras" refresh={cameras.refresh} refreshing={cameras.loading}>
-    <Feedback loading={cameras.loading} error={cameras.error} empty={cameras.data?.results.length===0} retry={cameras.refresh}/>
-    {cameras.data?.results.map(camera=><Panel key={camera.id} title={camera.name}>
-      <Text style={ui.text}>{camera.camera_type==="ENTRANCE"?"Portaria":"Cantina"} · {labels(camera.operational_status)}</Text>
-      <Text style={ui.subdued}>{camera.is_active?"Ativa administrativamente":"Inativa administrativamente"} · Última comunicação {stamp(camera.last_seen_at)}</Text>
-      <Action title="Detalhes da câmera" onPress={()=>router.push({pathname:"/camera",params:{id:camera.id}})}/>
-    </Panel>)}
-    <Pagination page={page} next={Boolean(cameras.data?.next)} onChange={setPage}/>
-  </Page>;
-}
 const reasons:Record<string,string>={timeout:"Comunicação interrompida",video_unavailable:"Vídeo indisponível",detector_unavailable:"Detector indisponível",warming_up:"Em inicialização",low_fps:"Processamento abaixo do limite",pending_events:"Acúmulo de eventos",healthy:"Operação normal"};
-export function CameraDetail(){
+export default function Camera(){
   const session=useSession(),workspace=session.workspace!;
   const {id}=useLocalSearchParams<{id:string}>();
   const [page,setPage]=useState(1),[edit,setEdit]=useState(false),[confirm,setConfirm]=useState(false);

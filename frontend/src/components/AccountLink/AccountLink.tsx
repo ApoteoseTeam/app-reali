@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import { Platform, Text } from "react-native";
-import { ApiError } from "../api/client";
-import { useAction } from "../hooks/useAction";
-import { credentialLink, observeCredential, takeCredential } from "../session/links";
-import { api, useSession } from "../session/provider";
-import { Action, Feedback, Field, Page, Panel, ui } from "./ui";
+import { ApiError } from "../../api/client";
+import { useAction } from "../../hooks/useAction";
+import { credentialLink, observeCredential, takeCredential } from "../../session/links";
+import { api, useSession } from "../../session/provider";
+import { Action, Feedback, Field, Page, Panel, ui } from "../../features/ui";
 
 export default function AccountLink({mode}:{mode:"activate"|"reset"}){
   const route=mode==="activate"?"/ativar":"/recuperar";
@@ -81,7 +81,7 @@ export default function AccountLink({mode}:{mode:"activate"|"reset"}){
 
   return <Page title={mode==="activate"?"Ativar conta":"Recuperar acesso"}>
     <Feedback loading={checking} error={action.error??(verification?.token===token?verification.error:undefined)}/>
-    {completed&&<Panel><Text accessibilityRole="alert" style={ui.text}>{completed}</Text></Panel>}
+    {completed ? <Panel><Text accessibilityRole="alert" style={ui.text}>{completed}</Text></Panel> : null}
     {mode==="activate"&&!token&&!completed&&!checking&&<Text style={ui.text}>Abra o link de ativação recebido por e-mail.</Text>}
     {((mode==="reset"&&!completed)||(mode==="activate"&&token&&verified&&!checking))&&<Panel>
       {mode==="activate"&&session.status!=="AUTHENTICATED"&&<Action title={existing?"Definir senha para nova conta":"Já tenho conta"} variant="flat" onPress={()=>{setExisting(!existing);setPassword("");setConfirmation("");action.setError(null);}}/>}
@@ -94,6 +94,7 @@ export default function AccountLink({mode}:{mode:"activate"|"reset"}){
       {token&&existing&&session.status!=="AUTHENTICATED"&&<Field label="Senha atual" value={password} onChangeText={setPassword} secureTextEntry/>}
       <Action title={mode==="activate"?"Ativar vínculo":token?"Redefinir senha":"Enviar instruções"} disabled={action.busy||session.status==="INITIALIZING"} onPress={submit}/>
     </Panel>}
-    <Action title={session.status==="AUTHENTICATED"?"Voltar para o Reali":"Voltar ao login"} variant="flat" onPress={()=>router.replace("/")}/>
+    <Action title={session.status==="AUTHENTICATED"?"Voltar para o Reali":"Voltar ao login"} variant="flat"
+      onPress={()=>router.dismissTo(session.status==="AUTHENTICATED"?"/":"/entrar")}/>
   </Page>;
 }

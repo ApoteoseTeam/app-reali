@@ -4,13 +4,16 @@ appId: ${APP_ID}
     clearState: true
 - assertVisible: "Entrar"
 - tapOn:
+    id: "welcome-enter"
+- tapOn:
     id: "login-email"
 - inputText: "mobile-smoke@example.test"
 - tapOn:
     id: "login-password"
 - inputText: ${REALI_SMOKE_PASSWORD}
 - hideKeyboard
-- tapOn: "Entrar"
+- tapOn:
+    id: "login-submit"
 - runFlow:
     when:
       visible: "Organização e escola"
@@ -33,7 +36,7 @@ appId: ${APP_ID}
     element: "Merenda"
     direction: DOWN
 - tapOn: "Merenda"
-- tapOn: "Detalhes do serviço"
+- tapOn: "Detalhes do serviço de .*"
 - extendedWaitUntil:
     visible: "Iniciar preparo"
     timeout: 30000
@@ -48,12 +51,12 @@ appId: ${APP_ID}
 - tapOn: "Voltar"
 - tapOn: "Voltar"
 - tapOn: "Relatórios"
-- assertVisible: "Relatório diário"
+- assertVisible: "Relatório"
 - tapOn: "Voltar"
 - scrollUntilVisible:
-    element: "RealInova"
+    element: "Abrir RealInova"
     direction: DOWN
-- tapOn: "RealInova"
+- tapOn: "Abrir RealInova"
 - tapOn: "Nova conversa"
 - tapOn:
     id: "chat-message"

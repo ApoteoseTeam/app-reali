@@ -8,7 +8,7 @@ type KpicardVariant = 'primary' | 'secondary' | 'summary' | 'gestao';
 type KpicardProps = {
     variant?: KpicardVariant
     title: string
-    value: number
+    value: number | null
     unit?: string
     change?: number
     lowerIsBetter?: boolean;
@@ -39,19 +39,20 @@ export const Kpicard = ({ title, value, unit, variant = "primary", change, lower
                     ? "resultado favorável"
                     : "resultado desfavorável";
 
+    const formattedValue = value?.toLocaleString("pt-BR") ?? "Indisponível";
+    const displayUnit = value === null ? undefined : unit;
     const accessibilityDescription =
-        `${title}: ${value.toLocaleString("pt-BR")} ${unit ?? ""}` +
+        `${title}: ${formattedValue} ${displayUnit ?? ""}` +
         (change !== undefined
             ? `. ${changeDirection} de ${Math.abs(change)} por cento, ${changeStatus}.`
             : ".");
 
 
     if (variant === "summary") {
-        const formattedValue = value.toLocaleString("pt-BR");
         return (
             <View style={kpicardStyles.summaryBox}>
                 <Text style={kpicardStyles.summaryValue}>
-                    {formattedValue} {unit}
+                    {formattedValue} {displayUnit}
                 </Text>
                 {description ? (
                     <Text style={kpicardStyles.summaryDescription}>
@@ -70,8 +71,8 @@ export const Kpicard = ({ title, value, unit, variant = "primary", change, lower
                 style={kpicardStyles.gestaoBox}
             >
                 <Text style={kpicardStyles.gestaoTitulo}>{title}</Text>
-                <Text style={kpicardStyles.gestaoValor}>
-                    {value.toLocaleString('pt-BR')}{unit ? ` ${unit}` : ''}
+                <Text style={[kpicardStyles.gestaoValor, value === null && kpicardStyles.emptyValue]}>
+                    {formattedValue}{displayUnit ? ` ${displayUnit}` : ''}
                 </Text>
             </View>
         );
@@ -88,9 +89,9 @@ export const Kpicard = ({ title, value, unit, variant = "primary", change, lower
             ]}>
             <Text style={kpicardStyles.kpicardTitle}>{title}</Text>
             <View style={kpicardStyles.kpicardValueContainer}>
-                <Text style={kpicardStyles.kpicardValue}>{value.toLocaleString("pt-BR")}</Text>
-                {unit ? (
-                    <Text style={kpicardStyles.kpicardUnit}>{unit}</Text>
+                <Text style={[kpicardStyles.kpicardValue, value === null && kpicardStyles.emptyValue]}>{formattedValue}</Text>
+                {displayUnit ? (
+                    <Text style={kpicardStyles.kpicardUnit}>{displayUnit}</Text>
                 ) : null}
             </View>
             {change !== undefined && (

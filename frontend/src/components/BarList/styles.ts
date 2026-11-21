@@ -24,7 +24,7 @@ export const styles = StyleSheet.create({
   },
   barra: {
     height: "100%",
-    backgroundColor: colors.primary,
+    backgroundColor: colors.secondary,
     borderRadius: 4,
   },
   valor: {

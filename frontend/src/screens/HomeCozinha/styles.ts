@@ -18,9 +18,9 @@ export const styles = StyleSheet.create({
         backgroundColor: azul,
     },
     logo: {
-        width: 34,
-        height: 34,
-        tintColor: branco,
+        width: 68,
+        height: 64,
+        marginLeft: -14,
     },
     scroll: {
         flex: 1,

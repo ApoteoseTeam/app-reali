@@ -1,1 +1,1 @@
-export { HistoryReport as default } from "../../../features/Reports";
+export { default } from "../../../screens/Historico/Historico";

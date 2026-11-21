@@ -1,1 +1,1 @@
-export {ConversationList as default} from "../../../features/RealInova";
+export { default } from "../../../screens/RealInova/RealInova";

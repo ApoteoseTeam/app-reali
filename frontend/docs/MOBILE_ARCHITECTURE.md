@@ -7,8 +7,9 @@ O Reali usa Expo SDK 58, React Native, TypeScript e Expo Router. A entrada passa
 | `src/api` | HTTP, erros, paginação, contratos TypeScript e endpoints da Fase 8. |
 | `src/session` | Credenciais, inicialização, contexto institucional e tratamento de links. |
 | `src/hooks` | Consultas com cache em memória, cancelamento, carregamento e proteção contra envio duplicado. |
-| `src/features` | Composição de fluxos operacionais, relatórios e RealInova. |
-| `src/screens` e `src/components` | Telas existentes reaproveitadas, componentes de interface, tema e estilos de gestão e cozinha. |
+| `src/app` | Entradas de rota, layouts e regras de navegação. |
+| `src/screens` | Implementações das telas, com uma pasta por tela e estilos próprios quando aplicável. |
+| `src/components` e `src/features` | Componentes de interface e recursos compartilhados entre telas. |
 
 A chave de cache inclui usuário, organização, escola e revisão do contexto. Consultas iguais em andamento compartilham uma chamada enquanto houver observadores. Voltar a uma tela revalida seus dados. Ao sair da rota, o último observador cancela a requisição. Ao mudar de contexto, o app encerra a sessão de consultas anterior e desmonta suas telas. O Django continua responsável por autorização, validação e resultados de negócio.
 

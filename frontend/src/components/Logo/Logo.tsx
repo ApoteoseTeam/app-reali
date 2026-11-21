@@ -1,10 +1,14 @@
 import { Image, StyleSheet, type StyleProp, type ImageStyle } from 'react-native';
 
-export function Logo({ style}: { style?: StyleProp<ImageStyle>}) {
+type LogoProps = { style?: StyleProp<ImageStyle>; variant?: "full" | "white" | "mark" };
+
+export function Logo({ style, variant = "full" }: LogoProps) {
   return (
     <Image
-      source={require("../../assets/logo-reali.png")}
-      style={[styles.logo, style]}
+      accessible
+      accessibilityLabel="Reali"
+      source={variant === "mark" ? require("../../assets/reali-header-mark.png") : require("../../assets/logo-reali.png")}
+      style={[styles.logo, variant === "white" && styles.white, style]}
       resizeMode="contain"
     />
   );
@@ -15,4 +19,5 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
   },
+  white: { tintColor: "#FFFFFF" },
 });

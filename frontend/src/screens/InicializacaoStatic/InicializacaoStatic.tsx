@@ -1,24 +1,28 @@
-import React from 'react';
-import { View, Text } from 'react-native';
-import { stylesInicializacao } from './styles';
+import { Text, View } from "react-native";
+import { Logo } from "../../components/Logo/Logo";
+import { Button } from "../../components/Button/Button";
+import { stylesInicializacao as styles } from "./styles";
 
-export default function TelaInicial() {
+type Props = { error?: string | null; onRetry?: () => void };
+
+export default function InicializacaoStatic({ error, onRetry }: Props) {
   return (
-    <View style={stylesInicializacao.container}>
-      <View style={stylesInicializacao.spacer} />
-
-      <View style={stylesInicializacao.centerContent}>
-        <Text style={stylesInicializacao.logo}>reali</Text>
-        <Text style={stylesInicializacao.subtitle}>Mais controle. Menos desperdício.</Text>
-      </View>
-
-      <View style={stylesInicializacao.footer}>
-        <View style={stylesInicializacao.progressBar}>
-          <View style={stylesInicializacao.progressFill} />
-        </View>
-        <Text style={stylesInicializacao.loadingText}>Iniciando...</Text>
-      </View>
+    <View style={styles.container} testID="reali-initializing">
+      <Logo style={styles.logo} />
+      <Text style={styles.subtitle}>Mais controle, menos desperdício</Text>
+      {error ? (
+        <>
+          <Text accessibilityRole="alert" style={styles.error}>{error}</Text>
+          <Button label="Tentar novamente" accessibilityRole="button" onPress={onRetry} />
+        </>
+      ) : (
+        <>
+          <View style={styles.track} accessible accessibilityRole="progressbar" accessibilityLabel="Inicializando o Reali">
+            <View style={styles.fill} />
+          </View>
+          <Text style={styles.loadingText}>Iniciando…</Text>
+        </>
+      )}
     </View>
   );
 }
-

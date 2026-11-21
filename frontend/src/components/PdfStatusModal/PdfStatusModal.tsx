@@ -10,7 +10,7 @@ export type ArquivoPdf = {
 
 export type EstadoPdf =
     | { tipo: 'gerando'; periodo: string; progresso: number | null }
-    | { tipo: 'erro' }
+    | { tipo: 'erro'; mensagem?: string }
     | { tipo: 'pronto'; arquivo: ArquivoPdf; erroAoAbrir?: string };
 
 type Props = {
@@ -32,7 +32,7 @@ export function PdfStatusModal({estado, onFechar, onTentarNovamente, onAbrirPdf}
         ? 'Gerando PDF...'
         : erro
             ? 'Não foi possível gerar o PDF'
-            : 'PDF salvo';
+            : 'PDF pronto';
 
     return (
         <Modal
@@ -83,7 +83,7 @@ export function PdfStatusModal({estado, onFechar, onTentarNovamente, onAbrirPdf}
 
                     {estado.tipo === 'erro' && (
                         <Text style={styles.descricao}>
-                            Tente novamente. Seus dados continuam no relatório.
+                            {estado.mensagem ?? 'Tente novamente. Seus dados continuam no relatório.'}
                         </Text>
                     )}
 

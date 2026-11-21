@@ -1,142 +1,31 @@
-import { StyleSheet, Platform } from 'react-native';
-import { colors } from '../../theme/colors';
-
-const FONT = 'Arial';
-const SERIF = Platform.select({ ios: 'Georgia', default: 'serif' });
+import { StyleSheet } from "react-native";
+import { colors } from "../../theme/colors";
 
 export const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.white,
-    overflow: 'hidden',
-  },
-
-  topo: {
-    alignSelf: 'stretch',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 24,
-    paddingTop: 48,
-    paddingBottom: 8,
-  },
-  perfilTopo: {
-    position: 'relative',
-  },
+  perfilTopo: { marginTop: -16, marginHorizontal: -16, paddingHorizontal: 16, paddingTop: 10, paddingBottom: 4 },
   fundoTopo: {
-    position: 'absolute',
-    top: 0,
-    left: '-20%',
-    right: '-20%',
-    bottom: 75,
-    borderBottomLeftRadius: 220,
-    borderBottomRightRadius: 220,
-    backgroundColor: colors.primary,
+    position: "absolute", top: 0, left: 0, right: 0, height: 72, backgroundColor: colors.primary,
+    borderBottomLeftRadius: 22, borderBottomRightRadius: 22,
   },
-  titulo: {
-    fontFamily: FONT,
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textSecondary,
-  },
-  iconeTopo: {
-    padding: 4,
-  },
-
-  avatarArea: {
-    alignSelf: 'center',
-    marginTop: 33,
-  },
+  avatarArea: { alignSelf: "center", alignItems: "center", gap: 8, width: "100%" },
+  avatarContorno: { width: 108, height: 108, position: "relative", marginBottom: 2 },
   avatarBorda: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    borderWidth: 7,
-    borderColor: colors.white,
-    overflow: 'hidden',
+    width: "100%", height: "100%", borderRadius: 54, borderWidth: 4, borderColor: colors.white,
+    backgroundColor: colors.surfaceLight, alignItems: "center", justifyContent: "center", overflow: "hidden",
   },
-  avatar: {
-    width: '100%',
-    height: '100%',
-  },
+  avatar: { width: "100%", height: "100%" },
   editar: {
-    position: 'absolute',
-    right: 0,
-    bottom: 0,
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
+    position: "absolute", right: -5, bottom: -5, width: 44, height: 44, borderRadius: 22,
+    backgroundColor: colors.primary, borderWidth: 3, borderColor: colors.white, alignItems: "center", justifyContent: "center",
   },
-
-  nome: {
-    fontFamily: SERIF,
-    fontSize: 16,
-    color: colors.text,
-    textAlign: 'center',
-    marginTop: 24,
-  },
-  cargo: {
-    fontFamily: SERIF,
-    fontSize: 11,
-    color: colors.text,
-    textAlign: 'center',
-    marginTop: 2,
-  },
-
-  conteudo: {
-    paddingHorizontal: 50,
-    marginTop: 50,
-    gap: 17,
-  },
-  linha: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  linhaTexto: {
-    fontFamily: FONT,
-    fontSize: 12,
-    color: colors.text,
-    flexShrink: 1,
-  },
-  botaoSair: {
-    backgroundColor: colors.primary,
-    borderWidth: 1.5,
-    borderColor: colors.secondary,
-    borderRadius: 14,
-    marginTop: 6,
-    paddingVertical: 7,
-    alignItems: 'center',
-  },
-  botaoSairTexto: {
-    fontFamily: FONT,
-    fontSize: 13,
-    fontWeight: '700',
-    color: colors.textSecondary,
-  },
-
-  abas: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingTop: 8,
-    paddingBottom: 20,
-    backgroundColor: colors.surfaceLight,
-  },
-  aba: {
-    alignItems: 'center',
-    gap: 2,
-  },
-  abaTexto: {
-    fontFamily: FONT,
-    fontSize: 10,
-    fontWeight: '700',
-    color: colors.text,
-  },
+  desabilitado: { opacity: 0.65 },
+  identidade: { gap: 2, alignItems: "center" },
+  nome: { color: colors.primary, fontSize: 18, fontWeight: "700", textAlign: "center" },
+  cargo: { color: "#455A50", fontSize: 13, textAlign: "center" },
+  fotoNota: { color: "#455A50", fontSize: 12, textAlign: "center" },
+  linha: { flexDirection: "row", alignItems: "center", gap: 9, minHeight: 44, borderRadius: 8 },
+  icone: { width: 32, height: 32, backgroundColor: colors.background, borderRadius: 8, alignItems: "center", justifyContent: "center" },
+  linhaTexto: { color: colors.primary, fontSize: 14, flex: 1 },
+  pressionado: { backgroundColor: colors.background },
+  formulario: { gap: 8, marginBottom: 6 },
 });

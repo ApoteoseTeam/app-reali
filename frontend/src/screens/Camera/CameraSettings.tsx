@@ -1,11 +1,11 @@
 import {useState} from "react";
 import {Text,View} from "react-native";
-import {ApiError} from "../api/client";
-import type {Camera,CameraParameters,Point} from "../api/reali";
-import {useAction} from "../hooks/useAction";
-import {useRemote} from "../hooks/useRemote";
-import {api,useSession} from "../session/provider";
-import {Action,Feedback,Field,Panel,stamp,ui} from "./ui";
+import {ApiError} from "../../api/client";
+import type {Camera,CameraParameters,Point} from "../../api/reali";
+import {useAction} from "../../hooks/useAction";
+import {useRemote} from "../../hooks/useRemote";
+import {api,useSession} from "../../session/provider";
+import {Action,Feedback,Field,Panel,stamp,ui} from "../../features/ui";
 
 type Form={fps:string;confidence:string;version:string;x1:string;y1:string;x2:string;y2:string};
 const keys=["x1","y1","x2","y2"] as const;

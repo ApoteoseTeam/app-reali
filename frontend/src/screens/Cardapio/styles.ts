@@ -1,55 +1,25 @@
-import { StyleSheet } from 'react-native';
-import { colors } from '../../theme/colors';
-
-const azul = '#102B53';
+import { StyleSheet } from "react-native";
+import { colors } from "../../theme/colors";
 
 export const styles = StyleSheet.create({
-    tela: { flex: 1, backgroundColor: '#FFFFFF' },
-    cabecalho: {
-        minHeight: 64,
-        justifyContent: 'center',
-        paddingHorizontal: 16,
-        backgroundColor: azul,
-    },
-    titulo: {
-        color: '#FFFFFF',
-        fontSize: 18,
-        fontWeight: '700',
-        textAlign: 'center',
-    },
-    scroll: { flex: 1 },
-    conteudo: {
-        width: '100%',
-        maxWidth: 640,
-        alignSelf: 'center',
-        padding: 16,
-        paddingBottom: 24,
-        gap: 10,
-    },
-    periodo: {
-        color: azul,
-        fontSize: 15,
-        fontWeight: '700',
-        marginBottom: 10,
-    },
-    medidas: {
-        marginTop: 10,
-        padding: 14,
-        gap: 4,
-        borderWidth: 0,
-        borderRadius: 12,
-        backgroundColor: colors.secondary,
-    },
-    tituloMedidas: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
-    textoMedidas: { color: '#FFFFFF', fontSize: 13, lineHeight: 18 },
-    rodape: { flexDirection: 'row', backgroundColor: azul },
-    aba: {
-        flex: 1,
-        minHeight: 52,
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 3,
-    },
-    textoAba: { color: '#FFFFFF', fontSize: 11, fontWeight: '600' },
-    abaAtiva: { color: '#C8DFB9' },
+  title: { color: colors.primary, fontSize: 18, fontWeight: "700" },
+  intro: { gap: 4 },
+  context: {
+    backgroundColor: colors.background, borderWidth: 1, borderColor: "#DDE8D7", borderRadius: 10, padding: 12, gap: 8,
+  },
+  field: {
+    minHeight: 44, borderWidth: 1, borderColor: "#718B78", borderRadius: 8, paddingHorizontal: 10,
+    backgroundColor: colors.white, color: colors.primary,
+  },
+  list: { gap: 8 },
+  meal: { backgroundColor: colors.surfaceLight, borderRadius: 10, borderWidth: 0, padding: 12, gap: 8 },
+  mealHeader: { flexDirection: "row", alignItems: "center", gap: 10 },
+  mealIdentity: { flex: 1, gap: 3 },
+  mealLabel: { color: colors.primary, fontSize: 15, fontWeight: "700" },
+  meta: { color: "#455A50", fontSize: 13, lineHeight: 19 },
+  time: { color: colors.secondaryDark, fontSize: 12, fontWeight: "700" },
+  icon: { width: 34, height: 34, backgroundColor: colors.white, borderRadius: 8, alignItems: "center", justifyContent: "center" },
+  schedule: { backgroundColor: colors.secondary, borderWidth: 0, borderRadius: 10, padding: 12, gap: 8 },
+  scheduleTitle: { color: colors.white, fontSize: 15, fontWeight: "700" },
+  scheduleCaption: { color: "#EDF4EA", fontSize: 13, lineHeight: 19 },
 });

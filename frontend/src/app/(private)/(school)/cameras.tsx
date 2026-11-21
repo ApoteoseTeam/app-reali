@@ -1,1 +1,1 @@
-export {CameraList as default} from "../../../features/Cameras";
+export { default } from "../../../screens/Cameras/Cameras";

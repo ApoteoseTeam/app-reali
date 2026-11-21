@@ -2,19 +2,18 @@ import { randomUUID } from "expo-crypto";
 import { useRef, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Text, View } from "react-native";
-import { mealTypes, type Count } from "../api/reali";
-import { useAction } from "../hooks/useAction";
-import { useRemote } from "../hooks/useRemote";
-import { api, useSession } from "../session/provider";
-import { Pagination } from "./Meals";
-import { Action, Feedback, Field, isDay, labels, Page, Panel, RangeFields, stamp, today, ui, value } from "./ui";
+import { mealTypes, type Count } from "../../api/reali";
+import { useAction } from "../../hooks/useAction";
+import { useRemote } from "../../hooks/useRemote";
+import { api, useSession } from "../../session/provider";
+import { Action, Feedback, Field, isDay, labels, Page, Pagination, Panel, RangeFields, stamp, today, ui, value } from "../../features/ui";
 
 const sao=new Intl.DateTimeFormat("en",{timeZone:"America/Sao_Paulo",timeZoneName:"longOffset"});
 function bound(day:string,end:boolean){
   const timeZone=sao.formatToParts(new Date(day+"T12:00:00Z")).find(part=>part.type==="timeZoneName")?.value;
   return day+(end?"T23:59:59.999999":"T00:00:00")+(timeZone?.slice(3)||"-03:00");
 }
-export default function Counts(){
+export default function Contagens(){
   const session=useSession(),workspace=session.workspace!,router=useRouter();
   const params=useLocalSearchParams<{meal?:string;date?:string}>();
   const [kind,setKind]=useState<"student"|"plate">(params.meal?"plate":"student");

@@ -1,15 +1,20 @@
 import { useState } from 'react';
 import { FlatList, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { ArrowLeft, Trash2 } from 'lucide-react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { mealTypes, type MealType } from '../../api/reali';
 import { Button } from '../../components/Button/Button';
 import { DateField } from '../../components/DateField/DateField';
-import { Header } from '../../components/Header/header';
+import { Header } from '../../components/header/header';
 import { IconButton } from '../../components/IconButton/IconButton';
+import { Input } from '../../components/Input/Input';
 import { Select } from '../../components/select/Select';
+import { Action, Feedback, ui } from '../../features/ui';
 import { styles } from './styles';
 
-const REFEICOES = ['Café da manhã', 'Almoço', 'Lanche', 'Jantar'];
+const REFEICOES = Object.keys(mealTypes) as MealType[];
+const DIAS = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
 
 const INGREDIENTES = [
     { id: 'arroz', nome: 'Arroz', medida: 'pacote de 5 kg' },
@@ -19,29 +24,31 @@ const INGREDIENTES = [
     { id: 'cenoura', nome: 'Cenoura', medida: 'unidade' },
 ];
 
-const DATA_INICIAL = '2026-11-09';
-const REFEICAO_INICIAL = 'Almoço';
-const INGREDIENTES_INICIAIS = ['arroz', 'feijao', 'omelete'];
-
-type Cardapio = {
-    data: string;
-    refeicao: string;
-    ingredienteIds: string[];
-};
-
 type AdicionarCardapioProps = {
-    onSalvar?: (cardapio: Cardapio) => void;
-    onVoltar?: () => void;
+    mode: 'service' | 'schedule';
+    data: string;
+    type: MealType;
+    time: string;
+    weekdays: number[];
+    name: string;
+    onDate: (date: string) => void;
+    onType: (type: MealType) => void;
+    onTime: (time: string) => void;
+    onDays: (days: number[]) => void;
+    onName: (name: string) => void;
+    onSave: () => void;
+    onClose: () => void;
+    disabled: boolean;
+    loading: boolean;
+    error: string | null;
 };
 
 export default function AdicionarCardapio({
-    onSalvar,
-    onVoltar,
-}: AdicionarCardapioProps = {}) {
-    const [data, setData] = useState(DATA_INICIAL);
-    const [refeicao, setRefeicao] = useState(REFEICAO_INICIAL);
-    const [ingredienteIds, setIngredienteIds] = useState(INGREDIENTES_INICIAIS);
+    mode, data, type, time, weekdays, name, onDate, onType, onTime, onDays, onName, onSave, onClose, disabled, loading, error,
+}: AdicionarCardapioProps) {
+    const [ingredienteIds, setIngredienteIds] = useState<string[]>([]);
     const [seletorAberto, setSeletorAberto] = useState(false);
+    const semanal = mode === 'schedule';
 
     const selecionados = INGREDIENTES.filter((item) =>
         ingredienteIds.includes(item.id)
@@ -49,7 +56,6 @@ export default function AdicionarCardapio({
     const disponiveis = INGREDIENTES.filter((item) =>
         !ingredienteIds.includes(item.id)
     );
-    const podeSalvar = Boolean(onSalvar && data && refeicao && ingredienteIds.length);
 
     function adicionarIngrediente(id: string) {
         setIngredienteIds((ids) => (ids.includes(id) ? ids : [...ids, id]));
@@ -60,21 +66,10 @@ export default function AdicionarCardapio({
         setIngredienteIds((ids) => ids.filter((itemId) => itemId !== id));
     }
 
-    function cancelar() {
-        if (onVoltar) {
-            onVoltar();
-            return;
-        }
-
-        setData(DATA_INICIAL);
-        setRefeicao(REFEICAO_INICIAL);
-        setIngredienteIds(INGREDIENTES_INICIAIS);
-    }
-
     return (
-        <View style={styles.tela}>
+        <SafeAreaView style={ui.managementScreen} edges={["top", "left", "right"]}>
             <Header
-                name="Adicionar cardápio"
+                name={semanal ? 'Nova programação' : 'Adicionar cardápio'}
                 containerStyle={styles.cabecalho}
                 titleStyle={styles.titulo}
                 left={
@@ -83,7 +78,7 @@ export default function AdicionarCardapio({
                         size={22}
                         color="#FFFFFF"
                         accessibilityLabel="Voltar"
-                        onPress={cancelar}
+                        onPress={() => { if (!loading) onClose(); }}
                         style={styles.voltar}
                     />
                 }
@@ -91,19 +86,43 @@ export default function AdicionarCardapio({
             />
 
             <ScrollView style={styles.scroll} contentContainerStyle={styles.conteudo}>
-                <DateField label="Data" value={data} onChange={setData} />
+                {!semanal && <DateField label="Data" value={data} onChange={onDate} />}
+                {semanal && <View style={styles.lista}>
+                    <Text style={styles.rotulo}>Nome da programação</Text>
+                    <Input accessibilityLabel="Nome da programação" value={name} onChangeText={onName} style={styles.campo}
+                        maxLength={120} placeholder="Ex. Almoço da semana" editable={!loading} />
+                </View>}
 
                 <Select
                     label="Refeição"
-                    options={REFEICOES}
-                    value={refeicao}
-                    onChange={setRefeicao}
+                    options={REFEICOES.map(refeicao => mealTypes[refeicao])}
+                    value={mealTypes[type]}
+                    onChange={label => {
+                        const refeicao = REFEICOES.find(value => mealTypes[value] === label);
+                        if (refeicao) onType(refeicao);
+                    }}
                 />
 
                 <View style={styles.lista}>
+                    <Text style={styles.rotulo}>Horário (HH:MM)</Text>
+                    <Input accessibilityLabel="Horário (HH:MM)" value={time} onChangeText={onTime} style={styles.campo}
+                        maxLength={5} placeholder="12:00" editable={!loading} />
+                </View>
+                {semanal ? <View style={styles.lista}>
+                    <Text style={styles.rotulo}>Dias da semana</Text>
+                    <View style={ui.row}>
+                        {DIAS.map((day, index) => {
+                            const number = index + 1;
+                            const selected = weekdays.includes(number);
+                            return <Action key={day} title={day} variant={selected ? undefined : 'flat'} disabled={loading}
+                                onPress={() => onDays(selected ? weekdays.filter(value => value !== number) : [...weekdays, number])} />;
+                        })}
+                    </View>
+                </View> : <View style={styles.lista}>
                     <Text accessibilityRole="header" style={styles.rotulo}>
-                        Ingredientes do cardápio
+                        Rascunho de ingredientes
                     </Text>
+                    <Text style={styles.medida}>Os ingredientes ficam no rascunho desta tela.</Text>
 
                     {selecionados.map(({ id, nome, medida }) => (
                         <View key={id} style={styles.ingrediente}>
@@ -135,25 +154,28 @@ export default function AdicionarCardapio({
                         ]}
                         textStyle={styles.textoAzul}
                     />
-                </View>
+                </View>}
+                <Feedback loading={loading} error={error} />
             </ScrollView>
 
-            <View style={styles.rodape}>
-                <Button
-                    label="Salvar cardápio"
-                    accessibilityRole="button"
-                    disabled={!podeSalvar}
-                    onPress={() => onSalvar?.({ data, refeicao, ingredienteIds })}
-                    style={[styles.botao, styles.preenchido, !podeSalvar && styles.desabilitado]}
-                />
-
-                <Button
-                    label="Cancelar"
-                    accessibilityRole="button"
-                    onPress={cancelar}
-                    style={[styles.botao, styles.contorno]}
-                    textStyle={styles.textoAzul}
-                />
+            <View style={ui.managementFooter}>
+                <View style={[ui.managementFooterContent, styles.rodape]}>
+                    <Button
+                        label={semanal ? 'Salvar programação' : 'Salvar serviço'}
+                        accessibilityRole="button"
+                        disabled={disabled}
+                        onPress={onSave}
+                        style={[styles.botao, styles.preenchido, disabled && styles.desabilitado]}
+                    />
+                    <Button
+                        label="Cancelar"
+                        accessibilityRole="button"
+                        disabled={loading}
+                        onPress={onClose}
+                        style={[styles.botao, styles.contorno]}
+                        textStyle={styles.textoAzul}
+                    />
+                </View>
             </View>
 
             <Modal
@@ -193,6 +215,6 @@ export default function AdicionarCardapio({
                     </View>
                 </View>
             </Modal>
-        </View>
+        </SafeAreaView>
     );
 }

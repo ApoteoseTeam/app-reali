@@ -1,1 +1,1 @@
-export {CameraDetail as default} from "../../../features/Cameras";
+export { default } from "../../../screens/Camera/Camera";

@@ -1,86 +1,31 @@
-import { StyleSheet } from "react-native"
-
-import { typography } from '../../theme/typography'
-import { colors } from '../../theme/colors'
+import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#FFFFFF',
-        position: 'relative',
-    },
-    topBlob: {
-        position: 'absolute',
-        top: -80,
-        left: -80,
-        width: 300,
-        height: 200,
-    },
-    bottomWave: {
-        position: 'absolute',
-        bottom: -160,
-        left: '-20%',
-        right: 0,
-        height: 300,
-        width: '130',
-    },
-    content: {
-        flex: 1,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 24,
-        paddingTop: 60,
-        paddingBottom: 20,
-        zIndex: 1,
-    },
-    headerGroup: {
-        alignItems: 'center',
-    },
-    title: {
-        fontSize: 56,
-        color: colors.primary,
-        marginBottom: 8,
-        textAlign: 'center',
-    },
-    subtitle: {
-        fontSize: typography.sizes.small,
-        color: colors.textSecondary,
-        fontWeight: '500',
-        marginBottom: 20,
-        textAlign: 'center',
-    },
-    description: {
-        fontSize: typography.sizes.small,
-        color: colors.textSecondary,
-        textAlign: 'center',
-        lineHeight: 20,
-        marginBottom: 32,
-        maxWidth: 310,
-    },
-    buttonContainer: {
-        width: '100%',
-        gap: 12,
-    },
-    footer: {
-        width: '100%',
-        flexDirection: 'row',
-        alignItems: 'flex-end',
-        justifyContent: 'space-between',
-    },
-    footerTextGroup: {
-        flex: 1,
-        paddingRight: 12,
-    },
-    footerText: {
-        fontSize: 12,
-        color: colors.textSecondary,
-        lineHeight: 16,
-        marginLeft: 20,
-        marginBottom: 12
-    },
-    foodImage: {
-        width: 160,
-        height: 160,
-        bottom: -10
-    }
+  container: { flex: 1, backgroundColor: "#F2F7ED" },
+  scroll: { flexGrow: 1, alignItems: "center" },
+  surface: { flex: 1, width: "100%", maxWidth: 540, backgroundColor: "#F6FAF1", overflow: "hidden" },
+  topShape: {
+    position: "absolute", top: -96, left: -69, width: 252, height: 213,
+    backgroundColor: "#173556", borderRadius: 135,
+  },
+  content: {
+    flex: 1, minHeight: 412, width: "100%", maxWidth: 398, alignSelf: "center", alignItems: "center",
+    justifyContent: "center", paddingHorizontal: 36, paddingTop: 78, paddingBottom: 12, gap: 28,
+  },
+  brand: { width: "100%", alignItems: "center" },
+  logo: { width: "100%", maxWidth: 310, height: 112 },
+  tagline: { color: "#173556", fontSize: 12, fontWeight: "700", textAlign: "center" },
+  description: { maxWidth: 310, color: "#243831", fontSize: 15, lineHeight: 22, textAlign: "center" },
+  enter: {
+    width: "100%", minHeight: 48, borderRadius: 14, paddingHorizontal: 18, paddingVertical: 12,
+    alignItems: "center", justifyContent: "center", backgroundColor: "#173556",
+  },
+  enterText: { color: "#FFFFFF", fontWeight: "700", fontSize: 16 },
+  art: { width: "100%", marginTop: 18, position: "relative", overflow: "hidden" },
+  wave: {
+    position: "absolute", left: "-15%", bottom: -72, width: "135%", height: "105%",
+    borderTopStartRadius: 260, borderTopEndRadius: 170, borderTopWidth: 16, borderTopColor: "#173556",
+    backgroundColor: "#B6CFAA", transform: [{ rotate: "-6deg" }],
+  },
+  plate: { position: "absolute", width: "88%", height: "138%", right: "-7%", bottom: "-42%" },
 });

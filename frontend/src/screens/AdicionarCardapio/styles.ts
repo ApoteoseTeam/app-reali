@@ -1,10 +1,10 @@
 import { StyleSheet } from 'react-native';
+import { colors } from '../../theme/colors';
 
-const azul = '#102B53';
+const azul = colors.primary;
 const branco = '#FFFFFF';
 
 export const styles = StyleSheet.create({
-    tela: { flex: 1, backgroundColor: branco },
     cabecalho: {
         minHeight: 56,
         paddingHorizontal: 12,
@@ -22,16 +22,17 @@ export const styles = StyleSheet.create({
     },
     espacoCabecalho: { width: 44 },
 
-    scroll: { flex: 1 },
+    scroll: { flex: 1, backgroundColor: branco },
     conteudo: {
         width: '100%',
-        maxWidth: 600,
+        maxWidth: 640,
         alignSelf: 'center',
-        padding: 20,
-        gap: 16,
+        padding: 16,
+        gap: 14,
     },
     lista: { gap: 8 },
     rotulo: { color: azul, fontSize: 14, fontWeight: '700' },
+    campo: { minHeight: 44, backgroundColor: colors.background, borderWidth: 1, borderColor: "#718B78", borderRadius: 8 },
     ingrediente: {
         minHeight: 56,
         flexDirection: 'row',
@@ -40,7 +41,7 @@ export const styles = StyleSheet.create({
         paddingVertical: 6,
         gap: 8,
         borderRadius: 12,
-        backgroundColor: '#E6F2DA',
+        backgroundColor: colors.surfaceLight,
     },
     textosIngrediente: { flex: 1 },
     nome: { color: azul, fontSize: 15, fontWeight: '700' },
@@ -54,18 +55,10 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
     },
 
-    rodape: {
-        width: '100%',
-        maxWidth: 600,
-        alignSelf: 'center',
-        paddingHorizontal: 20,
-        paddingBottom: 20,
-        paddingTop: 8,
-        gap: 10,
-    },
+    rodape: { gap: 8 },
     botao: {
-        minHeight: 48,
-        borderRadius: 12,
+        minHeight: 44,
+        borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center',
         paddingHorizontal: 12,

@@ -11,7 +11,7 @@ export type Me = { user: User; memberships: Member[] };
 export type MealType = "BREAKFAST" | "LUNCH" | "SNACK" | "DINNER";
 export type MealStatus = "PLANNED" | "PREPARING" | "SERVING" | "FINISHED" | "CANCELLED";
 export type Meal = { id: string; school: string; date: string; meal_type: MealType; scheduled_time: string; status: MealStatus; serving_data_quality: string };
-export type Schedule = { id: string; school: string; meal_type: MealType; start_time: string; end_time: string | null; weekdays: number[]; is_active: boolean };
+export type Schedule = { id: string; school: string; meal_type: MealType; name: string; start_time: string; end_time: string | null; weekdays: number[]; is_active: boolean };
 export type Snapshot = { total_student_entries: number; reference_time: string; data_quality_status: string };
 export type Forecast = { forecast_plates: number | null; method: string; confidence_status: string; calculated_at: string };
 export type StartedMeal = Meal & { attendance_snapshot: Snapshot; forecast: Forecast };
@@ -123,7 +123,7 @@ export class RealiApi {
   comparison = (scope: Scope, query: Query, signal?: AbortSignal) => this.http.request<Page<Metrics>>("analytics/schools/comparison/", {scope,query,signal});
   mealMetric = (scope:Scope,id:string,signal?:AbortSignal) => this.http.request<MealMetrics>(`analytics/meal-services/${objectId(id)}/`,{scope,signal});
   mealMetrics = (scope: Scope, query: Query, signal?: AbortSignal) => this.http.request<Page<MealMetrics>>("analytics/meal-services/", {scope,query,signal});
-  report = (scope: Scope, query: Query, file_format:"pdf"|"csv") => this.http.request<ArrayBuffer>("analytics/reports/export/", {scope,binary:true,timeout:30000,query:{...query,file_format}});
+  report = (scope: Scope, query: Query, file_format:"pdf"|"csv", signal?: AbortSignal) => this.http.request<ArrayBuffer>("analytics/reports/export/", {scope,signal,binary:true,timeout:30000,query:{...query,file_format}});
 
   meals = (scope: Scope, query: Query, signal?: AbortSignal) => this.http.request<Page<Meal>>("meal-services/", {scope,query,signal});
   meal = (scope: Scope,id:string,signal?:AbortSignal) => this.http.request<Meal>(`meal-services/${objectId(id)}/`, {scope,signal});
@@ -134,7 +134,7 @@ export class RealiApi {
   createMeal = (scope:Scope, body:{school:string; date:string; scheduled_time:string; meal_type:MealType}) => this.http.request<Meal>("meal-services/",{scope,method:"POST",body});
   schedules = (scope:Scope,query:Query,signal?:AbortSignal) => this.http.request<Page<Schedule>>("meal-schedules/",{scope,query,signal});
   generateMeal = (scope:Scope,id:string,date:string) => this.http.request<Meal>(`meal-schedules/${objectId(id)}/generate/`,{scope,method:"POST",body:{date}});
-  createSchedule = (scope:Scope, body:{school:string; weekdays:number[];start_time:string;meal_type:MealType}) => this.http.request<Schedule>("meal-schedules/",{scope,method:"POST",body});
+  createSchedule = (scope:Scope, body:{school:string; name:string; weekdays:number[];start_time:string;meal_type:MealType}) => this.http.request<Schedule>("meal-schedules/",{scope,method:"POST",body});
 
   cameras = (scope: Scope,query: Query,signal?:AbortSignal) => this.http.request<Page<Camera>>("cameras/",{scope,query,signal});
   cameraStatus = (scope:Scope,id:string,signal?:AbortSignal) => this.http.request<Camera>(`cameras/${objectId(id)}/status/`,{scope,signal});

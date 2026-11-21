@@ -8,6 +8,7 @@ function Routes(){
   const session=useSession();
   return <Stack screenOptions={{headerShown:false}}>
     <Stack.Screen name="index"/>
+    <Stack.Screen name="entrar"/>
     <Stack.Screen name="ativar"/>
     <Stack.Screen name="recuperar"/>
     <Stack.Protected guard={session.status==="AUTHENTICATED"}><Stack.Screen name="(private)"/></Stack.Protected>

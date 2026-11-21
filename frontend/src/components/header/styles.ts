@@ -14,14 +14,16 @@ export const style = StyleSheet.create({
 
     container_name: {
         padding: 15,
-        justifyContent: 'center',
-        alignItems: 'center',
     },
+    titleGroup: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flexShrink: 1, gap: 4 },
+    logoFrame: { width: 32, height: 36, alignItems: 'center', justifyContent: 'center' },
+    logo: { width: 64, height: 64 },
     pagename: {
         color: colors.textSecondary,
         fontSize: typography.sizes.title,
         fontWeight: typography.weights.bold,
-        padding: 20,
+        flexShrink: 1,
+        paddingVertical: 16,
     },
     icon: {
         position: 'absolute',

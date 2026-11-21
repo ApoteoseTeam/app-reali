@@ -39,6 +39,26 @@ export const styles = StyleSheet.create({
     textAlign: "center",
   },
 
+  abas: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E3E8E5",
+  },
+
+  aba: {
+    flex: 1,
+    minHeight: spacing.xxl,
+    alignItems: "center",
+    justifyContent: "center",
+    borderBottomWidth: 2,
+    borderBottomColor: "transparent",
+  },
+
+  abaSelecionada: { borderBottomColor: "#2F6B3A" },
+  textoAba: { fontSize: 13, color: "#667B70" },
+  textoAbaSelecionada: { color: "#14385F", fontWeight: typography.weights.bold },
+  instrucao: { color: "#465950", fontSize: 14, lineHeight: 21, marginBottom: 8 },
+
   paginas: {
     flex: 1,
   },
@@ -88,6 +108,15 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
+  recuperar: {
+    alignSelf: "center",
+    minHeight: 44,
+    justifyContent: "center",
+    paddingHorizontal: 10,
+    marginTop: 4,
+  },
+  recuperarTexto: { color: "#14385F", fontSize: 12, fontWeight: "600", textDecorationLine: "underline" },
+
   nota: {
     marginTop: 12,
     fontSize: 11,
@@ -95,4 +124,4 @@ export const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 16,
   },
-}) 
+});

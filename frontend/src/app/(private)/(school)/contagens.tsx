@@ -1,1 +1,1 @@
-export {default} from "../../../features/Counts";
+export { default } from "../../../screens/Contagens/Contagens";

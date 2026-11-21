@@ -21,6 +21,7 @@ type StatusModalProps = {
   onClose: () => void;
   onRetry: () => void;
   onViewHistory: () => void;
+  localDraft?: boolean;
 };
 
 export function StatusModal({
@@ -31,6 +32,7 @@ export function StatusModal({
   onClose,
   onRetry,
   onViewHistory,
+  localDraft,
 }: StatusModalProps) {
   return (
     <Modal
@@ -75,7 +77,7 @@ export function StatusModal({
               </View>
 
               <Text style={styles.title}>
-                Planejamento salvo
+                {localDraft ? "Rascunho salvo nesta sessão" : "Planejamento salvo"}
               </Text>
 
               <Text style={styles.description}>
@@ -88,7 +90,7 @@ export function StatusModal({
 
               <View style={styles.buttonContainer}>
                 <Button
-                  label="Ver no histórico"
+                  label={localDraft ? "Abrir histórico de indicadores" : "Ver no histórico"}
                   onPress={onViewHistory}
                   style={styles.primaryButton}
                 />

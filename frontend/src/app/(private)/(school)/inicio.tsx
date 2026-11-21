@@ -1,1 +1,1 @@
-export {default} from "../../../features/AnalyticsDashboard";
+export { default } from "../../../screens/Inicio/Inicio";

@@ -5,15 +5,18 @@ type Props = {
   opcoes: string[]
   selecionado: string
   aoSelecionar: (opcao: string) => void
+  variant?: "default" | "underline"
 }
 
 export const SegmentedControl = ({
   opcoes,
   selecionado,
-  aoSelecionar
+  aoSelecionar,
+  variant = "default",
 }: Props) => {
+  const underline = variant === "underline";
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, underline && styles.underline]} accessibilityRole="tablist">
       {opcoes.map((opcao) => {
         const ativo = selecionado === opcao
 
@@ -21,15 +24,19 @@ export const SegmentedControl = ({
           <Pressable
             key={opcao}
             onPress={() => aoSelecionar(opcao)}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: ativo }}
+            aria-selected={ativo}
             style={[
               styles.opcao,
-              ativo && styles.opcaoAtiva
+              underline && styles.underlineOption,
+              ativo && (underline ? styles.underlineSelected : styles.opcaoAtiva)
             ]}
           >
             <Text
               style={[
                 styles.texto,
-                ativo && styles.textoAtivo
+                ativo && (underline ? styles.underlineText : styles.textoAtivo)
               ]}
             >
               {opcao}

@@ -1,7 +1,8 @@
 import { View, Text, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
 import { style } from "./styles"
 import type { ReactNode } from 'react';
-import { NotificationBell } from '../../features/Notifications';
+import { NotificationBell } from '../../components/NotificationBell/NotificationBell';
+import { Logo } from '../Logo/Logo';
 
 type HeaderProps = {
   name: string;
@@ -15,19 +16,14 @@ type HeaderProps = {
 
 export function Header({ name, left, right, containerStyle, titleStyle }: HeaderProps) {
 
-  const title = (
-    <Text accessibilityRole="header" style={titleStyle ?? style.pagename}>{name}</Text>
-  )
-
   return (
     <View style={containerStyle ?? style.container}>
       {left}
 
-      {left == null ? (
-        <View style={style.container_name}>{title}</View>
-      ) : (
-        title
-      )}
+      <View style={[style.titleGroup, left == null && style.container_name]}>
+        <View style={style.logoFrame}><Logo variant="mark" style={style.logo} /></View>
+        <Text accessibilityRole="header" style={titleStyle ?? style.pagename}>{name}</Text>
+      </View>
       {right === undefined ? (
         <View style={style.icon}>
           <NotificationBell />

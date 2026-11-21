@@ -27,12 +27,15 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#F7FAF3",
-          "image": "./src/assets/logo-reali.png",
-          "imageWidth": 200
+          "backgroundColor": "#163352"
         }
       ],
       "expo-asset",
+      ["expo-image-picker", {
+        "photosPermission": "Permitir que o Reali selecione sua foto de perfil.",
+        "cameraPermission": false,
+        "microphonePermission": false
+      }],
       "expo-router",
       "expo-secure-store",
       ["expo-notifications", { "defaultChannel": "reali" }],

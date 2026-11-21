@@ -96,4 +96,5 @@ export const kpicardStyles = StyleSheet.create({
         fontSize: 34,
         fontWeight: '700',
     },
+    emptyValue: { fontSize: 18 },
 });

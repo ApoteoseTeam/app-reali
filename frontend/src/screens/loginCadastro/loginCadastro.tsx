@@ -1,342 +1,127 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState, type ComponentRef } from 'react';
 import {
-  Alert,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  Text,
-  useWindowDimensions,
-  View,
+  Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, useWindowDimensions, View,
 } from 'react-native';
-import { styles } from './styles';
+
+import { Button } from '../../components/Button/Button';
 import { Checkbox } from '../../components/CheckBox/CheckBox';
 import { Input } from '../../components/Input/Input';
-import { Button } from '../../components/Button/Button';
-import { Select } from "../../components/select/Select";
-// import { Header } from '../components/header';
+import { styles } from './styles';
 
-type Funcao = 'Nutricionista' | 'Gestor';
-type Aba = 0 | 1;
+type Props = {
+  onLogin: (email: string, password: string) => Promise<void>;
+  onReset: () => void;
+  sessionError: string | null;
+};
 
-export default function TelaAutenticacao() {
-  const { width: larguraJanela } = useWindowDimensions();
-  const paginasRef = useRef<React.ComponentRef<typeof ScrollView>>(null);
+const tabs = ['Entrar', 'Primeiro acesso'] as const;
 
-  const [largura, setLargura] = useState(larguraJanela);
-  const [abaAtiva, setAbaAtiva] = useState<Aba>(0);
-
-  // Estados do login
-  const [emailLogin, setEmailLogin] = useState('');
-  const [senhaLogin, setSenhaLogin] = useState('');
-  const [termosLogin, setTermosLogin] = useState(false);
-
-  // Estados do cadastro
-  const [nome, setNome] = useState('');
+export default function TelaAutenticacao({ onLogin, onReset, sessionError }: Props) {
+  const { width } = useWindowDimensions();
+  const pages = useRef<ComponentRef<typeof ScrollView>>(null);
+  const running = useRef(false);
+  const [tab, setTab] = useState(0);
   const [email, setEmail] = useState('');
-  const [escola, setEscola] = useState('');
-  const [funcao, setFuncao] = useState<Funcao>('Nutricionista');
-  const [senha, setSenha] = useState('');
-  const [termosCadastro, setTermosCadastro] = useState(false);
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const [tentouCadastrar, setTentouCadastrar] = useState(false);
-
-  const senhaInvalida = tentouCadastrar && senha.length < 8;
-
-  function trocarAba(aba: Aba) {
+  function selectTab(index: number) {
     Keyboard.dismiss();
-    setAbaAtiva(aba);
-
-    paginasRef.current?.scrollTo({
-      x: largura * aba,
-      animated: true,
-    });
+    setTab(index);
+    pages.current?.scrollTo({ x: width * index, animated: true });
   }
 
-  function handleLogin() {
+  async function submit() {
+    if (running.current) return;
+    if (!email.trim().includes('@') || !password) {
+      setError('Informe seu e-mail institucional e a senha.');
+      return;
+    }
+    running.current = true;
+    setBusy(true);
+    setError(null);
     Keyboard.dismiss();
-
-    Alert.alert(
-      'Demonstração',
-      'A integração de login ainda será implementada.'
-    );
-  }
-
-  function handleCadastro() {
-    Keyboard.dismiss();
-    setTentouCadastrar(true);
-
-    if (!nome.trim() || !email.trim() || !escola.trim()) {
-      Alert.alert('Campos obrigatórios', 'Preencha todos os campos.');
-      return;
+    try {
+      await onLogin(email.trim(), password);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Não foi possível entrar.');
+    } finally {
+      running.current = false;
+      setBusy(false);
     }
-
-    if (senha.length < 8) {
-      Alert.alert('Confira a senha', 'Use ao menos 8 caracteres.');
-      return;
-    }
-
-    if (!termosCadastro) {
-      Alert.alert(
-        'Termos de uso',
-        'Aceite os termos e a política de privacidade para continuar.'
-      );
-      return;
-    }
-
-    Alert.alert(
-      'Demonstração',
-      'Os campos foram preenchidos. A conta ainda não foi criada.'
-    );
   }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <View
-        style={styles.conteudo}
-        onLayout={({ nativeEvent }) => {
-          const novaLargura = nativeEvent.layout.width;
-
-          if (novaLargura !== largura) {
-            setLargura(novaLargura);
-
-            paginasRef.current?.scrollTo({
-              x: novaLargura * abaAtiva,
-              animated: false,
-            });
-          }
-        }}
-      >
-        {/* Substituir este bloco pelo Header quando estiver pronto. */}
-        {/* <Header /> */}
-
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <View style={styles.conteudo}>
         <View style={styles.cabecalho}>
-          <Text style={styles.logo}>
-            Re<Text style={styles.logoDestaque}>ali</Text>
-          </Text>
-
-          <Text style={styles.subtitulo}>
-            Mais controle. Menos desperdício.
-          </Text>
+          <Text style={styles.logo}>Re<Text style={styles.logoDestaque}>ali</Text></Text>
+          <Text style={styles.subtitulo}>Mais controle. Menos desperdício.</Text>
         </View>
 
         <View style={styles.abas} accessibilityRole="tablist">
-          {(['Entrar', 'Criar conta'] as const).map((titulo, indice) => {
-            const aba = indice as Aba;
-            const selecionada = abaAtiva === aba;
-
-            return (
-              <Pressable
-                key={titulo}
-                accessibilityRole="tab"
-                accessibilityState={{ selected: selecionada }}
-                onPress={() => trocarAba(aba)}
-                style={[
-                  styles.aba,
-                  selecionada && styles.abaSelecionada,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.textoAba,
-                    selecionada && styles.textoAbaSelecionada,
-                  ]}
-                >
-                  {titulo}
-                </Text>
-              </Pressable>
-            );
-          })}
+          {tabs.map((title, index) => (
+            <Pressable key={title} accessibilityRole="tab" accessibilityState={{ selected: tab === index, disabled: busy }}
+              disabled={busy} onPress={() => selectTab(index)}
+              style={[styles.aba, tab === index && styles.abaSelecionada]}>
+              <Text style={[styles.textoAba, tab === index && styles.textoAbaSelecionada]}>{title}</Text>
+            </Pressable>
+          ))}
         </View>
 
-        <ScrollView
-          ref={paginasRef}
-          style={styles.paginas}
-          horizontal
-          pagingEnabled
-          directionalLockEnabled
-          showsHorizontalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          scrollEventThrottle={16}
-          onScrollBeginDrag={Keyboard.dismiss}
-          onScroll={({ nativeEvent }) => {
-            const indice = Math.round(
-              nativeEvent.contentOffset.x / largura
-            );
-
-            setAbaAtiva(indice >= 1 ? 1 : 0);
-          }}
-        >
-          {/* ENTRAR */}
-          <ScrollView
-            style={{ width: largura }}
-            contentContainerStyle={styles.formulario}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-          >
+        <ScrollView ref={pages} style={styles.paginas} horizontal pagingEnabled directionalLockEnabled
+          showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" scrollEventThrottle={16}
+          scrollEnabled={!busy} onScrollBeginDrag={Keyboard.dismiss}
+          onLayout={() => pages.current?.scrollTo({ x: width * tab, animated: false })}
+          onMomentumScrollEnd={({ nativeEvent }) => setTab(nativeEvent.contentOffset.x >= width / 2 ? 1 : 0)}>
+          <ScrollView style={{ width }} contentContainerStyle={styles.formulario}
+            keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}
+            aria-hidden={tab !== 0} accessibilityElementsHidden={tab !== 0} importantForAccessibility={tab !== 0 ? 'no-hide-descendants' : 'auto'}>
             <View style={styles.grupo}>
               <Text style={styles.label}>E-mail</Text>
-
-              <Input
-                accessibilityLabel="E-mail para entrar"
-                style={styles.input}
-                placeholder="voce@escola.gov.br"
-                placeholderTextColor="#667B70"
-                value={emailLogin}
-                onChangeText={setEmailLogin}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
+              <Input accessibilityLabel="E-mail para entrar" testID="login-email" editable={!busy}
+                style={styles.input} placeholder="voce@escola.gov.br" placeholderTextColor="#667B70"
+                value={email} onChangeText={setEmail} keyboardType="email-address"
+                autoComplete="email" autoCapitalize="none" autoCorrect={false} />
             </View>
 
             <View style={styles.grupo}>
               <Text style={styles.label}>Senha</Text>
-
-              <Input
-                accessibilityLabel="Senha para entrar"
-                style={styles.input}
-                placeholder="••••••"
-                placeholderTextColor="#667B70"
-                value={senhaLogin}
-                onChangeText={setSenhaLogin}
-                secureTextEntry
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
+              <Input accessibilityLabel="Senha para entrar" testID="login-password" editable={!busy}
+                style={styles.input} placeholder="••••••" placeholderTextColor="#667B70"
+                value={password} onChangeText={setPassword} secureTextEntry={!showPassword}
+                autoComplete="current-password" autoCapitalize="none" autoCorrect={false}
+                onSubmitEditing={() => void submit()} />
             </View>
 
             <View style={styles.termos}>
-              <Checkbox
-                text="Li e aceito os termos e a política de privacidade."
-                checked={termosLogin}
-                onChange={setTermosLogin}
-              />
+              <Checkbox text="Mostrar senha" checked={showPassword} onChange={setShowPassword} />
             </View>
-
-            <Button
-              label="Entrar"
-              style={styles.botao}
-              onPress={handleLogin}
-            />
-
-            <Text style={styles.nota}>
-              Não coletamos dados de alunos. Só pesos por preparação.
-            </Text>
+            {(error ?? sessionError) && <Text accessibilityRole="alert" style={styles.nota}>{error ?? sessionError}</Text>}
+            <Button label={busy ? 'Entrando…' : 'Entrar'} testID="login-submit" accessibilityRole="button" style={styles.botao}
+              disabled={busy} onPress={() => void submit()} />
+            <Pressable accessibilityRole="link" disabled={busy} onPress={onReset} style={styles.recuperar}>
+              <Text style={styles.recuperarTexto}>Esqueci minha senha</Text>
+            </Pressable>
+            <Text style={styles.nota}>O acesso ao Reali é feito por convite da instituição.</Text>
           </ScrollView>
 
-          {/* CADASTRO */}
-          <ScrollView
-            style={{ width: largura }}
-            contentContainerStyle={styles.formulario}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-          >
+          <ScrollView style={{ width }} contentContainerStyle={styles.formulario}
+            aria-hidden={tab !== 1} accessibilityElementsHidden={tab !== 1} importantForAccessibility={tab !== 1 ? 'no-hide-descendants' : 'auto'}>
             <View style={styles.grupo}>
-              <Text style={styles.label}>Nome completo</Text>
-
-              <Input
-                accessibilityLabel="Nome completo"
-                style={styles.input}
-                placeholder="Seu nome"
-                placeholderTextColor="#667B70"
-                value={nome}
-                onChangeText={setNome}
-                autoCapitalize="words"
-              />
-            </View>
-
-            <View style={styles.grupo}>
-              <Text style={styles.label}>E-mail</Text>
-
-              <Input
-                accessibilityLabel="E-mail para cadastro"
-                style={styles.input}
-                placeholder="voce@escola.gov.br"
-                placeholderTextColor="#667B70"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
-
-            <View style={styles.grupo}>
-              <Text style={styles.label}>Escola ou rede</Text>
-
-              <Input
-                accessibilityLabel="Escola ou rede"
-                style={styles.input}
-                placeholder="Nome da escola ou da rede"
-                placeholderTextColor="#667B70"
-                value={escola}
-                onChangeText={setEscola}
-                autoCapitalize="sentences"
-              />
-            </View>
-
-            <View style={styles.grupo}>
-              <Select
-                label="Função"
-                options={["Nutricionista", "Gestor"]}
-                value={funcao}
-                onChange={(valor) => setFuncao(valor as Funcao)}
-              />
-            </View>
-
-            <View style={styles.grupoSenha}>
-              <Text style={styles.label}>Senha</Text>
-
-              <Input
-                accessibilityLabel="Senha para cadastro"
-                style={[
-                  styles.input,
-                  senhaInvalida && styles.inputErro,
-                ]}
-                placeholder="••••••"
-                placeholderTextColor="#667B70"
-                value={senha}
-                onChangeText={setSenha}
-                secureTextEntry
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-
-              <Text
-                style={[
-                  styles.ajuda,
-                  senhaInvalida && styles.textoErro,
-                ]}
-              >
-                Use ao menos 8 caracteres.
+              <Text accessibilityRole="header" style={styles.label}>Ative seu acesso por convite</Text>
+              <Text style={styles.instrucao}>
+                Abra o link que sua instituição enviou por e-mail para ativar a conta e definir sua senha.
               </Text>
+              <Text style={styles.instrucao}>Se precisar de um novo convite, fale com a direção da instituição.</Text>
             </View>
-
-            <View style={styles.termos}>
-              <Checkbox
-                text="Li e aceito os termos e a política de privacidade."
-                checked={termosCadastro}
-                onChange={setTermosCadastro}
-              />
-            </View>
-
-            <Button
-              label="Criar conta"
-              style={styles.botao}
-              onPress={handleCadastro}
-            />
-
-            <Text style={styles.nota}>
-              Não coletamos dados de alunos. Só pesos por preparação.
-            </Text>
+            <Button label="Voltar para entrar" accessibilityRole="button" style={styles.botao}
+              onPress={() => selectTab(0)} />
           </ScrollView>
         </ScrollView>
       </View>
     </KeyboardAvoidingView>
   );
-};
+}

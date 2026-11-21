@@ -1,1 +1,1 @@
-export { NotificationDetail as default } from "../../../features/Notifications";
+export { default } from "../../../screens/Notificacao/Notificacao";

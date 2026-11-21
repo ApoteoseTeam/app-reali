@@ -33,12 +33,16 @@ type DateFieldProps = {
     value: string;
     onChange: (data: string) => void;
     label?: string;
+    minDate?: string;
+    maxDate?: string;
 };
 
 export function DateField({
     value,
     onChange,
     label = 'Data da coleta',
+    minDate,
+    maxDate,
 }: DateFieldProps) {
     const [aberto, setAberto] = useState(false);
 
@@ -71,7 +75,7 @@ export function DateField({
                 <CalendarDays
                     size={18}
                     color={colors.text}
-                    accessible={false}
+                    aria-hidden
                 />
 
                 <View
@@ -111,6 +115,8 @@ export function DateField({
                         {aberto ? (
                             <Calendar
                                 initialDate={value || undefined}
+                                minDate={minDate}
+                                maxDate={maxDate}
                                 onDayPress={(dia) => selecionarData(dia.dateString)}
                                 markedDates={
                                     value

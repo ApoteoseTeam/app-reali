@@ -2,6 +2,7 @@ const assert=require("node:assert/strict");
 const {test}=require("node:test");
 const {apiBase,HttpClient}=require("../.test-build/api/client.js");
 const {RealiApi,objectId}=require("../.test-build/api/reali.js");
+const {reportMonths}=require("../.test-build/api/reportPeriods.js");
 const {SessionTokens}=require("../.test-build/session/tokens.js");
 const {credentialLink}=require("../.test-build/session/links.js");
 
@@ -26,6 +27,78 @@ function mock(handler){
 }
 const sync=fixture=>fixture.tokens.accept({access:"first-access",refresh:"stored-refresh"},fixture.tokens.credentials().generation);
 const nextIteration=()=>new Promise(resolve=>setImmediate(resolve));
+
+test("login usa as credenciais fornecidas e carrega a sessão pelo endpoint autenticado",async()=>{
+  const submitted={email:"direcao@escola.example.test",password:"senha-sintetica"};
+  const user={id:1,email:submitted.email,full_name:"Direção"};
+  const fixture=mock(({path})=>path==="auth/login/"?json({user,access:"access",refresh:"refresh"}):json({user,memberships:[]}));
+  const credentials=await fixture.api.login(submitted.email,submitted.password);
+  assert.deepEqual(fixture.calls[0].body,submitted);
+  assert.equal(fixture.calls[0].request.method,"POST");
+  assert.equal(fixture.calls[0].request.headers.Authorization,undefined);
+  await fixture.tokens.accept(credentials,fixture.tokens.credentials().generation);
+  assert.deepEqual(await fixture.api.me(),{user,memberships:[]});
+  assert.equal(fixture.calls[1].path,"auth/me/");
+  assert.equal(fixture.calls[1].request.headers.Authorization,"Bearer access");
+});
+
+test("serviço e programação enviam os campos aceitos pelo Django na organização selecionada",async()=>{
+  const oneOff={school,date:"2026-11-20",scheduled_time:"12:00",meal_type:"LUNCH"};
+  const weekly={school,name:"Lanche da semana",meal_type:"SNACK",start_time:"15:00",weekdays:[1,5]};
+  const fixture=mock(({path,body})=>json({...body,id:meal,...(path==="meal-services/"?{status:"PLANNED"}:{is_active:true})},201));
+  await sync(fixture);
+  const scope={organization:org};
+  assert.equal((await fixture.api.createMeal(scope,oneOff)).status,"PLANNED");
+  assert.equal((await fixture.api.createSchedule(scope,weekly)).is_active,true);
+  assert.deepEqual(fixture.calls.map(({path,request,body})=>[path,request.method,request.headers["X-Organization-ID"],body]),[
+    ["meal-services/","POST",org,oneOff],
+    ["meal-schedules/","POST",org,weekly],
+  ]);
+});
+
+test("relatório diferencia escola e visão institucional, preserva nulos e exporta PDF e CSV",async()=>{
+  const day={school,date:"2026-11-20",meal_type:"LUNCH"};
+  const month={start_date:"2026-11-01",end_date:"2026-11-20"};
+  const totals={total_student_entries:25,total_forecast_plates:20,total_served_plates:null};
+  const fixture=mock(({path})=>{
+    if(path.startsWith("analytics/reports/export/")){
+      const pdf=path.endsWith("file_format=pdf");
+      return new Response(pdf?"%PDF-":"data,entradas",{headers:{"content-type":pdf?"application/pdf":"text/csv"}});
+    }
+    if(path.startsWith("analytics/organizations/summary/")) return json({period:month,summary:totals,comparison:{total_served_plates:null}});
+    return json(page([{id:meal,...totals}]));
+  });
+  await sync(fixture);
+  const scope={organization:org};
+  assert.equal((await fixture.api.mealMetrics(scope,{...day,page:2})).results[0].id,meal);
+  const summary=await fixture.api.summary(scope,{school:undefined,...month});
+  assert.deepEqual(summary.summary,totals);
+  assert.equal(summary.comparison.total_served_plates,null);
+  assert.equal(new TextDecoder().decode(await fixture.api.report(scope,{...day,group:"daily"},"pdf")),"%PDF-");
+  assert.equal(new TextDecoder().decode(await fixture.api.report(scope,{...month,group:"monthly"},"csv")),"data,entradas");
+  const parsed=fixture.calls.map(({path,request})=>{
+    assert.equal(request.headers["X-Organization-ID"],org);
+    return Object.fromEntries(new URL(path,base+"/").searchParams);
+  });
+  assert.deepEqual(parsed,[{...day,page:"2"},month,{...day,group:"daily",file_format:"pdf"},{...month,group:"monthly",file_format:"csv"}]);
+  const cancel=new AbortController();
+  cancel.abort();
+  await assert.rejects(fixture.api.report(scope,day,"pdf",cancel.signal),{code:"CANCELLED"});
+  assert.equal(fixture.calls.length,4);
+});
+
+test("meses do relatório respeitam a data atual, o mês bissexto e a janela autorizada",()=>{
+  const months=reportMonths("2024-03-05");
+  assert.equal(months.length,12);
+  assert.deepEqual(months.slice(0,2).map(option=>option.range),[
+    {start_date:"2024-03-01",end_date:"2024-03-05"},
+    {start_date:"2024-02-01",end_date:"2024-02-29"},
+  ]);
+  assert.deepEqual(reportMonths("2024-03-05","2024-02-05").map(option=>option.range),[
+    {start_date:"2024-03-01",end_date:"2024-03-05"},
+    {start_date:"2024-02-05",end_date:"2024-02-29"},
+  ]);
+});
 
 test("cliente usa o fetch padrão com o receptor aceito pelo navegador",async()=>{
   const original=globalThis.fetch;

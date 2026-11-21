@@ -1,53 +1,39 @@
-import { View, Text } from "react-native";
-import { House, UserRound } from "lucide-react-native";
+import { usePathname, useRouter } from "expo-router";
+import { ClipboardList, History, House, TrendingUp, UserRound } from "lucide-react-native";
+import { Pressable, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSession } from "../../session/provider";
 import { styles } from "./styles";
-import { IconButton } from "../IconButton/IconButton";
 
-type FooterProps = {
-  activeTab?: "home" | "perfil";
+const tabs = [
+  { href: "/inicio", label: "Início", icon: House, routes: ["/inicio"], capability: null },
+  { href: "/relatorio", label: "Relatórios", icon: TrendingUp, routes: ["/relatorio"], capability: "indicators" },
+  { href: "/merenda", label: "Merenda", icon: ClipboardList, routes: ["/merenda", "/servico"], capability: "meal_history" },
+  { href: "/historico", label: "Histórico", icon: History, routes: ["/historico"], capability: "indicators" },
+  { href: "/perfil", label: "Perfil", icon: UserRound, routes: ["/perfil"], capability: null },
+] as const;
 
-  onHomePress?: () => void;
-  onPerfilPress?: () => void;
-};
-
-export const BottomTabs = ({
-  activeTab = "home",
-  onHomePress,
-  onPerfilPress,
-
-}: FooterProps) => {
+export function BottomTabs() {
+  const { can } = useSession();
+  const router = useRouter();
+  const pathname = usePathname();
+  const { bottom } = useSafeAreaInsets();
 
   return (
-    <View style={styles.footer}>
-
-      <View style={styles.item}>
-        <IconButton
-          icon={House}
-          onPress={onHomePress ?? (() => { })}
-          color={activeTab === "home" ? "#315E50" : "#718078"}
-          size={20}
-          accessibilityLabel="Home"
-          style={styles.iconButton}
-        />
-
-        <Text style={[styles.label, activeTab === "home" && styles.activeLabel]}>Home</Text>
-      </View>
-
-      <View style={styles.item}>
-        <IconButton
-          icon={UserRound}
-          onPress={onPerfilPress ?? (() => { })}
-          color={activeTab === "perfil" ? "#315E50" : "#718078"}
-          size={20}
-          accessibilityLabel="Perfil"
-          style={styles.iconButton}
-        />
-
-        <Text style={[styles.label, activeTab === "perfil" && styles.activeLabel]}>Perfil</Text>
-
-      </View>
-
+    <View style={[styles.footer, { paddingBottom: Math.max(6, bottom) }]} accessibilityRole="tablist"
+      accessibilityLabel="Navegação principal" testID="workspace-navigation">
+      {tabs.filter(({ capability }) => !capability || can(capability)).map(({ href, label, icon: Icon, routes }) => {
+        const selected = routes.some(route => route === pathname);
+        const color = selected ? "#D9EACD" : "#FFFFFF";
+        return (
+          <Pressable key={href} testID={`nav-${href.slice(1)}`} accessibilityRole="tab" accessibilityLabel={label}
+            accessibilityState={{ selected }} aria-selected={selected} onPress={() => { if (pathname !== href) router.navigate(href); }}
+            style={({ pressed }) => [styles.item, selected && styles.selected, pressed && styles.pressed]}>
+            <Icon size={20} color={color} />
+            <Text numberOfLines={1} style={[styles.label, { color }]}>{label}</Text>
+          </Pressable>
+        );
+      })}
     </View>
-  )
-
+  );
 }

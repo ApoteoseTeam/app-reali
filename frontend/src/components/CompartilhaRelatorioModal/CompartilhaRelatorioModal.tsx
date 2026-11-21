@@ -22,13 +22,13 @@ export function CompartilharRelatorioModal({
     const opcoes = [
         {
             titulo: 'WhatsApp',
-            descricao: 'Enviar para um contato ou grupo',
+            descricao: 'Abra o PDF e escolha o WhatsApp no dispositivo',
             Icone: MessageSquare,
             acao: onWhatsApp,
         },
         {
             titulo: 'E-mail',
-            descricao: 'Enviar o resumo em PDF',
+            descricao: 'Abra o PDF e escolha o e-mail no dispositivo',
             Icone: Mail,
             acao: onEmail,
         },

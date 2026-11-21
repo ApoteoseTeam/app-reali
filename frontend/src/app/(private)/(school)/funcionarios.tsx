@@ -1,1 +1,1 @@
-export { StaffList as default } from "../../../features/Staff";
+export { default } from "../../../screens/Funcionarios/Funcionarios";

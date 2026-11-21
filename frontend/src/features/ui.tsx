@@ -1,14 +1,21 @@
-import { useRouter } from "expo-router";
+import { useCanGoBack, useRouter } from "expo-router";
+import { ArrowLeft } from "lucide-react-native";
 import { type ReactNode } from "react";
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, type TextInputProps, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ApiError } from "../api/client";
+import { Header } from "../components/header/header";
+import { IconButton } from "../components/IconButton/IconButton";
+import { Logo } from "../components/Logo/Logo";
 import { colors } from "../theme/colors";
 
 export const ui=StyleSheet.create({
   screen:{flex:1,backgroundColor:colors.background},
   header:{backgroundColor:colors.primary,padding:16,gap:5},
-  headerTitle:{color:colors.white,fontSize:23,fontWeight:"700"},
+  headerTitleRow:{flexDirection:"row",alignItems:"center",gap:8},
+  headerMark:{width:30,height:28,alignItems:"center",justifyContent:"center"},
+  headerMarkImage:{width:60,height:60},
+  headerTitle:{color:colors.white,fontSize:23,fontWeight:"700",flexShrink:1},
   headerAction:{color:colors.white,fontWeight:"600",minHeight:28,paddingVertical:4},
   scroll:{padding:18,gap:12,paddingBottom:32},
   panel:{backgroundColor:colors.white,borderColor:"#DCE7D7",borderWidth:1,borderRadius:15,padding:15,gap:8},
@@ -24,19 +31,54 @@ export const ui=StyleSheet.create({
   buttonText:{fontWeight:"700",color:colors.white,fontSize:15},
   flatText:{color:colors.primary},
   row:{flexDirection:"row",flexWrap:"wrap",gap:8},
+  managementScreen:{flex:1,backgroundColor:colors.primary},
+  managementHeader:{minHeight:56,backgroundColor:colors.primary,alignItems:"center",justifyContent:"center",paddingHorizontal:52},
+  managementTitle:{color:colors.white,fontSize:17,fontWeight:"700",textAlign:"center",flexShrink:1},
+  managementBack:{position:"absolute",left:8,width:44,height:44,alignItems:"center",justifyContent:"center"},
+  managementBody:{flex:1,backgroundColor:colors.white},
+  managementContent:{width:"100%",maxWidth:640,alignSelf:"center",padding:16,paddingBottom:24,gap:14},
+  managementFooter:{backgroundColor:colors.white,borderTopWidth:StyleSheet.hairlineWidth,borderTopColor:"#DCE7D7"},
+  managementFooterContent:{width:"100%",maxWidth:640,alignSelf:"center",paddingHorizontal:16,paddingVertical:10},
+  managementPrimary:{backgroundColor:colors.primary},
 });
-export function Action({title,onPress,disabled,variant,testID}:{title:string;onPress:()=>void;disabled?:boolean;variant?:"flat"|"danger";testID?:string}) {
+export function Action({title,onPress,disabled,variant,testID}:{title:string;onPress:()=>void;disabled?:boolean;variant?:"flat"|"danger"|"primary";testID?:string}) {
   return <Pressable accessibilityRole="button" accessibilityState={{disabled}} accessibilityLabel={title} testID={testID} disabled={disabled} onPress={onPress}
-    style={[ui.button,variant==="flat"&&ui.flat,variant==="danger"&&ui.danger,disabled&&{opacity:0.55}]}>
+    style={[ui.button,variant==="flat"&&ui.flat,variant==="danger"&&ui.danger,variant==="primary"&&ui.managementPrimary,disabled&&{opacity:0.55}]}>
     <Text style={[ui.buttonText,variant==="flat"&&ui.flatText]}>{title}</Text>
   </Pressable>;
 }
+export function Pagination({page,next,onChange}:{page:number;next:boolean;onChange:(page:number)=>void}){
+  if(page===1&&!next)return null;
+  return <View style={ui.row}><Action title="Página anterior" variant="flat" disabled={page===1} onPress={()=>onChange(page-1)}/>
+    <Action title="Próxima página" variant="flat" disabled={!next} onPress={()=>onChange(page+1)}/></View>;
+}
 export function Panel({title,children}:{title?:string;children:ReactNode}) { return <View style={ui.panel}>{title&&<Text accessibilityRole="header" style={ui.title}>{title}</Text>}{children}</View>; }
 export function Field({label,...props}:TextInputProps&{label:string}) { return <View style={{gap:5}}><Text style={ui.text}>{label}</Text><TextInput accessibilityLabel={label} placeholderTextColor="#566D63" style={ui.input} {...props}/></View>; }
-export function Page({title,children,refresh,refreshing=false,back=true}:{title:string;children:ReactNode;refresh?:()=>void;refreshing?:boolean;back?:boolean}) {
+export function Page({title,children,refresh,refreshing=false,back=true,management=false,footer}:{
+  title:string;children:ReactNode;refresh?:()=>void;refreshing?:boolean;back?:boolean;management?:boolean;footer?:ReactNode;
+}) {
   const router=useRouter();
+  const canGoBack=useCanGoBack();
+  if(management) return (
+    <SafeAreaView style={ui.managementScreen} edges={["top","left","right"]}>
+      <Header name={title} right={null} containerStyle={ui.managementHeader} titleStyle={ui.managementTitle}
+        left={back ? <IconButton icon={ArrowLeft} color={colors.white} size={21} accessibilityLabel="Voltar"
+          style={ui.managementBack} onPress={()=>canGoBack?router.back():router.replace("/inicio")} /> : undefined} />
+      <ScrollView style={ui.managementBody} contentContainerStyle={ui.managementContent}
+        keyboardShouldPersistTaps="handled" refreshControl={refresh?<RefreshControl refreshing={refreshing} onRefresh={refresh}/>:undefined}>
+        {children}
+      </ScrollView>
+      {footer && <View style={ui.managementFooter}><View style={ui.managementFooterContent}>{footer}</View></View>}
+    </SafeAreaView>
+  );
   return <SafeAreaView style={ui.screen}>
-    <View style={ui.header}>{back&&router.canGoBack()&&<Text accessibilityRole="button" style={ui.headerAction} onPress={()=>router.back()}>Voltar</Text>}<Text accessibilityRole="header" style={ui.headerTitle}>{title}</Text></View>
+    <View style={ui.header}>
+      {back&&canGoBack&&<Text accessibilityRole="button" style={ui.headerAction} onPress={()=>router.back()}>Voltar</Text>}
+      <View style={ui.headerTitleRow}>
+        <View style={ui.headerMark}><Logo variant="mark" style={ui.headerMarkImage}/></View>
+        <Text accessibilityRole="header" style={ui.headerTitle}>{title}</Text>
+      </View>
+    </View>
     <ScrollView contentContainerStyle={ui.scroll} keyboardShouldPersistTaps="handled"
       refreshControl={refresh?<RefreshControl refreshing={refreshing} onRefresh={refresh}/>:undefined}>{children}</ScrollView>
   </SafeAreaView>;

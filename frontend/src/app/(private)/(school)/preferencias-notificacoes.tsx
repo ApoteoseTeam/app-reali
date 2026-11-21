@@ -1,1 +1,1 @@
-export { NotificationPreferences as default } from "../../../features/Notifications";
+export { default } from "../../../screens/PreferenciasNotificacoes/PreferenciasNotificacoes";

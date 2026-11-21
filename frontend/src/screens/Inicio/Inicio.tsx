@@ -1,12 +1,12 @@
-import Home from "../screens/HomeGestao/Home";
-import HomeCozinha from "../screens/HomeCozinha/HomeCozinha";
-import { useRemote } from "../hooks/useRemote";
-import { api, useSession } from "../session/provider";
+import Home from "../HomeGestao/Home";
+import HomeCozinha from "../HomeCozinha/HomeCozinha";
+import { useRemote } from "../../hooks/useRemote";
+import { api, useSession } from "../../session/provider";
 
 const configured=Number(process.env.EXPO_PUBLIC_DASHBOARD_INTERVAL_MS??0);
 const interval=Number.isFinite(configured)&&configured>0?Math.max(60000,configured):0;
 
-export default function Dashboard(){
+export default function Inicio(){
   const session=useSession();
   const workspace=session.workspace!;
   const data=useRemote("dashboard",signal=>api.dashboard(workspace.scope,{school:workspace.school?.id},signal),true,interval);

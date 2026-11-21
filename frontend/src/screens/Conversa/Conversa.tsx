@@ -2,45 +2,18 @@ import { useRef, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { randomUUID } from "expo-crypto";
 import { Text, View } from "react-native";
-import { ApiError } from "../api/client";
-import type { ChatInput, ChatOutput, Conversation } from "../api/reali";
-import { ChatMessage } from "../components/ChatMessage/ChatMessage";
-import { useAction } from "../hooks/useAction";
-import { useRemote } from "../hooks/useRemote";
-import { api, useSession } from "../session/provider";
-import { Pagination } from "./Meals";
-import { Action, Feedback, Field, labels, Page, Panel, stamp, ui } from "./ui";
-
-export function ConversationList(){
-  const session=useSession(),workspace=session.workspace!,router=useRouter();
-  const [page,setPage]=useState(1);
-  const [title,setTitle]=useState("");
-  const [archived,setArchived]=useState(false);
-  const conversations=useRemote(`conversations:${page}`,signal=>api.conversations(workspace.scope,signal,page));
-  const action=useAction();
-  const items=conversations.data?.results.filter(item=>
-    (item.school_id===workspace.school!.id||item.school_id===null&&session.can("realinova_full"))
-    &&(item.status==="ARCHIVED")===archived);
-  function open(item:Conversation){router.push({pathname:"/conversa",params:{id:item.id}});}
-  return <Page title="RealInova" refresh={conversations.refresh} refreshing={conversations.loading}>
-    <Panel title={workspace.school!.name}>
-      <Field label="Título da conversa (opcional)" value={title} onChangeText={setTitle} maxLength={120}/>
-      <Action title="Nova conversa" disabled={action.busy} onPress={()=>void action.run(async()=>open(await api.createConversation(workspace.scope,workspace.school!.id,title.trim()||undefined)))}/>
-    </Panel>
-    <View style={ui.row}><Action title="Ativas" variant={archived?"flat":undefined} onPress={()=>setArchived(false)}/><Action title="Arquivadas" variant={archived?undefined:"flat"} onPress={()=>setArchived(true)}/></View>
-    <Feedback loading={conversations.loading||action.busy} error={conversations.error??action.error} empty={items?.length===0} retry={conversations.refresh}/>
-    {items?.map(item=><Panel key={item.id} title={item.title}>
-      <Text style={ui.subdued}>{item.school_id?workspace.school!.name:"Escopo institucional"} · {stamp(item.last_message_at)}</Text>
-      <Action title="Abrir conversa" variant="flat" onPress={()=>open(item)}/>
-    </Panel>)}
-    <Pagination page={page} next={Boolean(conversations.data?.next)} onChange={setPage}/>
-  </Page>;
-}
+import { ApiError } from "../../api/client";
+import type { ChatInput, ChatOutput } from "../../api/reali";
+import { ChatMessage } from "../../components/ChatMessage/ChatMessage";
+import { Action, Feedback, Field, labels, Page, Pagination, Panel, ui } from "../../features/ui";
+import { useAction } from "../../hooks/useAction";
+import { useRemote } from "../../hooks/useRemote";
+import { api, useSession } from "../../session/provider";
 
 const sourceLabels:Record<string,string>={DAILY_METRICS:"Indicadores diários",PLATE_COUNTS:"Pratos servidos",STUDENT_COUNTS:"Entradas registradas",MEAL_FORECASTS:"Previsões originais",MEAL_SERVICE_METRICS:"Serviços de merenda",PERIOD_COMPARISON:"Comparação de períodos",SCHOOL_PERFORMANCE:"Desempenho histórico",SCHOOL_COMPARISON:"Comparação entre escolas"};
 const errorLabels:Record<string,string>={AI_PROVIDER_UNAVAILABLE:"O provedor do RealInova está indisponível.",AI_PROVIDER_AUTH_FAILED:"A integração do RealInova está indisponível.",AI_PROVIDER_RATE_LIMITED:"O provedor atingiu o limite de uso.",AI_TIMEOUT:"O RealInova demorou a responder.",AI_TOOL_ERROR:"Os indicadores não puderam ser consultados."};
 
-export function ConversationDetail(){
+export default function Conversa(){
   const session=useSession(),workspace=session.workspace!,router=useRouter();
   const {id}=useLocalSearchParams<{id:string}>();
   const [message,setMessage]=useState(""),[notice,setNotice]=useState(""),[page,setPage]=useState<number|null>(null),[confirm,setConfirm]=useState(false);

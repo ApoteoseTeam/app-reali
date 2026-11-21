@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Card } from "../../components/Card/Card";
 import { Logo } from "../../components/Logo/Logo";
 import { Action, Feedback, labels, stamp, ui, value } from "../../features/ui";
-import { NotificationBell } from "../../features/Notifications";
+import { NotificationBell } from "../../components/NotificationBell/NotificationBell";
 import { mealStatuses, mealTypes, type Dashboard } from "../../api/reali";
 import { styles } from "./styles";
 
@@ -12,7 +12,7 @@ type Props={name:string;school:string;data?:Dashboard;loading:boolean;error?:Err
 export default function HomeCozinha({name,school,data,loading,error,refresh}:Props){
   const router=useRouter();
   return <SafeAreaView style={styles.tela}>
-    <View style={styles.cabecalho}><Logo style={styles.logo}/><NotificationBell color="#FFFFFF"/></View>
+    <View style={styles.cabecalho}><Logo variant="mark" style={styles.logo}/><NotificationBell color="#FFFFFF"/></View>
     <ScrollView style={styles.scroll} contentContainerStyle={styles.conteudo} refreshControl={<RefreshControl refreshing={loading} onRefresh={refresh}/>}>
       <View style={styles.saudacao}><Text accessibilityRole="header" style={styles.titulo}>Olá, {name}</Text>
       <Text style={styles.data}>{school} · {data?.reference_date}</Text></View>

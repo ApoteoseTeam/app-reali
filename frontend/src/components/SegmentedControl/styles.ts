@@ -27,4 +27,8 @@ export const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontWeight: "700",
   },
+  underline: { backgroundColor: colors.white, borderRadius: 0, padding: 0, gap: 0 },
+  underlineOption: { minHeight: 44, borderRadius: 0, borderBottomWidth: 3, borderBottomColor: "#E4ECE2" },
+  underlineSelected: { borderBottomColor: colors.secondary },
+  underlineText: { color: colors.secondary, fontWeight: "700" },
 })

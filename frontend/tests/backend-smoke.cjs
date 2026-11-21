@@ -24,8 +24,15 @@ async function main(){
   const date=dashboard.reference_date;
   const counts=await api.countSummary(scope,"student",{school:school.id,date});
   assert.equal(counts.student_entries,25);
-  const meal=(await api.meals(scope,{school:school.id,date})).results.find(item=>item.status==="PLANNED");
+  const meal=(await api.meals(scope,{school:school.id,date,meal_type:"LUNCH"})).results.find(item=>item.status==="PLANNED");
   assert.ok(meal,"Crie um novo banco de teste ou replante o serviço sintético.");
+  const planned=await api.createMeal(scope,{school:school.id,date,meal_type:"DINNER",scheduled_time:"18:30"});
+  assert.equal(planned.status,"PLANNED");
+  assert.ok((await api.meals(scope,{school:school.id,date,meal_type:"DINNER"})).results.some(item=>item.id===planned.id));
+  const weekly=await api.createSchedule(scope,{school:school.id,name:"Lanche semanal de teste",meal_type:"SNACK",start_time:"15:00",weekdays:[1,5]});
+  assert.deepEqual(weekly.weekdays,[1,5]);
+  assert.equal(weekly.name,"Lanche semanal de teste");
+  assert.ok((await api.schedules(scope,{school:school.id})).results.some(item=>item.id===weekly.id));
   const started=await api.start(scope,meal.id);
   assert.equal(started.attendance_snapshot.total_student_entries,25);
   assert.equal(started.forecast.forecast_plates,20);
@@ -41,7 +48,18 @@ async function main(){
   assert.equal((await api.countSummary(scope,"plate",{school:school.id,date:prior})).served_plates,19);
   const history=await api.history(scope,"daily",{school:school.id,start_date:prior,end_date:date});
   assert.equal(history.results.length,2);
+  const metrics=await api.mealMetrics(scope,{school:school.id,date,meal_type:"LUNCH",page:1});
+  assert.equal(metrics.results.length,1);
+  assert.equal(metrics.results[0].id,meal.id);
+  assert.equal(metrics.results[0].total_forecast_plates,20);
+  const monthly=await api.history(scope,"monthly",{school:school.id,start_date:prior,end_date:prior});
+  assert.equal(monthly.results[0].total_served_plates,19);
+  const institutional=await api.summary(scope,{start_date:prior,end_date:date});
+  assert.equal(institutional.summary.total_student_entries,25);
+  assert.equal(institutional.summary.total_served_plates,19);
   assert.match(Buffer.from(await api.report(scope,{school:school.id,date},"pdf")).toString("ascii",0,5),/^%PDF-/);
+  const csv=new TextDecoder().decode(await api.report(scope,{school:school.id,start_date:prior,end_date:date,group:"daily"},"csv"));
+  assert.match(csv,new RegExp(prior));
   const cameras=(await api.cameras(scope,{school:school.id})).results;
   const entrance=cameras.find(item=>item.camera_type==="ENTRANCE");
   assert.ok(cameras.length>=2&&entrance);
@@ -72,6 +90,6 @@ async function main(){
     headers:{Authorization:"Bearer "+lastAccess},
   });
   assert.equal(ended.status,401);
-  console.log("Django HTTP validado: JWT, organização, escola, perfil, dashboard, contagens, merenda, previsão, histórico, PDF, câmeras, funcionários e RealInova.");
+  console.log("Django HTTP validado: JWT, organização, escola, perfil, merenda, programação, previsão, relatórios, histórico, PDF, CSV, câmeras, notificações, funcionários e RealInova.");
 }
 main().catch(error=>{console.error(error.name+": "+error.message);process.exitCode=1;});
