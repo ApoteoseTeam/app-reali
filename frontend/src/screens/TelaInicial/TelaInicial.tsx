@@ -1,5 +1,5 @@
 import { View, Text, Image } from 'react-native'
-import { styles } from './styles'
+import { styles } from './styles';
 
 import { Button } from '../../components/Button/Button'
 
@@ -13,12 +13,11 @@ export default function TelaInicial() {
                 resizeMode="contain"
             />
 
-            <Image source={require('../../assets/footergreen.png')} style={styles.bottomWave} resizeMode="stretch"/>
+        {/*    <Image source={require('../../assets/footergreen.png')} style={styles.bottomWave} resizeMode="stretch"/> */}
 
             <View style={styles.content}>
                 <View style={styles.headerGroup}>
-                    <Image
-                        source={require('../../assets/logo-reali.png')} style={styles.logo} resizeMode="contain"/>
+                    <Image source={require('../../assets/logo-reali.png')} style={styles.logo} resizeMode="contain"/>
                     <Text style={styles.subtitle}>Mais controle, menos desperdício</Text>
                 </View>
 
@@ -34,7 +33,7 @@ export default function TelaInicial() {
             </View>
 
             <Image
-                source={require('../../assets/prato-de-comida-2.png')}
+               // source={require('../../assets/prato-de-comida-2.png')}
                 style={styles.foodImage}
                 resizeMode="contain"
             />

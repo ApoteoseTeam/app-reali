@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native"
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F6F8F2', 
+        backgroundColor: '#F6F8F2',
     },
     topBlob: {
         position: 'absolute',
@@ -87,5 +87,6 @@ export const styles = StyleSheet.create({
         right: -20,
         width: 270,
         height: 210,
-        zIndex: 3, 
-    },});
+        zIndex: 3,
+    },
+});
