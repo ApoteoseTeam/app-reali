@@ -8,7 +8,7 @@ type KpicardVariant = 'primary' | 'secondary' | 'summary' | 'gestao';
 type KpicardProps = {
     variant?: KpicardVariant
     title: string
-    value: number
+    value: number | null
     unit?: string
     change?: number
     lowerIsBetter?: boolean;
@@ -39,15 +39,15 @@ export const Kpicard = ({ title, value, unit, variant = "primary", change, lower
                     ? "resultado favorável"
                     : "resultado desfavorável";
 
+    const formattedValue = value?.toLocaleString("pt-BR") ?? "—";
     const accessibilityDescription =
-        `${title}: ${value.toLocaleString("pt-BR")} ${unit ?? ""}` +
+        `${title}: ${formattedValue} ${unit ?? ""}` +
         (change !== undefined
             ? `. ${changeDirection} de ${Math.abs(change)} por cento, ${changeStatus}.`
             : ".");
 
 
     if (variant === "summary") {
-        const formattedValue = value.toLocaleString("pt-BR");
         return (
             <View style={kpicardStyles.summaryBox}>
                 <Text style={kpicardStyles.summaryValue}>
@@ -71,7 +71,7 @@ export const Kpicard = ({ title, value, unit, variant = "primary", change, lower
             >
                 <Text style={kpicardStyles.gestaoTitulo}>{title}</Text>
                 <Text style={kpicardStyles.gestaoValor}>
-                    {value.toLocaleString('pt-BR')}{unit ? ` ${unit}` : ''}
+                    {formattedValue}{unit ? ` ${unit}` : ''}
                 </Text>
             </View>
         );
@@ -88,7 +88,7 @@ export const Kpicard = ({ title, value, unit, variant = "primary", change, lower
             ]}>
             <Text style={kpicardStyles.kpicardTitle}>{title}</Text>
             <View style={kpicardStyles.kpicardValueContainer}>
-                <Text style={kpicardStyles.kpicardValue}>{value.toLocaleString("pt-BR")}</Text>
+                <Text style={kpicardStyles.kpicardValue}>{formattedValue}</Text>
                 {unit ? (
                     <Text style={kpicardStyles.kpicardUnit}>{unit}</Text>
                 ) : null}

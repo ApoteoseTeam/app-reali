@@ -8,6 +8,7 @@ import { Logo } from '../../components/Logo/Logo';
 import { styles } from './styles';
 
 type HomeProps = {
+    resumo?: Resumo;
     onPerfilPress?: () => void;
     onAssistentePress?: () => void;
     onRelatoriosPress?: () => void;
@@ -15,19 +16,13 @@ type HomeProps = {
     onHistoricoPress?: () => void;
 };
 
-const RESUMO_DEMO = {
-    nome: 'Horlando',
-    escola: 'Escola Municipal Novo Horizonte',
-    data: '09 de novembro de 2026',
-    alunos: 400,
-    refeicoesServidas: 300,
-    refeicao: '09/11 · Almoço',
-    cardapio: 'Arroz, feijão e omelete',
-    consumo: '75% de consumo',
-    aviso: 'Em dias de omelete, preparar 25% menos do que o habitual.',
+type Resumo = {
+    nome: string; escola: string; data: string; alunos: number | null;
+    refeicoesServidas: number | null; refeicao: string; cardapio: string; consumo: string; aviso: string;
 };
 
 export default function Home({
+    resumo,
     onPerfilPress,
     onAssistentePress,
     onRelatoriosPress,
@@ -62,41 +57,41 @@ export default function Home({
             >
                 <View style={styles.saudacao}>
                     <Text accessibilityRole="header" style={styles.titulo}>
-                        Bom dia, {RESUMO_DEMO.nome}
+                        Bom dia, {resumo?.nome}
                     </Text>
-                    <Text style={styles.textoSecundario}>{RESUMO_DEMO.escola}</Text>
+                    <Text style={styles.textoSecundario}>{resumo?.escola}</Text>
                 </View>
 
                 <View style={styles.indicador}>
-                    <Text style={styles.data}>{RESUMO_DEMO.data}</Text>
+                    <Text style={styles.data}>{resumo?.data}</Text>
                     <Kpicard
                         variant="gestao"
                         title="Alunos registrados"
-                        value={RESUMO_DEMO.alunos}
+                        value={resumo?.alunos ?? null}
                     />
                 </View>
 
                 <View style={styles.indicador}>
-                    <Text style={styles.data}>{RESUMO_DEMO.data}</Text>
+                    <Text style={styles.data}>{resumo?.data}</Text>
                     <Kpicard
                         variant="gestao"
                         title="Refeições servidas"
-                        value={RESUMO_DEMO.refeicoesServidas}
+                        value={resumo?.refeicoesServidas ?? null}
                     />
                 </View>
 
                 <Card style={styles.refeicao}>
                     <Text style={styles.textoSecundario}>Refeição do dia</Text>
-                    <Text style={styles.tituloRefeicao}>{RESUMO_DEMO.refeicao}</Text>
+                    <Text style={styles.tituloRefeicao}>{resumo?.refeicao}</Text>
                     <Text style={styles.textoRefeicao}>
-                        {RESUMO_DEMO.cardapio} · {RESUMO_DEMO.consumo}
+                        {resumo?.cardapio} · {resumo?.consumo}
                     </Text>
                 </Card>
 
                 <View style={styles.aviso}>
                     <Text style={styles.textoAviso}>
                         <Text style={styles.negrito}>Ponto de atenção: </Text>
-                        {RESUMO_DEMO.aviso}
+                        {resumo?.aviso}
                     </Text>
                 </View>
 

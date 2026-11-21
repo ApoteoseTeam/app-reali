@@ -10,6 +10,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import { useSession } from '../../session/provider';
 import { styles } from './styles';
 import { Checkbox } from '../../components/CheckBox/CheckBox';
 import { Input } from '../../components/Input/Input';
@@ -21,6 +22,8 @@ type Funcao = 'Nutricionista' | 'Gestor';
 type Aba = 0 | 1;
 
 export default function TelaAutenticacao() {
+  const session = useSession();
+  const loginEmAndamento = useRef(false);
   const { width: larguraJanela } = useWindowDimensions();
   const paginasRef = useRef<React.ComponentRef<typeof ScrollView>>(null);
 
@@ -54,13 +57,22 @@ export default function TelaAutenticacao() {
     });
   }
 
-  function handleLogin() {
+  async function handleLogin() {
+    if (loginEmAndamento.current || session.selecting || session.status === "INITIALIZING") return;
     Keyboard.dismiss();
+    if (!emailLogin.trim() || !senhaLogin || !termosLogin) {
+      Alert.alert('Confira os dados', 'Informe o e-mail, a senha e aceite os termos.');
+      return;
+    }
 
-    Alert.alert(
-      'Demonstração',
-      'A integração de login ainda será implementada.'
-    );
+    loginEmAndamento.current = true;
+    try {
+      await session.signIn(emailLogin.trim(), senhaLogin);
+    } catch (error) {
+      Alert.alert('Falha no login', error instanceof Error ? error.message : 'Não foi possível entrar.');
+    } finally {
+      loginEmAndamento.current = false;
+    }
   }
 
   function handleCadastro() {
@@ -86,8 +98,8 @@ export default function TelaAutenticacao() {
     }
 
     Alert.alert(
-      'Demonstração',
-      'Os campos foram preenchidos. A conta ainda não foi criada.'
+      'Cadastro indisponível',
+      'O acesso é liberado por convite da instituição.'
     );
   }
 

@@ -14,6 +14,7 @@ import {
 
 type HeaderProps = {
   name: string;
+  onTitlePress?: () => void;
   left?: ReactNode;
   right?: ReactNode;
   containerStyle?: StyleProp<ViewStyle>;
@@ -22,10 +23,10 @@ type HeaderProps = {
 
 
 
-export function Header({ name, left, right, containerStyle, titleStyle }: HeaderProps) {
+export function Header({ name, left, right, containerStyle, titleStyle, onTitlePress }: HeaderProps) {
 
   const title = (
-    <Text accessibilityRole="header" style={titleStyle ?? style.pagename}>{name}</Text>
+    <Text accessibilityRole={onTitlePress ? "button" : "header"} accessibilityHint={onTitlePress ? "Voltar à tela inicial" : undefined} onPress={onTitlePress} style={titleStyle ?? style.pagename}>{name}</Text>
   )
 
   return (

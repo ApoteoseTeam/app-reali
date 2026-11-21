@@ -1,4 +1,4 @@
-import { View, Text, Image, Pressable, Platform } from 'react-native';
+import { View, Text, Image, Pressable } from 'react-native';
 import {
   Undo2,
   Settings,
@@ -15,8 +15,10 @@ import {
 import { Button } from '../../components/Button/Button';
 import { Card } from '../../components/Card/Card';
 import { IconButton } from '../../components/IconButton/IconButton';
-import { Header } from '../../components/Header/header';
+import { Header } from '../../components/header/header';
 import { colors } from '../../theme/colors';
+import { roleNames } from '../../api/reali';
+import { useSession } from '../../session/provider';
 import { styles } from './styles';
 
 const ABAS: { nome: string; icone: LucideIcon; ativa?: boolean }[] = [
@@ -33,7 +35,14 @@ const Linha = ({ icone: Icone, texto }: { icone: LucideIcon; texto: string }) =>
   </View>
 );
 
-export default function PerfilUsuario() {
+type Props = { onInicio?: () => void; onCardapio?: () => void; onRelatorio?: () => void };
+
+export default function PerfilUsuario({ onInicio, onCardapio, onRelatorio }: Props = {}) {
+  const { me, workspace, signOut } = useSession();
+  const actions: Record<string, (() => void) | undefined> = {
+    Home: onInicio, Formulário: onCardapio, Dashboard: onRelatorio,
+  };
+  const role = workspace?.member.role;
   return (
     <View style={styles.container}>
       <View style={styles.perfilTopo}>
@@ -50,7 +59,7 @@ export default function PerfilUsuario() {
               size={24}
               style={styles.iconeTopo}
               accessibilityLabel="Voltar"
-              onPress={() => console.log('Voltar')}
+              onPress={() => onInicio?.()}
             />
           }
           right={
@@ -80,14 +89,14 @@ export default function PerfilUsuario() {
         </View>
       </View>
 
-      <Text style={styles.nome}>Horlando da Silva</Text>
-      <Text style={styles.cargo}>Diretor</Text>
+      <Text style={styles.nome}>{me?.user.full_name || me?.user.email || "—"}</Text>
+      <Text style={styles.cargo}>{role ? roleNames[role] ?? role : "—"}</Text>
 
       <View style={styles.conteudo}>
         <Card title="Dados pessoais">
-          <Linha icone={CircleUser} texto="horlandodiretor@gmail.com" />
-          <Linha icone={Phone} texto="(11) 98765-4321" />
-          <Linha icone={MapPin} texto="Escola Municipal Novo Horizonte" />
+          <Linha icone={CircleUser} texto={me?.user.email ?? "—"} />
+          <Linha icone={Phone} texto="—" />
+          <Linha icone={MapPin} texto={[workspace?.school?.name, workspace?.organization.name].filter(Boolean).join(" · ") || "—"} />
         </Card>
 
         <Card title="Minha conta">
@@ -99,17 +108,13 @@ export default function PerfilUsuario() {
           label="Sair da conta"
           style={styles.botaoSair}
           textStyle={styles.botaoSairTexto}
-          onPress={() => {
-            if (Platform.OS === 'web') {
-              window.location.href = '/';
-            }
-          }}
+          onPress={signOut}
         />
       </View>
 
       <View style={styles.abas}>
         {ABAS.map(({ nome, icone: Icone, ativa }) => (
-          <Pressable key={nome} style={styles.aba}>
+          <Pressable key={nome} style={styles.aba} onPress={actions[nome]}>
             <Icone size={24} color={colors.text} strokeWidth={ativa ? 2.6 : 2} />
             <Text style={styles.abaTexto}>{nome}</Text>
           </Pressable>

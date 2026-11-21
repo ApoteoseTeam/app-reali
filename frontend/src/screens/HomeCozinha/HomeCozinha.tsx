@@ -8,17 +8,17 @@ import { styles } from './styles';
 type HomeCozinhaProps = {
     nome?: string;
     dataTurno?: string;
-    presentes?: number;
-    totalPlanejado?: number;
+    presentes?: number | null;
+    totalPlanejado?: number | null;
     onCardapioPress?: () => void;
     onPerfilPress?: () => void;
 };
 
 export default function HomeCozinha({
-    nome = 'Letícia',
-    dataTurno = 'Segunda, 9 de novembro · Manhã',
-    presentes = 400,
-    totalPlanejado = 440,
+    nome = '—',
+    dataTurno = '—',
+    presentes = null,
+    totalPlanejado = null,
     onCardapioPress,
     onPerfilPress,
 }: HomeCozinhaProps = {}) {
@@ -42,12 +42,12 @@ export default function HomeCozinha({
                 <Card style={styles.cartao}>
                     <View>
                         <Text style={styles.rotulo}>ALUNOS DE HOJE</Text>
-                        <Text style={styles.numero}>{presentes.toLocaleString('pt-BR')}</Text>
-                        <Text style={styles.presentes}>presentes</Text>
+                        <Text style={styles.numero}>{presentes?.toLocaleString('pt-BR') ?? '—'}</Text>
+                        <Text style={styles.presentes}>entradas registradas</Text>
                     </View>
 
                     <Text style={styles.planejamento}>
-                        Preparar comida para {totalPlanejado.toLocaleString('pt-BR')} alunos
+                        Preparar comida para {totalPlanejado?.toLocaleString('pt-BR') ?? '—'} alunos
                     </Text>
 
                     <Image

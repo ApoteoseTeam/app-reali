@@ -4,7 +4,7 @@ import { ArrowLeft, Trash2 } from 'lucide-react-native';
 
 import { Button } from '../../components/Button/Button';
 import { DateField } from '../../components/DateField/DateField';
-import { Header } from '../../components/Header/header';
+import { Header } from '../../components/header/header';
 import { IconButton } from '../../components/IconButton/IconButton';
 import { Select } from '../../components/select/Select';
 import { styles } from './styles';
