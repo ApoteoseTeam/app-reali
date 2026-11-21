@@ -3,7 +3,7 @@ import { ClipboardList, House, UserRound } from 'lucide-react-native';
 
 import { Card } from '../../components/Card/Card';
 import { Logo } from '../../components/Logo/Logo';
-import { styles } from './styles';
+import { styles, coresRodape } from './styles';
 
 type HomeCozinhaProps = {
     nome?: string;
@@ -22,10 +22,17 @@ export default function HomeCozinha({
     onCardapioPress,
     onPerfilPress,
 }: HomeCozinhaProps = {}) {
+    const abas = [
+        { titulo: 'Início', Icone: House, ativa: true },
+        { titulo: 'Cardápio', Icone: ClipboardList, onPress: onCardapioPress },
+        {
+            titulo: 'Perfil', Icone: UserRound, onPress: onPerfilPress,
+        },
+    ];
     return (
         <View style={styles.tela}>
             <View style={styles.cabecalho}>
-                <Logo style={styles.logo} />
+                <Image style={styles.logo} source={require ('../../assets/r-logotipo-branca.png')}></Image>
             </View>
 
             <ScrollView
@@ -51,7 +58,7 @@ export default function HomeCozinha({
                     </Text>
 
                     <Image
-                        source={require('../../assets/pratoimg.png')} //alterar foto posteriomente, e adicionar fotos variaveis pelo turno e dia da semana
+                        source={require('../../assets/pratos-de-comida.jpg')} //alterar foto posteriomente, e adicionar fotos variaveis pelo turno e dia da semana
                         style={styles.foto}
                         resizeMode="cover"
                         accessible={false}
@@ -60,38 +67,23 @@ export default function HomeCozinha({
             </ScrollView>
 
             <View style={styles.rodape}>
-                <View
-                    accessible
-                    accessibilityRole="tab"
-                    accessibilityLabel="Início"
-                    accessibilityState={{ selected: true }}
-                    style={styles.aba}
-                >
-                    <House size={22} color="#C8DFB9" />
-                    <Text style={[styles.textoAba, styles.abaAtiva]}>Início</Text>
-                </View>
-
-                <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel="Abrir cardápio"
-                    disabled={!onCardapioPress}
-                    onPress={onCardapioPress}
-                    style={styles.aba}
-                >
-                    <ClipboardList size={22} color="#FFFFFF" />
-                    <Text style={styles.textoAba}>Cardápio</Text>
-                </Pressable>
-
-                <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel="Abrir perfil"
-                    disabled={!onPerfilPress}
-                    onPress={onPerfilPress}
-                    style={styles.aba}
-                >
-                    <UserRound size={22} color="#FFFFFF" />
-                    <Text style={styles.textoAba}>Perfil</Text>
-                </Pressable>
+                {abas.map(({ titulo, Icone, ativa, onPress }) => {
+                    return (
+                        <Pressable
+                            key={titulo}
+                            accessibilityRole="tab"
+                            accessibilityState={{ selected: !!ativa, disabled: !ativa && !onPress }}
+                            disabled={!ativa && !onPress}
+                            onPress={onPress}
+                            style={styles.aba}
+                        >
+                            <Icone color={ativa ? coresRodape.ativa : coresRodape.inativa} size={22} />
+                            <Text style={[ styles.textoAba,{ color: ativa ? coresRodape.ativa : coresRodape.inativa }, ]}>
+                                {titulo}
+                            </Text>
+                        </Pressable>
+                    );
+                })}
             </View>
         </View>
     );

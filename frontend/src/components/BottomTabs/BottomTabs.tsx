@@ -49,5 +49,4 @@ export const BottomTabs = ({
 
     </View>
   )
-
 }

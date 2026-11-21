@@ -4,12 +4,7 @@ import { IconButton } from '../IconButton/IconButton';
 import type { ReactNode } from 'react';
 
 import {
-  Bell,
-  Pencil,
-  Trash2,
-  ChevronLeft,
-  ChevronRight,
-  Send,
+  Bell
 } from 'lucide-react-native';
 
 type HeaderProps = {
@@ -19,8 +14,6 @@ type HeaderProps = {
   containerStyle?: StyleProp<ViewStyle>;
   titleStyle?: StyleProp<TextStyle>;
 };
-
-
 
 export function Header({ name, left, right, containerStyle, titleStyle }: HeaderProps) {
 
@@ -49,6 +42,5 @@ export function Header({ name, left, right, containerStyle, titleStyle }: Header
         right
       )}
     </View>
-
   );
 }

@@ -1,10 +1,9 @@
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View,Image } from 'react-native';
 import { ClipboardList, History, House, MessageCircle, TrendingUp, UserRound} from 'lucide-react-native';
 
 import { Card } from '../../components/Card/Card';
 import { IconButton } from '../../components/IconButton/IconButton';
 import { Kpicard } from '../../components/KpiCard/KpiCard';
-import { Logo } from '../../components/Logo/Logo';
 import { styles } from './styles';
 
 type HomeProps = {
@@ -41,10 +40,10 @@ export default function Home({
         { titulo: 'Histórico', Icone: History, onPress: onHistoricoPress },
     ];
 
-    return ( //adicionar logo apenas com o R
+    return (
         <View style={styles.tela}>
             <View style={styles.cabecalho}>
-                <Logo style={styles.logo} />  
+                <Image style={styles.logo} source={require ('../../assets/r-logotipo-branca.png')}></Image>  
 
                 <IconButton //adicionar imagem real de uma pessoal
                     icon={UserRound}
