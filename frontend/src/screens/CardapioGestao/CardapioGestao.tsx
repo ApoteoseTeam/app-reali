@@ -2,36 +2,32 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { ClipboardList, House, TrendingUp, History} from 'lucide-react-native';
 
 import { Card } from '../../components/Card/Card';
-import { Header } from '../../components/Header/Header';
+import { Header } from '../../components/header/header';
 import { MenuDayCard } from '../../components/MenuDayCard/MenuDayCard';
 import { styles } from './styles';
 
-const DIAS = [
-    { dia: 'SEG · 09/11', preparacoes: ['Arroz', 'feijão', 'omelete'] },
-    { dia: 'TER · 10/11', preparacoes: ['Arroz', 'lentilha', 'carne e abóbora'] },
-    { dia: 'QUA · 11/11', preparacoes: ['Macarrão', 'frango e legumes'] },
-    { dia: 'QUI · 12/11', preparacoes: ['Arroz', 'feijão', 'omelete e salada'] },
-    { dia: 'SEX · 13/11', preparacoes: ['Arroz', 'feijão', 'carne e cenoura'] },
-];
-
 type CardapioSemanaProps = {
-    totalPlanejado?: number;
+    periodo?: string;
+    dias?: { dia: string; refeicoes: { nome: string; preparacoes: string[] }[]; planejamento?: number }[];
+    onInicioPress?: () => void;
     onRelatoriosPress?: () => void;
     onCardapioPress?: () => void;
     onHistoricoPress?: () => void;
 };
 
 export default function CardapioSemanaGestao({
-    totalPlanejado = 440,
+    periodo = "—",
+    dias = [],
+    onInicioPress,
     onRelatoriosPress,
     onCardapioPress,
     onHistoricoPress
 }: CardapioSemanaProps = {}) {
 
     const abas = [
-        { titulo: 'Início', Icone: House, ativa: true },
+        { titulo: 'Início', Icone: House, onPress: onInicioPress },
         { titulo: 'Relatórios', Icone: TrendingUp, onPress: onRelatoriosPress },
-        { titulo: 'Cardápio', Icone: ClipboardList, onPress: onCardapioPress },
+        { titulo: 'Cardápio', Icone: ClipboardList, ativa: true },
         { titulo: 'Histórico', Icone: History, onPress: onHistoricoPress },
     ];
     return (
@@ -47,15 +43,15 @@ export default function CardapioSemanaGestao({
                 style={styles.scroll}
                 contentContainerStyle={styles.conteudo}
             >
-                <Text style={styles.periodo}>9 a 13 de novembro · Almoço</Text>
+                <Text style={styles.periodo}>{periodo}</Text>
 
-                {DIAS.map(({ dia, preparacoes }) => (
+                {dias.map(({ dia, refeicoes, planejamento }) => (
                     <MenuDayCard
                         key={dia}
                         variante="cozinha"
                         dia={dia}
-                        refeicoes={[{ nome: 'Almoço', preparacoes }]}
-                        planejamento={dia === 'SEG · 09/11' ? totalPlanejado : undefined}
+                        refeicoes={refeicoes}
+                        planejamento={planejamento}
                     />
                 ))}
 

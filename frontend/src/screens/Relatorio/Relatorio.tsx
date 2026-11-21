@@ -1,43 +1,39 @@
-import { useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { ScrollView, Text, View, Pressable } from 'react-native';
-import { ClipboardList, History, House, TrendingUp, } from 'lucide-react-native';
+import { ClipboardList, History, House, TrendingUp } from 'lucide-react-native';
 
 import { BarList } from '../../components/BarList/BarList';
 import { Button } from '../../components/Button/Button';
 import { Card } from '../../components/Card/Card';
-import { Header } from '../../components/Header/Header';
+import { Header } from '../../components/header/header';
 import { Kpicard } from '../../components/KpiCard/KpiCard';
 import { SegmentedControl } from '../../components/SegmentedControl/SegmentedControl';
-import { Select } from '../../components/Select/Select';
+import { Select } from '../../components/select/Select';
 import { Logo } from '../../components/Logo/Logo';
 import { Input } from '../../components/Input/Input';
 import { CompartilharRelatorioModal } from '../../components/CompartilhaRelatorioModal/CompartilhaRelatorioModal';
 import { PdfStatusModal, type ArquivoPdf, type EstadoPdf } from '../../components/PdfStatusModal/PdfStatusModal';
-import { StatusModal, type StatusPlanejamento, } from '../../components/StatusModal/StatusModal';
+import { StatusModal } from '../../components/StatusModal/StatusModal';
 
+import { mealTypes } from '../../api/reali';
+import { api, useSession } from '../../session/provider';
+import { useRemote } from '../../hooks/useRemote';
+import { dateLabel, localDate, monthRange } from '../../services/dates';
 import { styles } from './styles';
 
-const REGISTROS_DEMO = [
-    { data: '2026-11-03', alunos: 150, previsao: 158 },
-    { data: '2026-11-04', alunos: 148, previsao: 156 },
-    { data: '2026-11-05', alunos: 152, previsao: 160 },
-];
-
-const MESES = ['Novembro de 2026'];
-
-const DIAS = [
-    '03/11/2026',
-    '04/11/2026',
-    '05/11/2026',
-];
-
 type DadosRelatorio = {
+    month: string;
     periodo: string;
     alunos: number;
     previsao: number;
 };
 
 type FormularioResumoProps = {
+    onInicioPress?: () => void;
+    onRelatoriosPress?: () => void;
+    onCardapioPress?: () => void;
+    onHistoricoPress?: () => void;
+    initialMode?: 'Mensal' | 'Diário';
     onBaixarPdf?: (
         relatorio: DadosRelatorio,
         opcoes: {
@@ -45,151 +41,60 @@ type FormularioResumoProps = {
             onProgresso: (percentual: number) => void;
         }
     ) => Promise<ArquivoPdf>;
-    onRelatoriosPress?: () => void;
-    onCardapioPress?: () => void;
-    onHistoricoPress?: () => void;
 };
 
-const OPCOES_DIARIAS = [
-    '09/11/2026 · Almoço',
-    '10/11/2026 · Almoço',
-];
-
-const MARGEM_SEGURANCA = 0.10;
-
-type Planejamento = {
-    alunos: string;
-    extras: string;
-};
-
-const PLANEJAMENTO_INICIAL: Planejamento = {
-    alunos: '150',
-    extras: '',
-};
-
-export default function Relatorio({ onBaixarPdf,
-    onRelatoriosPress,
-    onCardapioPress,
-    onHistoricoPress, }: FormularioResumoProps = {}) {
+export default function Relatorio({ onBaixarPdf, onInicioPress, onRelatoriosPress, onCardapioPress, onHistoricoPress, initialMode = "Mensal" }: FormularioResumoProps = {}) {
     const abas = [
-        { titulo: 'Início', Icone: House, ativa: true },
-        { titulo: 'Relatórios', Icone: TrendingUp, onPress: onRelatoriosPress },
+        { titulo: 'Início', Icone: House, onPress: onInicioPress },
+        { titulo: 'Relatórios', Icone: TrendingUp, ativa: initialMode === 'Mensal', onPress: onRelatoriosPress },
         { titulo: 'Cardápio', Icone: ClipboardList, onPress: onCardapioPress },
-        { titulo: 'Histórico', Icone: History, onPress: onHistoricoPress },
+        { titulo: 'Histórico', Icone: History, ativa: initialMode === 'Diário', onPress: onHistoricoPress },
     ];
-    const [modo, setModo] = useState('Mensal');
-    const [mes, setMes] = useState(MESES[0]);
-    const [dia, setDia] = useState(DIAS[0]);
-    const [diaRefeicao, setDiaRefeicao] = useState(OPCOES_DIARIAS[0]);
+    const [modo, setModo] = useState<string>(initialMode);
+    const { workspace } = useSession();
+    const [selectedMonth, setMes] = useState('');
+    const [selectedMeal, setDiaRefeicao] = useState('');
+    const school = workspace?.school;
+    const scope = workspace?.scope;
+    const today = localDate();
+    const months = Array.from({ length: 12 }, (_, offset) => {
+        const date = new Date(Date.UTC(Number(today.slice(0, 4)), Number(today.slice(5, 7)) - 1 - offset, 1, 12));
+        const key = date.toISOString().slice(0, 7);
+        return { key, label: date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' }) };
+    });
+    const month = months.find(item => item.label === selectedMonth) ?? months[0];
+    const query = { school: school?.id, ...monthRange(month.key) };
+    const report = useRemote('report/' + month.key, signal => api.summary(scope!, query, signal), Boolean(scope && school && modo === 'Mensal'));
+    const meals = useRemote('meal-metrics/' + month.key, signal =>
+        api.all(() => api.mealMetrics(scope!, query, signal), { scope, signal }),
+        Boolean(scope && school && modo === 'Diário'));
+    const mealOptions = (meals.data ?? []).map(item => ({
+        item, label: dateLabel(item.reference_date) + ' · ' + mealTypes[item.meal_type],
+    }));
+    const meal = mealOptions.find(option => option.label === selectedMeal) ?? mealOptions[0];
+    const diaRefeicao = meal?.label ?? '';
     const [compartilharAberto, setCompartilharAberto] = useState(false);
     const [estadoPdf, setEstadoPdf] = useState<EstadoPdf | null>(null);
     const exportacao = useRef<AbortController | null>(null);
-    const [modalPlanejamentoAberto, setModalPlanejamentoAberto] = useState(false);
-
-    const [statusPlanejamento, setStatusPlanejamento] =
-        useState<StatusPlanejamento>("loading");
-
-    const [rascunhos, setRascunhos] = useState<Record<string, Planejamento>>({
-        [OPCOES_DIARIAS[0]]: PLANEJAMENTO_INICIAL,
-    });
-
-    const [planejamentosSalvos, setPlanejamentosSalvos] =
-        useState<Record<string, Planejamento>>({});
-
     const mensal = modo === 'Mensal';
-
-    const registros = mensal
-        ? REGISTROS_DEMO.filter((registro) =>
-            registro.data.startsWith('2026-11')
-        )
-        : REGISTROS_DEMO.filter(
-            (registro) => registro.data.split('-').reverse().join('/') === dia
-        );
-
-    const REFERENCIA_DEMO = {
-        periodo: 'setembro',
-        previsao: 450,
+    const metrics = report.data?.summary;
+    const relatorio = {
+        month: month.key,
+        periodo: month.label,
+        alunos: metrics?.total_student_entries ?? 0,
+        previsao: metrics?.total_forecast_plates ?? 0,
     };
+    const served = metrics?.total_served_plates ?? 0;
+    const previous = report.data?.previous.total_forecast_plates;
+    const difference = report.data?.comparison.total_forecast_plates;
+    const variacao = previous && difference != null ? difference / previous * 100 : null;
+    const percentual = Math.abs(variacao ?? 0).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+    const simbolo = (variacao ?? 0) > 0 ? '▲' : '▼';
+    const textoComparacao = `a previsão de atendimento ${(variacao ?? 0) > 0 ? 'aumentou' : 'caiu'} ${percentual}%.`;
+    const totalPlanejado = meal?.item.total_forecast_plates;
+    const podeSalvar = false;
 
-    const relatorio: DadosRelatorio = {
-        periodo: mensal ? mes : dia,
-        alunos: registros.reduce((total, registro) => total + registro.alunos, 0),
-        previsao: registros.reduce(
-            (total, registro) => total + registro.previsao,
-            0
-        ),
-    };
-
-    const variacao = REFERENCIA_DEMO.previsao > 0 //adicionar conexao com backend para o calculo variavel
-        ? ((relatorio.previsao - REFERENCIA_DEMO.previsao)
-            / REFERENCIA_DEMO.previsao) * 100
-        : null;
-
-    const percentual = variacao === null
-        ? ''
-        : Math.abs(variacao).toLocaleString('pt-BR', {
-            maximumFractionDigits: 1,
-        });
-
-    let simbolo = '–';
-    let textoComparacao = 'a previsão de atendimento ficou estável.';
-
-    if (variacao !== null && variacao > 0) {
-        simbolo = '▲';
-        textoComparacao = `a previsão de atendimento aumentou ${percentual}%.`;
-    } else if (variacao !== null && variacao < 0) {
-        simbolo = '▼';
-        textoComparacao = `a previsão de atendimento caiu ${percentual}%.`;
-    }
-
-
-    const planejamento = rascunhos[diaRefeicao] ?? { alunos: '', extras: '' };
-    const salvo = planejamentosSalvos[diaRefeicao];
-
-    const totalAlunos = Number(planejamento.alunos);
-    const totalExtras = Number(planejamento.extras);
-    const alunosDaMargem = Math.ceil(totalAlunos * MARGEM_SEGURANCA);
-    const totalPlanejado = totalAlunos + alunosDaMargem + totalExtras;
-
-    const podeSalvar =
-        planejamento.alunos !== '' &&
-        Number.isSafeInteger(totalAlunos) &&
-        Number.isSafeInteger(totalExtras) &&
-        Number.isSafeInteger(totalPlanejado);
-
-    const estaSalvo =
-        salvo?.alunos === planejamento.alunos &&
-        salvo?.extras === planejamento.extras;
-
-    function atualizarPlanejamento(campo: keyof Planejamento, texto: string) {
-        const somenteDigitos = texto.replace(/[^0-9]/g, '');
-
-        setRascunhos((anteriores) => ({
-            ...anteriores,
-            [diaRefeicao]: {
-                ...(anteriores[diaRefeicao] ?? { alunos: '', extras: '' }),
-                [campo]: somenteDigitos,
-            },
-        }));
-    }
-
-    function salvarPlanejamento() {
-        if (!podeSalvar) return;
-
-        setStatusPlanejamento("loading");
-        setModalPlanejamentoAberto(true);
-
-        setPlanejamentosSalvos((anteriores) => ({
-            ...anteriores,
-            [diaRefeicao]: planejamento,
-        }));
-
-        setStatusPlanejamento("success");
-    }
-
-    function tentarSalvarNovamente() {
-        salvarPlanejamento();
-    }
+    useEffect(() => () => exportacao.current?.abort(), []);
 
     async function baixarPdf() {
         if (!onBaixarPdf || exportacao.current) return;
@@ -270,9 +175,9 @@ export default function Relatorio({ onBaixarPdf,
                         <Select
                             variant='relatorio'
                             label={mensal ? 'Mês do relatório' : 'Dia do relatório'}
-                            options={mensal ? MESES : DIAS}
-                            value={mensal ? mes : dia}
-                            onChange={mensal ? setMes : setDia}
+                            options={months.map(item => item.label)}
+                            value={month.label}
+                            onChange={setMes}
                         />
 
                         <Card style={styles.relatorio}>
@@ -283,16 +188,16 @@ export default function Relatorio({ onBaixarPdf,
                             </Text>
 
                             <Text style={styles.info}>
-                                Escola Municipal Novo Horizonte · {relatorio.periodo}
+                                {school?.name ?? '—'} · {relatorio.periodo}
                             </Text>
 
                             <View style={styles.indicadores}>
                                 <View style={styles.indicador}>
-                                    <Kpicard title="Total de alunos registrados" value={relatorio.alunos} />
+                                    <Kpicard title="Total de alunos registrados" value={metrics?.total_student_entries ?? null} />
                                 </View>
 
                                 <View style={styles.indicador}>
-                                    <Kpicard title="Refeições servidas" value={relatorio.previsao} />
+                                    <Kpicard title="Refeições servidas" value={metrics?.total_served_plates ?? null} />
                                 </View>
                             </View>
 
@@ -302,14 +207,14 @@ export default function Relatorio({ onBaixarPdf,
 
                             <BarList
                                 itens={[
-                                    { nome: 'Alunos', valor: relatorio.alunos },
-                                    { nome: 'Pratos', valor: relatorio.previsao },
+                                    ...(metrics?.total_student_entries == null ? [] : [{ nome: 'Alunos', valor: relatorio.alunos }]),
+                                    ...(metrics?.total_served_plates == null ? [] : [{ nome: 'Pratos', valor: served }]),
                                 ]}
                                 unidade=""
                             />
-                            {mensal && variacao !== null && (
+                            {Boolean(variacao) && (
                                 <Text style={styles.comparacao}>
-                                    {simbolo} Em relação a {REFERENCIA_DEMO.periodo}: {textoComparacao}
+                                    {simbolo} Em relação ao período anterior: {textoComparacao}
                                 </Text>
                             )}
 
@@ -318,12 +223,11 @@ export default function Relatorio({ onBaixarPdf,
                             </Text>
 
                             <Text style={styles.info}>
-                                A previsão inclui a margem de segurança sobre a presença registrada.
+                                {metrics?.forecast_difference == null ? 'Diferença de previsão indisponível.' : `Diferença de previsão: ${metrics.forecast_difference}`}
                             </Text>
 
                             <Text style={styles.info}>
-                                Dados de demonstração · {registros.length}{' '}
-                                {registros.length === 1 ? 'dia registrado' : 'dias registrados'}
+                                {report.error?.message ?? (report.loading ? 'Carregando dados' : metrics?.calculated_at ? `Atualizado em ${new Date(metrics.calculated_at).toLocaleString('pt-BR')}` : 'Sem dados disponíveis')}
                             </Text>
                         </Card>
                     </>
@@ -335,7 +239,7 @@ export default function Relatorio({ onBaixarPdf,
                         <Select
                             variant="relatorio"
                             label="Data e refeição"
-                            options={OPCOES_DIARIAS}
+                            options={mealOptions.map(option => option.label)}
                             value={diaRefeicao}
                             onChange={setDiaRefeicao}
                         />
@@ -347,19 +251,19 @@ export default function Relatorio({ onBaixarPdf,
                             inputMode="numeric"
                             placeholder="Informe o total"
                             placeholderTextColor="#E6F2DA"
-                            value={planejamento.alunos}
-                            onChangeText={(texto) => atualizarPlanejamento('alunos', texto)}
+                            value={meal?.item.snapshot_entries?.toString() ?? ''}
+                            editable={false}
                             style={styles.inputDiario}
                         />
 
                         <Text style={styles.ajudaDiario}>
-                            Informe apenas o total. Sem nomes de alunos.
+                            {meals.error?.message ?? 'Total registrado pelo Django.'}
                         </Text>
 
                         <Card style={styles.cardMargem}>
-                            <Text style={styles.tituloMargem}>Margem de segurança: 10%</Text>
+                            <Text style={styles.tituloMargem}>Margem de segurança</Text>
                             <Text style={styles.ajudaDiario}>
-                                Configuração do MVP · +{alunosDaMargem} alunos
+                                A previsão segue a configuração do Django.
                             </Text>
                         </Card>
 
@@ -370,15 +274,15 @@ export default function Relatorio({ onBaixarPdf,
                             inputMode="numeric"
                             placeholder="Adicionar alunos extras"
                             placeholderTextColor="#315F52"
-                            value={planejamento.extras}
-                            onChangeText={(texto) => atualizarPlanejamento('extras', texto)}
+                            value=""
+                            editable={false}
                             style={styles.inputExtras}
                         />
 
                         <View style={styles.totalDiario}>
                             <Text style={styles.totalLegenda}>Preparo planejado para</Text>
                             <Text style={styles.totalValor}>
-                                {podeSalvar ? `${totalPlanejado.toLocaleString('pt-BR')} alunos` : '—'}
+                                {totalPlanejado == null ? '—' : `${totalPlanejado.toLocaleString('pt-BR')} alunos`}
                             </Text>
                         </View>
 
@@ -386,13 +290,12 @@ export default function Relatorio({ onBaixarPdf,
                             label="Salvar planejamento"
                             accessibilityRole="button"
                             disabled={!podeSalvar}
-                            onPress={salvarPlanejamento}
                             style={[styles.salvarDiario, !podeSalvar && styles.desabilitado]}
                         />
 
-                        {estaSalvo && (
+                        {!podeSalvar && (
                             <Text accessibilityLiveRegion="polite" style={styles.ajudaDiario}>
-                                Planejamento salvo nesta sessão.
+                                A API não aceita planejamento manual com estes campos.
                             </Text>
                         )}
                     </View>
@@ -435,15 +338,14 @@ export default function Relatorio({ onBaixarPdf,
             />
 
             <StatusModal
-                visible={modalPlanejamentoAberto}
-                status={statusPlanejamento}
-                totalAlunos={totalPlanejado}
+                visible={false}
+                status="error"
+                totalAlunos={totalPlanejado ?? 0}
                 dataRefeicao={diaRefeicao}
-                onClose={() => setModalPlanejamentoAberto(false)}
-                onRetry={tentarSalvarNovamente}
+                onClose={() => {}}
+                onRetry={() => {}}
                 onViewHistory={() => { }}
             />
-
             <View style={styles.rodape}>
                 {abas.map(({ titulo, Icone, ativa, onPress }) => {
                     const cor = ativa ? '#C8DFB9' : '#FFFFFF';  // adicionar navegação entre os icones do rodape

@@ -1,9 +1,11 @@
-import { View, Text, Image, Platform, TouchableOpacity } from 'react-native';
+import { View, Text, Image, Alert, TouchableOpacity } from 'react-native';
 import { Undo2, Settings, Pencil, CircleUser, Phone, MapPin, Lock, type LucideIcon } from 'lucide-react-native';
 import { Button } from '../../components/Button/Button';
 import { IconButton } from '../../components/IconButton/IconButton';
-import { Header } from '../../components/Header/Header';
+import { Header } from '../../components/header/header';
 import { colors } from '../../theme/colors';
+import { useSession } from '../../session/provider';
+import { roleNames } from '../../api/reali';
 import { styles } from './styles';
 
 type LinhaProps = {
@@ -36,7 +38,10 @@ const Linha = ({ icone: Icone, texto, onPress }: LinhaProps) => {
   return <View style={styles.linha}>{conteudo}</View>;
 };
 
-export default function PerfilUsuario() {
+export default function PerfilUsuario({ onVoltar }: { onVoltar?: () => void } = {}) {
+  const { me, workspace, signOut } = useSession();
+  const unavailable = () => Alert.alert('Recurso indisponível nesta versão');
+  const role = workspace?.member.role;
   return (
     <View style={styles.container}>
       <View style={styles.perfilTopo}>
@@ -53,7 +58,7 @@ export default function PerfilUsuario() {
               size={24}
               style={styles.iconeTopo}
               accessibilityLabel="Voltar"
-              onPress={() => console.log('Voltar')}
+              onPress={() => onVoltar?.()}
             />
           }
           right={<View style={styles.iconeEspacador} />}
@@ -69,20 +74,20 @@ export default function PerfilUsuario() {
             size={16}
             style={styles.editar}
             accessibilityLabel="Editar foto do perfil"
-            onPress={() => console.log('Editar foto do perfil')}
+            onPress={unavailable}
           />
         </View>
       </View>
 
-      <Text style={styles.nome}>Horlando da Silva</Text>
-      <Text style={styles.cargo}>Diretor</Text>
+      <Text style={styles.nome}>{me?.user.full_name || me?.user.email || "—"}</Text>
+      <Text style={styles.cargo}>{role ? roleNames[role] ?? role : "—"}</Text>
 
       <View style={styles.conteudo}>
         <View style={styles.card}>
           <Text style={styles.cardTitulo}>Dados pessoais</Text>
-          <Linha icone={CircleUser} texto="horlandodiretor@gmail.com" />
-          <Linha icone={Phone} texto="(11) 98765-4321" />
-          <Linha icone={MapPin} texto="Escola Municipal Novo Horizonte" />
+          <Linha icone={CircleUser} texto={me?.user.email ?? "—"} />
+          <Linha icone={Phone} texto="—" />
+          <Linha icone={MapPin} texto={workspace?.school?.name ?? "—"} />
         </View>
 
         <View style={[styles.card, styles.cardConta]}>
@@ -90,12 +95,12 @@ export default function PerfilUsuario() {
           <Linha
             icone={Settings}
             texto="Editar perfil"
-            onPress={() => console.log('Editar perfil')}
+            onPress={unavailable}
           />
           <Linha
             icone={Lock}
             texto="Alterar Senha"
-            onPress={() => console.log('Alterar Senha')}
+            onPress={unavailable}
           />
         </View>
 
@@ -103,11 +108,7 @@ export default function PerfilUsuario() {
           label="Sair da conta"
           style={styles.botaoSair}
           textStyle={styles.botaoSairTexto}
-          onPress={() => {
-            if (Platform.OS === 'web') {
-              window.location.href = '/';
-            }
-          }}
+          onPress={signOut}
         />
       </View>
     </View>

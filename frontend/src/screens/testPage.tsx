@@ -24,11 +24,11 @@ import { Input } from '../components/Input/Input';
 import { Checkbox } from '../components/CheckBox/CheckBox';
 import { IconButton } from '../components/IconButton/IconButton';
 import { Logo } from '../components/Logo/Logo';
-import { Select } from '../components/Select/Select';
-import { Skeleton } from '../components/Skeleton/Skeleton';
+import { Select } from '../components/select/Select';
+import { Skeleton } from '../components/Skeleton/skeleton';
 import { Chip } from "../components/Chip/Chip";
 import { PreparationRow } from "../components/PreparationRow/PreparationRow";
-import { Header } from '../components/Header/Header';
+import { Header } from '../components/header/header';
 import { Banner } from "../components/Banner/Banner";
 import { SegmentedControl } from '../components/SegmentedControl/SegmentedControl';
 import { RecordCard } from '../components/RecordCard/RecordCard';
@@ -36,7 +36,7 @@ export default function testPage() {
   const [checked, setChecked] = useState(false);
   const [categoria, setCategoria] = useState('');
   const [periodo, setPeriodo] = useState("Semana")
-  const historicoVazio = require('../assets/historico-vazio.png');
+  const historicoVazio = require('../assets/logo-reali.png');
 
   function abrirFormulario() {
     console.log('Clicou em Novo registro');

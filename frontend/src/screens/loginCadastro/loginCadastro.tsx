@@ -15,20 +15,20 @@ import { styles } from './styles';
 import { Checkbox } from '../../components/CheckBox/CheckBox';
 import { Input } from '../../components/Input/Input';
 import { Button } from '../../components/Button/Button';
-import { Select } from "../../components/Select/Select";
+import { Select } from "../../components/select/Select";
 // import { Header } from '../components/header';
 
 type Funcao = 'Nutricionista' | 'Gestor';
 type Aba = 0 | 1;
 
-export default function TelaAutenticacao() {
+export default function TelaAutenticacao({ abaInicial = 0 }: { abaInicial?: Aba } = {}) {
   const session = useSession();
   const loginEmAndamento = useRef(false);
   const { width: larguraJanela } = useWindowDimensions();
   const paginasRef = useRef<React.ComponentRef<typeof ScrollView>>(null);
 
   const [largura, setLargura] = useState(larguraJanela);
-  const [abaAtiva, setAbaAtiva] = useState<Aba>(0);
+  const [abaAtiva, setAbaAtiva] = useState<Aba>(abaInicial);
 
   // Estados do login
   const [emailLogin, setEmailLogin] = useState('');
@@ -167,6 +167,7 @@ export default function TelaAutenticacao() {
 
         <ScrollView
           ref={paginasRef}
+          contentOffset={{ x: largura * abaInicial, y: 0 }}
           style={styles.paginas}
           horizontal
           pagingEnabled

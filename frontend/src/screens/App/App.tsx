@@ -18,7 +18,7 @@ export default function App() {
             try {
                 // Carrega um recurso real do aplicativo.
                 await Asset.loadAsync([
-                    require("../../assets/splash-icon.png"),
+                    require("../../assets/logo-reali.png"),
                 ]);
 
                 setProgress(100);
