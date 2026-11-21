@@ -2,6 +2,7 @@ export const colors = {
   primary: "#173559",
   secondary: "#2F5D50",
   secondaryDark: "#244A40",
+  azulGestao: '#102B53',
 
   background: "#F6FAF2",
   surface: "#B9D1AC",

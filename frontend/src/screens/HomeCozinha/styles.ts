@@ -21,8 +21,8 @@ export const styles = StyleSheet.create({
         backgroundColor: azul,
     },
     logo: {
-        width: 34,
-        height: 34,
+        width: 53,
+        height: 53,
         tintColor: branco,
     },
     scroll: {
@@ -80,7 +80,7 @@ export const styles = StyleSheet.create({
     foto: {
         width: '100%',
         aspectRatio: 5 / 3,
-        maxHeight: 260,
+        maxHeight: 205,
         borderRadius: 16,
     },
     rodape: {

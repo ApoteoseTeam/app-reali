@@ -32,7 +32,7 @@ export default function HomeCozinha({
     return (
         <View style={styles.tela}>
             <View style={styles.cabecalho}>
-                <Logo style={styles.logo} />
+                <Image style={styles.logo} source={require ('../../assets/r-logotipo-branca.png')}></Image>
             </View>
 
             <ScrollView
@@ -58,7 +58,7 @@ export default function HomeCozinha({
                     </Text>
 
                     <Image
-                        source={require('../../assets/pratoimg.png')} //alterar foto posteriomente, e adicionar fotos variaveis pelo turno e dia da semana
+                        source={require('../../assets/pratos-de-comida.jpg')} //alterar foto posteriomente, e adicionar fotos variaveis pelo turno e dia da semana
                         style={styles.foto}
                         resizeMode="cover"
                         accessible={false}

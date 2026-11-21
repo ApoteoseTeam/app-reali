@@ -1,19 +1,40 @@
-import { View, Text, Image, Platform } from 'react-native';
-import { Undo2, Settings, Pencil, CircleUser, Phone, MapPin, Lock,type LucideIcon,
-} from 'lucide-react-native';
+import { View, Text, Image, Platform, TouchableOpacity } from 'react-native';
+import { Undo2, Settings, Pencil, CircleUser, Phone, MapPin, Lock, type LucideIcon } from 'lucide-react-native';
 import { Button } from '../../components/Button/Button';
-import { Card } from '../../components/Card/Card';
 import { IconButton } from '../../components/IconButton/IconButton';
 import { Header } from '../../components/Header/Header';
 import { colors } from '../../theme/colors';
 import { styles } from './styles';
 
-const Linha = ({ icone: Icone, texto }: { icone: LucideIcon; texto: string }) => (
-  <View style={styles.linha}>
-    <Icone size={22} color={colors.text}/>
-    <Text style={styles.linhaTexto}>{texto}</Text>
-  </View>
-);
+type LinhaProps = {
+  icone: LucideIcon;
+  texto: string;
+  onPress?: () => void;
+};
+
+
+const Linha = ({ icone: Icone, texto, onPress }: LinhaProps) => {
+  const conteudo = (
+    <>
+      <Icone size={20} color={colors.primary} />
+      <Text style={styles.linhaTexto}>{texto}</Text>
+    </>
+  );
+
+  if (onPress) {
+    return (
+      <TouchableOpacity
+        style={styles.linha}
+        onPress={onPress}
+        activeOpacity={0.7}
+      >
+        {conteudo}
+      </TouchableOpacity>
+    );
+  }
+
+  return <View style={styles.linha}>{conteudo}</View>;
+};
 
 export default function PerfilUsuario() {
   return (
@@ -35,16 +56,7 @@ export default function PerfilUsuario() {
               onPress={() => console.log('Voltar')}
             />
           }
-          right={
-            <IconButton
-              icon={Settings}
-              color={colors.white}
-              size={24}
-              style={styles.iconeTopo}
-              accessibilityLabel="Configurações"
-              onPress={() => console.log('Configurações')}
-            />
-          }
+          right={<View style={styles.iconeEspacador} />}
         />
 
         <View style={styles.avatarArea}>
@@ -54,7 +66,7 @@ export default function PerfilUsuario() {
           <IconButton
             icon={Pencil}
             color={colors.white}
-            size={18}
+            size={16}
             style={styles.editar}
             accessibilityLabel="Editar foto do perfil"
             onPress={() => console.log('Editar foto do perfil')}
@@ -66,16 +78,26 @@ export default function PerfilUsuario() {
       <Text style={styles.cargo}>Diretor</Text>
 
       <View style={styles.conteudo}>
-        <Card title="Dados pessoais">
+        <View style={styles.card}>
+          <Text style={styles.cardTitulo}>Dados pessoais</Text>
           <Linha icone={CircleUser} texto="horlandodiretor@gmail.com" />
           <Linha icone={Phone} texto="(11) 98765-4321" />
           <Linha icone={MapPin} texto="Escola Municipal Novo Horizonte" />
-        </Card>
+        </View>
 
-        <Card title="Minha conta">
-          <Linha icone={Settings} texto="Editar perfil" />
-          <Linha icone={Lock} texto="Alterar Senha" />
-        </Card>
+        <View style={[styles.card, styles.cardConta]}>
+          <Text style={styles.cardTitulo}>Minha conta</Text>
+          <Linha
+            icone={Settings}
+            texto="Editar perfil"
+            onPress={() => console.log('Editar perfil')}
+          />
+          <Linha
+            icone={Lock}
+            texto="Alterar Senha"
+            onPress={() => console.log('Alterar Senha')}
+          />
+        </View>
 
         <Button
           label="Sair da conta"
