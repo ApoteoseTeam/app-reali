@@ -28,7 +28,7 @@ import { Select } from '../components/Select/Select';
 import { Skeleton } from '../components/Skeleton/Skeleton';
 import { Chip } from "../components/Chip/Chip";
 import { PreparationRow } from "../components/PreparationRow/PreparationRow";
-import { Header } from "../components/Header/Header";
+import { Header } from '../components/Header/Header';
 import { Banner } from "../components/Banner/Banner";
 import { SegmentedControl } from '../components/SegmentedControl/SegmentedControl';
 import { RecordCard } from '../components/RecordCard/RecordCard';
