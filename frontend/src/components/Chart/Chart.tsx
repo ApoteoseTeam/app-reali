@@ -157,5 +157,4 @@ export const Chart = ({ data = [], variant = "line", height = 200, width = 320, 
             </View>
         </View>
     );
-
 }; 

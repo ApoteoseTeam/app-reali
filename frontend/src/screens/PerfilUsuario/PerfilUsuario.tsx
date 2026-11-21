@@ -1,16 +1,5 @@
-import { View, Text, Image, Pressable, Platform } from 'react-native';
-import {
-  Undo2,
-  Settings,
-  Pencil,
-  CircleUser,
-  Phone,
-  MapPin,
-  Lock,
-  House,
-  ClipboardList,
-  LayoutDashboard,
-  type LucideIcon,
+import { View, Text, Image, Platform } from 'react-native';
+import { Undo2, Settings, Pencil, CircleUser, Phone, MapPin, Lock,type LucideIcon,
 } from 'lucide-react-native';
 import { Button } from '../../components/Button/Button';
 import { Card } from '../../components/Card/Card';
@@ -19,16 +8,9 @@ import { Header } from '../../components/Header/Header';
 import { colors } from '../../theme/colors';
 import { styles } from './styles';
 
-const ABAS: { nome: string; icone: LucideIcon; ativa?: boolean }[] = [
-  { nome: 'Home', icone: House },
-  { nome: 'Formulário', icone: ClipboardList },
-  { nome: 'Dashboard', icone: LayoutDashboard },
-  { nome: 'Perfil', icone: CircleUser, ativa: true },
-];
-
 const Linha = ({ icone: Icone, texto }: { icone: LucideIcon; texto: string }) => (
   <View style={styles.linha}>
-    <Icone size={22} color={colors.text} />
+    <Icone size={22} color={colors.text}/>
     <Text style={styles.linhaTexto}>{texto}</Text>
   </View>
 );
@@ -105,15 +87,6 @@ export default function PerfilUsuario() {
             }
           }}
         />
-      </View>
-
-      <View style={styles.abas}>
-        {ABAS.map(({ nome, icone: Icone, ativa }) => (
-          <Pressable key={nome} style={styles.aba}>
-            <Icone size={24} color={colors.text} strokeWidth={ativa ? 2.6 : 2} />
-            <Text style={styles.abaTexto}>{nome}</Text>
-          </Pressable>
-        ))}
       </View>
     </View>
   );
