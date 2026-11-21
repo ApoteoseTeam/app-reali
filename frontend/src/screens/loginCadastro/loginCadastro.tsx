@@ -9,8 +9,11 @@ import {
   Text,
   useWindowDimensions,
   View,
+  type TextInputProps,
 } from 'react-native';
 import { useSession } from '../../session/provider';
+import { Eye, EyeOff } from 'lucide-react-native';
+import { IconButton } from '../../components/IconButton/IconButton';
 import { styles } from './styles';
 import { Checkbox } from '../../components/CheckBox/CheckBox';
 import { Input } from '../../components/Input/Input';
@@ -20,6 +23,29 @@ import { Select } from "../../components/select/Select";
 
 type Funcao = 'Nutricionista' | 'Gestor';
 type Aba = 0 | 1;
+
+function CampoSenha({ style, ...props }: TextInputProps) {
+  const [visivel, setVisivel] = useState(false);
+
+  return (
+    <View>
+      <Input
+        {...props}
+        style={[style, styles.inputComOlho]}
+        secureTextEntry={!visivel}
+      />
+      <IconButton
+        icon={visivel ? EyeOff : Eye}
+        accessibilityLabel={visivel ? 'Ocultar senha' : 'Mostrar senha'}
+        onPress={() => setVisivel(valor => !valor)}
+        color="#14385F"
+        size={20}
+        style={styles.olhoSenha}
+      />
+    </View>
+  );
+}
+
 
 export default function TelaAutenticacao({ abaInicial = 0 }: { abaInicial?: Aba } = {}) {
   const session = useSession();
@@ -210,14 +236,13 @@ export default function TelaAutenticacao({ abaInicial = 0 }: { abaInicial?: Aba 
             <View style={styles.grupo}>
               <Text style={styles.label}>Senha</Text>
 
-              <Input
+              <CampoSenha
                 accessibilityLabel="Senha para entrar"
                 style={styles.input}
                 placeholder="••••••"
                 placeholderTextColor="#667B70"
                 value={senhaLogin}
                 onChangeText={setSenhaLogin}
-                secureTextEntry
                 autoCapitalize="none"
                 autoCorrect={false}
               />
@@ -305,7 +330,7 @@ export default function TelaAutenticacao({ abaInicial = 0 }: { abaInicial?: Aba 
             <View style={styles.grupoSenha}>
               <Text style={styles.label}>Senha</Text>
 
-              <Input
+              <CampoSenha
                 accessibilityLabel="Senha para cadastro"
                 style={[
                   styles.input,
@@ -315,7 +340,6 @@ export default function TelaAutenticacao({ abaInicial = 0 }: { abaInicial?: Aba 
                 placeholderTextColor="#667B70"
                 value={senha}
                 onChangeText={setSenha}
-                secureTextEntry
                 autoCapitalize="none"
                 autoCorrect={false}
               />

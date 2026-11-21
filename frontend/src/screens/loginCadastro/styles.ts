@@ -108,6 +108,20 @@ export const styles = StyleSheet.create({
     fontSize: 14,
   },
 
+  inputComOlho: {
+    paddingRight: 48,
+  },
+
+  olhoSenha: {
+    position: "absolute",
+    right: 2,
+    top: 0,
+    bottom: 0,
+    width: 44,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
   inputErro: {
     borderColor: colors.error,
     backgroundColor: "#FFFFFF",
