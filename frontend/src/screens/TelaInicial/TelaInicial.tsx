@@ -3,7 +3,7 @@ import { styles } from './styles';
 
 import { Button } from '../../components/Button/Button'
 
-export default function TelaInicial({ onEntrar, onCadastro }: { onEntrar?: () => void; onCadastro?: () => void } = {}) {
+export default function TelaInicial({ onEntrar }: { onEntrar?: () => void } = {}) {
     return (
         <View style={styles.container}>
             {/* 1. Decoração azul do topo esquerdo */}
@@ -28,7 +28,6 @@ export default function TelaInicial({ onEntrar, onCadastro }: { onEntrar?: () =>
 
                 <View style={styles.buttonContainer}>
                     <Button label="Entrar" onPress={onEntrar} />
-                    <Button label="Criar conta" onPress={onCadastro} style={styles.buttonTwo} textStyle={styles.buttonTwoText} />
                 </View>
             </View>
 

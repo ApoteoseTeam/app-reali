@@ -98,10 +98,10 @@ function SignedIn() {
 
 function SessionScreen() {
   const { status, me, workspace, error } = useSession();
-  const [entry, setEntry] = useState<0 | 1 | null>(null);
+  const [showLogin, setShowLogin] = useState(false);
 
   useEffect(() => {
-    if (status === 'AUTHENTICATED') setEntry(null);
+    if (status === 'AUTHENTICATED') setShowLogin(false);
   }, [status]);
 
   useEffect(() => {
@@ -109,8 +109,8 @@ function SessionScreen() {
   }, [error]);
 
   if (status === 'AUTHENTICATED') return <SignedIn key={workspace?.key ?? me?.user.id} />;
-  if (entry !== null || status === 'SESSION_EXPIRED') return <Login abaInicial={entry ?? 0} />;
-  return <TelaInicial onEntrar={() => setEntry(0)} onCadastro={() => setEntry(1)} />;
+  if (showLogin || status === 'SESSION_EXPIRED') return <Login />;
+  return <TelaInicial onEntrar={() => setShowLogin(true)} />;
 }
 
 export default function App() {
