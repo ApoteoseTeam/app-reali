@@ -1,48 +1,42 @@
-import { View, Text, Image, Pressable } from 'react-native';
-import {
-  Undo2,
-  Settings,
-  Pencil,
-  CircleUser,
-  Phone,
-  MapPin,
-  Lock,
-  House,
-  ClipboardList,
-  LayoutDashboard,
-  type LucideIcon,
-} from 'lucide-react-native';
+import { View, Text, Image, Platform, TouchableOpacity } from 'react-native';
+import { Undo2, Settings, Pencil, CircleUser, Phone, MapPin, Lock, type LucideIcon } from 'lucide-react-native';
 import { Button } from '../../components/Button/Button';
-import { Card } from '../../components/Card/Card';
 import { IconButton } from '../../components/IconButton/IconButton';
-import { Header } from '../../components/header/header';
+import { Header } from '../../components/Header/Header';
 import { colors } from '../../theme/colors';
-import { roleNames } from '../../api/reali';
-import { useSession } from '../../session/provider';
 import { styles } from './styles';
 
-const ABAS: { nome: string; icone: LucideIcon; ativa?: boolean }[] = [
-  { nome: 'Home', icone: House },
-  { nome: 'Formulário', icone: ClipboardList },
-  { nome: 'Dashboard', icone: LayoutDashboard },
-  { nome: 'Perfil', icone: CircleUser, ativa: true },
-];
+type LinhaProps = {
+  icone: LucideIcon;
+  texto: string;
+  onPress?: () => void;
+};
 
-const Linha = ({ icone: Icone, texto }: { icone: LucideIcon; texto: string }) => (
-  <View style={styles.linha}>
-    <Icone size={22} color={colors.text} />
-    <Text style={styles.linhaTexto}>{texto}</Text>
-  </View>
-);
 
-type Props = { onInicio?: () => void; onCardapio?: () => void; onRelatorio?: () => void };
+const Linha = ({ icone: Icone, texto, onPress }: LinhaProps) => {
+  const conteudo = (
+    <>
+      <Icone size={20} color={colors.primary} />
+      <Text style={styles.linhaTexto}>{texto}</Text>
+    </>
+  );
 
-export default function PerfilUsuario({ onInicio, onCardapio, onRelatorio }: Props = {}) {
-  const { me, workspace, signOut } = useSession();
-  const actions: Record<string, (() => void) | undefined> = {
-    Home: onInicio, Formulário: onCardapio, Dashboard: onRelatorio,
-  };
-  const role = workspace?.member.role;
+  if (onPress) {
+    return (
+      <TouchableOpacity
+        style={styles.linha}
+        onPress={onPress}
+        activeOpacity={0.7}
+      >
+        {conteudo}
+      </TouchableOpacity>
+    );
+  }
+
+  return <View style={styles.linha}>{conteudo}</View>;
+};
+
+export default function PerfilUsuario() {
   return (
     <View style={styles.container}>
       <View style={styles.perfilTopo}>
@@ -59,19 +53,10 @@ export default function PerfilUsuario({ onInicio, onCardapio, onRelatorio }: Pro
               size={24}
               style={styles.iconeTopo}
               accessibilityLabel="Voltar"
-              onPress={() => onInicio?.()}
+              onPress={() => console.log('Voltar')}
             />
           }
-          right={
-            <IconButton
-              icon={Settings}
-              color={colors.white}
-              size={24}
-              style={styles.iconeTopo}
-              accessibilityLabel="Configurações"
-              onPress={() => console.log('Configurações')}
-            />
-          }
+          right={<View style={styles.iconeEspacador} />}
         />
 
         <View style={styles.avatarArea}>
@@ -81,7 +66,7 @@ export default function PerfilUsuario({ onInicio, onCardapio, onRelatorio }: Pro
           <IconButton
             icon={Pencil}
             color={colors.white}
-            size={18}
+            size={16}
             style={styles.editar}
             accessibilityLabel="Editar foto do perfil"
             onPress={() => console.log('Editar foto do perfil')}
@@ -89,36 +74,41 @@ export default function PerfilUsuario({ onInicio, onCardapio, onRelatorio }: Pro
         </View>
       </View>
 
-      <Text style={styles.nome}>{me?.user.full_name || me?.user.email || "—"}</Text>
-      <Text style={styles.cargo}>{role ? roleNames[role] ?? role : "—"}</Text>
+      <Text style={styles.nome}>Horlando da Silva</Text>
+      <Text style={styles.cargo}>Diretor</Text>
 
       <View style={styles.conteudo}>
-        <Card title="Dados pessoais">
-          <Linha icone={CircleUser} texto={me?.user.email ?? "—"} />
-          <Linha icone={Phone} texto="—" />
-          <Linha icone={MapPin} texto={[workspace?.school?.name, workspace?.organization.name].filter(Boolean).join(" · ") || "—"} />
-        </Card>
+        <View style={styles.card}>
+          <Text style={styles.cardTitulo}>Dados pessoais</Text>
+          <Linha icone={CircleUser} texto="horlandodiretor@gmail.com" />
+          <Linha icone={Phone} texto="(11) 98765-4321" />
+          <Linha icone={MapPin} texto="Escola Municipal Novo Horizonte" />
+        </View>
 
-        <Card title="Minha conta">
-          <Linha icone={Settings} texto="Editar perfil" />
-          <Linha icone={Lock} texto="Alterar Senha" />
-        </Card>
+        <View style={[styles.card, styles.cardConta]}>
+          <Text style={styles.cardTitulo}>Minha conta</Text>
+          <Linha
+            icone={Settings}
+            texto="Editar perfil"
+            onPress={() => console.log('Editar perfil')}
+          />
+          <Linha
+            icone={Lock}
+            texto="Alterar Senha"
+            onPress={() => console.log('Alterar Senha')}
+          />
+        </View>
 
         <Button
           label="Sair da conta"
           style={styles.botaoSair}
           textStyle={styles.botaoSairTexto}
-          onPress={signOut}
+          onPress={() => {
+            if (Platform.OS === 'web') {
+              window.location.href = '/';
+            }
+          }}
         />
-      </View>
-
-      <View style={styles.abas}>
-        {ABAS.map(({ nome, icone: Icone, ativa }) => (
-          <Pressable key={nome} style={styles.aba} onPress={actions[nome]}>
-            <Icone size={24} color={colors.text} strokeWidth={ativa ? 2.6 : 2} />
-            <Text style={styles.abaTexto}>{nome}</Text>
-          </Pressable>
-        ))}
       </View>
     </View>
   );

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Alert, Platform } from 'react-native';
+import { Alert } from 'react-native';
 import { api, SessionProvider, useSession } from './session/provider';
 import { mealTypes } from './api/reali';
 import { useRemote } from './hooks/useRemote';
-import { dateLabel, localDate, monthRange, weekDays } from './services/dates';
+import { dateLabel, localDate } from './services/dates';
 import Login from './screens/loginCadastro/loginCadastro';
 import Home from './screens/HomeGestao/Home';
 import HomeCozinha from './screens/HomeCozinha/HomeCozinha';
 import PerfilUsuario from './screens/PerfilUsuario/PerfilUsuario';
-import Cardapio from './screens/Cardapio/Cardapio';
+import Cardapio from './screens/CardapioCozinha/CardapioCozinha';
 import Relatorio from './screens/Relatorio/Relatorio';
 
 type Screen = 'home' | 'perfil' | 'cardapio' | 'relatorio';
@@ -19,14 +19,10 @@ function SignedIn() {
   const scope = workspace?.scope;
   const school = workspace?.school;
   const today = localDate();
-  const days = weekDays(today);
   const query = { school: school?.id, date: today };
   const dashboard = useRemote('dashboard/' + today, signal => api.dashboard(scope!, query, signal),
     Boolean(scope && school && screen === 'home'), 60000);
-  const menu = useRemote('menu/' + days[0], signal => api.all(
-    () => api.mealMetrics(scope!, { school: school?.id, start_date: days[0], end_date: days[6] }, signal),
-    { scope, signal }), Boolean(scope && school && screen === 'cardapio'));
-  const error = dashboard.error?.message ?? menu.error?.message;
+  const error = dashboard.error?.message;
 
   useEffect(() => {
     if (error) Alert.alert('Não foi possível carregar os dados', error);
@@ -38,37 +34,13 @@ function SignedIn() {
   const report = () => setScreen('relatorio');
 
   if (screen === 'perfil') {
-    return <PerfilUsuario onInicio={home} onCardapio={cardapio} onRelatorio={report} />;
+    return <PerfilUsuario />;
   }
   if (screen === 'cardapio') {
-    return <Cardapio onInicioPress={home} onPerfilPress={profile}
-      periodo={`${dateLabel(days[0])} a ${dateLabel(days[6])}`}
-      dias={days.map(day => {
-        const meals = menu.data?.filter(item => item.reference_date === day) ?? [];
-        return {
-          dia: dateLabel(day),
-          refeicoes: meals.map(item => ({ nome: mealTypes[item.meal_type], preparacoes: [] })),
-          planejamento: meals.length === 1 ? meals[0].total_forecast_plates ?? undefined : undefined,
-        };
-      })} />;
+    return <Cardapio onInicioPress={home} onPerfilPress={profile} />;
   }
   if (screen === 'relatorio') {
-    return <Relatorio onVoltar={home} onBaixarPdf={Platform.OS === 'web' && scope && school
-      ? async (range, { signal }) => {
-        const pdf = await api.report(scope, { ...monthRange(range.month), school: school.id, group: 'monthly' }, 'pdf', signal);
-        return {
-          nome: `reali-${range.month}.pdf`,
-          abrir: async () => {
-            if (signal.aborted || scope.signal?.aborted) throw new Error('Exportação cancelada.');
-            const url = URL.createObjectURL(new Blob([pdf], { type: 'application/pdf' }));
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `reali-${range.month}.pdf`;
-            link.click();
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
-          },
-        };
-      } : undefined} />;
+    return <Relatorio onRelatoriosPress={report} onCardapioPress={cardapio} onHistoricoPress={report} />;
   }
   const data = dashboard.data;
   const meal = data?.meal_services[0];

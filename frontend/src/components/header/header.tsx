@@ -4,29 +4,21 @@ import { IconButton } from '../IconButton/IconButton';
 import type { ReactNode } from 'react';
 
 import {
-  Bell,
-  Pencil,
-  Trash2,
-  ChevronLeft,
-  ChevronRight,
-  Send,
+  Bell
 } from 'lucide-react-native';
 
 type HeaderProps = {
   name: string;
-  onTitlePress?: () => void;
   left?: ReactNode;
   right?: ReactNode;
   containerStyle?: StyleProp<ViewStyle>;
   titleStyle?: StyleProp<TextStyle>;
 };
 
-
-
-export function Header({ name, left, right, containerStyle, titleStyle, onTitlePress }: HeaderProps) {
+export function Header({ name, left, right, containerStyle, titleStyle }: HeaderProps) {
 
   const title = (
-    <Text accessibilityRole={onTitlePress ? "button" : "header"} accessibilityHint={onTitlePress ? "Voltar à tela inicial" : undefined} onPress={onTitlePress} style={titleStyle ?? style.pagename}>{name}</Text>
+    <Text accessibilityRole="header" style={titleStyle ?? style.pagename}>{name}</Text>
   )
 
   return (
@@ -50,6 +42,5 @@ export function Header({ name, left, right, containerStyle, titleStyle, onTitleP
         right
       )}
     </View>
-
   );
 }

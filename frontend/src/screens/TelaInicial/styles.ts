@@ -1,99 +1,92 @@
 import { StyleSheet } from "react-native"
 
-import { typography } from '../../theme/typography'
-import { colors } from '../../theme/colors'
-import { spacing } from '../../theme/spacing'
-
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
-        position: 'relative',
+        backgroundColor: '#F6F8F2',
     },
     topBlob: {
         position: 'absolute',
-        top: -80,
-        left: -80,
-        width: 300,
-        height: 200,
-    },
-    bottomWave: {
-        position: 'absolute',
-        bottom: -160,
-        left: '-20%',
-        right: 0,
-        height: 300,
-        width: '130',
+        top: 0,
+        left: 0,
+        width: 190,
+        height: 150,
     },
     content: {
         flex: 1,
-        justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 24,
-        paddingTop: 60,
-        paddingBottom: 20,
-        zIndex: 1,
+        justifyContent: 'center',
+        paddingHorizontal: 32,
+        paddingBottom: 90, 
+        zIndex: 2,
     },
     headerGroup: {
         alignItems: 'center',
+        marginBottom: 24,
     },
-    title: {
-        fontSize: 56,
-        color: colors.primary,
-        marginBottom: 8,
-        textAlign: 'center',
+    logo: {
+        width: 240,
+        height: 110,
     },
     subtitle: {
-        fontSize: typography.sizes.small,
-        color: colors.textSecondary,
-        fontWeight: '500',
-        marginBottom: 20,
-        textAlign: 'center',
+        fontSize: 12,
+        fontWeight: '700',
+        color: '#163254',
+        marginTop: 4,
     },
     description: {
-        fontSize: typography.sizes.small,
-        color: colors.textSecondary,
+        fontSize: 13.5,
+        color: '#2B2B2B',
         textAlign: 'center',
         lineHeight: 20,
-        marginBottom: 32,
-        maxWidth: 310,
+        marginBottom: 34,
+        paddingHorizontal: 8,
     },
     buttonContainer: {
         width: '100%',
-        gap: 12,
+        gap: 14,
+    },
+    buttonOne: {
+        backgroundColor: '#163254',
+        borderRadius: 10,
+        height: 46,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    buttonOneText: {
+        color: '#FFFFFF',
+        fontWeight: '600',
+        fontSize: 15,
     },
     buttonTwo: {
-        backgroundColor: 'transparent',
-        borderWidth: 1,
-        borderColor: colors.primary,
-        borderRadius: 8,
-        paddingVertical: 14,
-        alignItems: 'center',
+        backgroundColor: '#FFFFFF',
+        borderWidth: 1.5,
+        borderColor: '#163254',
+        borderRadius: 10,
+        height: 46,
         justifyContent: 'center',
+        alignItems: 'center',
     },
     buttonTwoText: {
-        color: colors.primary,
+        color: '#163254',
+        fontWeight: '600',
+        fontSize: 15,
     },
-    footer: {
+    bottomWave: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
         width: '100%',
-        flexDirection: 'row',
-        alignItems: 'flex-end',
-        justifyContent: 'space-between',
-    },
-    footerTextGroup: {
-        flex: 1,
-        paddingRight: 12,
-    },
-    footerText: {
-        fontSize: 12,
-        color: colors.textSecondary,
-        lineHeight: 16,
-        marginLeft: 20,
-        marginBottom: 12
+        height: 165,
+        zIndex: 1,
     },
     foodImage: {
-        width: 160,
-        height: 160,
-        bottom: -10
-    }
+        position: 'absolute',
+        bottom: -10,
+        right: -20,
+        width: 270,
+        height: 210,
+        zIndex: 3,
+    },
 });

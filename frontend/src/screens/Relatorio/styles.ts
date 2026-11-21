@@ -194,4 +194,24 @@ export const styles = StyleSheet.create({
         backgroundColor: azulGestao,
         borderRadius: 10,
     },
+
+    rodape: {
+        flexDirection: 'row',
+        paddingHorizontal: 8,
+        backgroundColor: azulGestao,
+    },
+
+    aba: {
+        flex: 1,
+        minHeight: 52,
+        paddingVertical: 6,
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 3,
+    },
+
+    textoAba: {
+        fontSize: 11,
+        fontWeight: '600'
+    },
 });
