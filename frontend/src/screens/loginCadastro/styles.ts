@@ -14,6 +14,7 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
 
+  
   cabecalho: {
     backgroundColor: "#14385F",
     alignItems: "center",
@@ -23,10 +24,8 @@ export const styles = StyleSheet.create({
   },
 
   logo: {
-    fontSize: 34,
-    fontWeight: typography.weights.bold,
-    color: "#FFFFFF",
-    letterSpacing: -0.8,
+      width: 240,
+      height: 120,
   },
 
   logoDestaque: {

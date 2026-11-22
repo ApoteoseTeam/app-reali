@@ -7,6 +7,7 @@ import {
   ScrollView,
   Text,
   View,
+  Image,
   type TextInputProps,
 } from 'react-native';
 import { useSession } from '../../session/provider';
@@ -16,6 +17,7 @@ import { styles } from './styles';
 import { Checkbox } from '../../components/CheckBox/CheckBox';
 import { Input } from '../../components/Input/Input';
 import { Button } from '../../components/Button/Button';
+
 function CampoSenha({ style, ...props }: TextInputProps) {
   const [visivel, setVisivel] = useState(false);
 
@@ -72,7 +74,7 @@ export default function TelaAutenticacao() {
       <View style={styles.conteudo}>
         <View style={styles.cabecalho}>
           <Text style={styles.logo}>
-            Re<Text style={styles.logoDestaque}>ali</Text>
+            <Image source={require('../../assets/reali-branco.png')} style={styles.logo} resizeMode="contain"/>
           </Text>
 
           <Text style={styles.subtitulo}>
