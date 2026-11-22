@@ -5,7 +5,7 @@ from apps.institutions.models import School
 from apps.users.models import Membership
 
 Role = Membership.Role
-DIRECTORS = {Role.DIRECTOR, Role.ADMIN}
+DIRECTORS = {Role.DIRECTOR}
 MANAGEMENT_ROLES = DIRECTORS | {Role.MANAGER}
 KITCHEN_ROLES = MANAGEMENT_ROLES | {Role.COOK}
 FULL_REPORT_ROLES = MANAGEMENT_ROLES | {Role.NUTRITIONIST, Role.SECRETARIAT}
@@ -22,12 +22,12 @@ ROLE_PERMISSIONS = {
     "meal_history": FULL_REPORT_ROLES | {Role.COOK},
     "raw_counts": FULL_REPORT_ROLES,
     "adjust_counts": MANAGEMENT_ROLES,
-    "indicators": FULL_REPORT_ROLES | {Role.COOK, Role.TEACHER},
+    "indicators": FULL_REPORT_ROLES | {Role.COOK},
     "camera_status": FULL_REPORT_ROLES | {Role.COOK},
     "camera_history": FULL_REPORT_ROLES,
     "camera_admin": DIRECTORS,
     "realinova_full": FULL_REPORT_ROLES,
-    "realinova_limited": {Role.COOK, Role.TEACHER},
+    "realinova_limited": {Role.COOK},
 }
 
 

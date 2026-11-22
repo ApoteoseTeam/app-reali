@@ -27,10 +27,6 @@ def locked_staff(actor):
     return require_role(actor, "staff")
 
 
-def canonical_role(role):
-    return Membership.Role.DIRECTOR if role in DIRECTORS else role
-
-
 def validate_grant(actor, role, all_schools, school_ids):
     if (role in DIRECTORS or all_schools) and not actor.all_schools_access:
         raise PermissionDenied("A atribuição exige direção com escopo institucional.")
@@ -100,8 +96,12 @@ def update_membership(actor, membership_id, *, role=None, is_active=None, grant=
     membership = manageable_memberships(actor).filter(pk=membership_id).first()
     if not membership:
         raise NotFound("Vínculo não encontrado.")
-    resulting_role = canonical_role(role) if role is not None else membership.role
+    resulting_role = role if role is not None else membership.role
     resulting_active = membership.is_active if is_active is None else is_active
+    if resulting_active and resulting_role not in Membership.Role.values:
+        raise ValidationError(
+            {"role": "Escolha um cargo vigente para reativar o vínculo."}
+        )
     all_schools = (
         membership.all_schools_access if grant is None else grant["all_schools_access"]
     )

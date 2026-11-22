@@ -12,7 +12,6 @@ O campo `is_active` representa a habilitação administrativa. O estado operacio
 | Gestão | Sim | Sim | Sem acesso |
 | Nutricionista | Sim | Últimos sete dias | Sem acesso |
 | Cozinha | Estado resumido da cantina | Sem acesso | Sem acesso |
-| Professor | Sem acesso | Sem acesso | Sem acesso |
 | Secretaria | Sim | Sim | Sem acesso |
 
 O JWT da pessoa, o vínculo ativo e as escolas concedidas são verificados pelo servidor. A equipe interna opera em rotas `/api/v1/admin/cameras/` e `/api/v1/admin/edge-devices/`, com `is_staff`, a permissão Django `cameras.support_camera_devices` e a organização selecionada explicitamente.

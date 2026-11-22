@@ -59,22 +59,12 @@ class ScopeMixin:
             or (end - start).days >= max_days
         ):
             raise ValidationError("Período inválido para esta consulta.")
-        if member.role in {
-            Membership.Role.COOK,
-            Membership.Role.TEACHER,
-        } and start < today - timedelta(days=29):
+        if member.role == Membership.Role.COOK and start < today - timedelta(days=29):
             raise ValidationError("O papel permite consultar os últimos 30 dias.")
         if "school" in filters:
             schools = schools.filter(pk=filters["school"])
             if not schools.exists():
                 raise NotFound("Escola não encontrada no seu escopo.")
-        if (
-            member.role == Membership.Role.TEACHER
-            and {"meal_type", "status"} & filters.keys()
-        ):
-            raise ValidationError(
-                "Filtros de refeição exigem acesso aos indicadores de serviço."
-            )
         return member, schools, {**filters, "start_date": start, "end_date": end}
 
 
@@ -88,12 +78,6 @@ class DailyMetricsView(ScopeMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = s.DailyMetricsSerializer
     queryset = DailyMetrics.objects.none()
 
-    def get_serializer_context(self):
-        result = super().get_serializer_context()
-        if not getattr(self, "swagger_fake_view", False):
-            result["entry_only"] = self.scope()[0].role == Membership.Role.TEACHER
-        return result
-
     def get_queryset(self):
         if getattr(self, "swagger_fake_view", False):
             return self.queryset
@@ -102,23 +86,18 @@ class DailyMetricsView(ScopeMixin, viewsets.ReadOnlyModelViewSet):
             today = timezone.localdate()
             start = (
                 today - timedelta(days=29)
-                if member.role in {Membership.Role.COOK, Membership.Role.TEACHER}
+                if member.role == Membership.Role.COOK
                 else date(1900, 1, 1)
             )
             end = today
         else:
             member, schools, filters = self.report_scope()
             start, end = filters["start_date"], filters["end_date"]
-            if member.role not in {
-                Membership.Role.COOK,
-                Membership.Role.TEACHER,
-            } and not (
+            if member.role != Membership.Role.COOK and not (
                 {"date", "start_date", "end_date"} & self.request.query_params.keys()
             ):
                 start = date(1900, 1, 1)
-        return day_scope(
-            schools, start, end, entry_only=member.role == Membership.Role.TEACHER
-        ).order_by("-reference_date", "id")
+        return day_scope(schools, start, end).order_by("-reference_date", "id")
 
 
 @extend_schema_view(
@@ -197,15 +176,10 @@ class DashboardView(ScopeMixin, APIView):
         responses=s.DashboardSerializer,
     )
     def get(self, request):
-        member, schools, filters = self.report_scope(single_day=True)
-        entry_only = member.role == Membership.Role.TEACHER
-        summary = report_rollups(schools, filters, entry_only=entry_only)[0]
-        meals = (
-            []
-            if entry_only
-            else list(
-                filtered_meals(schools, filters).order_by("scheduled_time", "id")[:51]
-            )
+        _, schools, filters = self.report_scope(single_day=True)
+        summary = report_rollups(schools, filters)[0]
+        meals = list(
+            filtered_meals(schools, filters).order_by("scheduled_time", "id")[:51]
         )
         return Response(
             s.DashboardSerializer(
@@ -230,14 +204,9 @@ class HistoryView(ScopeMixin, generics.GenericAPIView):
         responses=s.MetricValues(many=True),
     )
     def get(self, request):
-        member, schools, filters = self.report_scope()
+        _, schools, filters = self.report_scope()
         group = self.group or filters.get("group", "daily")
-        rows = report_rollups(
-            schools,
-            filters,
-            group=group,
-            entry_only=member.role == Membership.Role.TEACHER,
-        )
+        rows = report_rollups(schools, filters, group=group)
         return self.get_paginated_response(
             self.get_serializer(self.paginate_queryset(rows), many=True).data
         )

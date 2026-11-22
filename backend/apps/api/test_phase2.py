@@ -629,11 +629,17 @@ def test_management_and_school_boundaries_live_sessions(tenant):
     assert user.get(ROOT + "schools/").status_code == 403
     assert user.get(ROOT + "auth/me/").json()["memberships"] == []
     assert director_client.post(detail + "reactivate/").status_code == 200
+    for role in ("ADMIN", "TEACHER"):
+        assert (
+            director_client.patch(detail, {"role": role}, format="json").status_code
+            == 400
+        )
     assert (
-        director_client.patch(detail, {"role": "TEACHER"}, format="json").status_code
+        director_client.patch(
+            detail, {"role": "NUTRITIONIST"}, format="json"
+        ).status_code
         == 200
     )
-    assert user.get(ROOT + "meal-services/").status_code == 403
     assert (
         AuditLog.objects.filter(
             action="SCHOOL_ACCESS_CHANGED", actor=director.user
@@ -664,23 +670,21 @@ def test_role_matrix_for_existing_data_and_inactive_school(tenant):
     meal = MealService.objects.create(
         school=first, date=today, scheduled_time="12:00", meal_type="LUNCH"
     )
-    for role in ("MANAGER", "NUTRITIONIST", "COOK", "TEACHER", "SECRETARIAT"):
+    for role in ("MANAGER", "NUTRITIONIST", "COOK", "SECRETARIAT"):
         actor = make_member(org, first, role, f"{role.lower()}@example.com")
         client = client_for(actor.user, org)
         indicators = client.get(ROOT + "analytics/daily/").json()
-        assert indicators["count"] == (1 if role in {"TEACHER", "COOK"} else 2)
-        assert indicators["results"][0]["total_served_plates"] == (
-            None if role == "TEACHER" else 25
-        )
+        assert indicators["count"] == (1 if role == "COOK" else 2)
+        assert indicators["results"][0]["total_served_plates"] == 25
         assert client.get(ROOT + "student-counts/").status_code == (
-            403 if role in {"TEACHER", "COOK"} else 200
+            403 if role == "COOK" else 200
         )
-        forecast_status = {"TEACHER": 403, "SECRETARIAT": 200}.get(role, 404)
+        forecast_status = 200 if role == "SECRETARIAT" else 404
         assert (
             client.get(ROOT + f"meal-services/{meal.pk}/forecast/").status_code
             == forecast_status
         )
-        if role in {"TEACHER", "NUTRITIONIST", "SECRETARIAT"}:
+        if role in {"NUTRITIONIST", "SECRETARIAT"}:
             assert (
                 client.post(ROOT + f"meal-services/{meal.pk}/start/").status_code == 403
             )

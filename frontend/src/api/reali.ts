@@ -28,7 +28,7 @@ export type Summary = { summary: Metrics; previous: Metrics; period: Range; prev
 export type Range = { start_date: string; end_date: string };
 
 export const mealTypes: Record<MealType, string> = { BREAKFAST: "Café da manhã", LUNCH: "Almoço", SNACK: "Lanche", DINNER: "Jantar" };
-export const roleNames: Record<string, string> = { DIRECTOR: "Direção", ADMIN: "Administração", MANAGER: "Gestão", COOK: "Cozinha", NUTRITIONIST: "Nutrição", TEACHER: "Docência", SECRETARIAT: "Secretaria" };
+export const roleNames: Record<string, string> = { DIRECTOR: "Direção", MANAGER: "Gestão", COOK: "Cozinha", NUTRITIONIST: "Nutrição", SECRETARIAT: "Secretaria" };
 
 export class RealiApi {
   constructor(readonly http: HttpClient) {}

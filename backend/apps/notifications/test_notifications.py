@@ -625,7 +625,7 @@ def test_meals_invitation_and_pending_analytics(org_data, settings, monkeypatch)
 def test_audited_adjustment_idempotency_reversal_and_rescope(org_data, monkeypatch):
     org, school, other, director = org_data
     restricted = person(org, "limited@reali.test", schools=[other])
-    teacher = person(org, "teacher@reali.test", role=Membership.Role.TEACHER)
+    cook = person(org, "cook@reali.test", role=Membership.Role.COOK)
     camera = Camera.objects.create(
         school=school, name="Portaria", camera_type=Camera.CameraType.ENTRANCE
     )
@@ -646,7 +646,7 @@ def test_audited_adjustment_idempotency_reversal_and_rescope(org_data, monkeypat
     }
     key = str(uuid4())
     headers = {"HTTP_IDEMPOTENCY_KEY": key}
-    assert client(teacher).post(ADJUSTMENTS, body, format="json").status_code == 403
+    assert client(cook).post(ADJUSTMENTS, body, format="json").status_code == 403
     assert client(restricted).post(ADJUSTMENTS, body, format="json").status_code == 404
     assert client(restricted).patch(
         f"{BASE}schools/{school.pk}/", {"name": "Indevido"}, format="json"
@@ -669,7 +669,7 @@ def test_audited_adjustment_idempotency_reversal_and_rescope(org_data, monkeypat
     audit_path = f"{AUDIT}{record['audit_log']}/"
     assert api.get(audit_path).json()["request_id"] == saved.headers["X-Request-ID"]
     assert client(restricted).get(audit_path).status_code == 404
-    assert client(teacher).get(AUDIT).status_code == 403
+    assert client(cook).get(AUDIT).status_code == 403
     assert (
         api.patch(audit_path, {"action": "REWRITTEN"}, format="json").status_code == 405
     )
@@ -680,7 +680,7 @@ def test_audited_adjustment_idempotency_reversal_and_rescope(org_data, monkeypat
         == 1
     )
     assert AuditLog.objects.filter(
-        action="ADMIN_ACCESS_DENIED", actor=teacher.user
+        action="ADMIN_ACCESS_DENIED", actor=cook.user
     ).exists()
     assert (
         api.post(ADJUSTMENTS, {**body, "delta": -6}, format="json").status_code == 400

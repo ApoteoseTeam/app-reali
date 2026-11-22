@@ -73,12 +73,6 @@ class QueryTools:
         self.attempts = []
 
     def available(self):
-        if self.scope.role == Membership.Role.TEACHER:
-            return [
-                self.get_student_counts,
-                self.get_daily_metrics,
-                self.compare_periods,
-            ]
         tools = [
             self.get_student_counts,
             self.get_plate_counts,
@@ -98,11 +92,7 @@ class QueryTools:
         end = date.fromisoformat(end_date) if end_date else start
         earliest = (
             today - timedelta(days=29)
-            if self.scope.role
-            in {
-                Membership.Role.COOK,
-                Membership.Role.TEACHER,
-            }
+            if self.scope.role == Membership.Role.COOK
             else date(1900, 1, 1)
         )
         if (
@@ -145,15 +135,11 @@ class QueryTools:
         self.evidence.append(evidence)
         return evidence
 
-    def rollups(
-        self, school_id, period, *, group=None, meal_type=None, entry_only=False
-    ):
+    def rollups(self, school_id, period, *, group=None, meal_type=None):
         if meal_type and meal_type not in MealService.MealType.values:
             raise AIError("AI_INVALID_ARGUMENTS")
         filters = {**period, **({"meal_type": meal_type} if meal_type else {})}
-        return report_rollups(
-            self.schools(school_id), filters, group=group, entry_only=entry_only
-        )
+        return report_rollups(self.schools(school_id), filters, group=group)
 
     def services(self, school_id, period, meal_type, meal_service_id=None):
         self.scope.require("meal_history")
@@ -209,9 +195,7 @@ class QueryTools:
         """Consulta entradas registradas, não presença individual. Datas ISO inclusivas. Sem datas usa hoje."""
         self.scope.require("indicators")
         period = self.period(start_date, end_date)
-        rows = self.rollups(
-            school_id, period, entry_only=self.scope.role == Membership.Role.TEACHER
-        )
+        rows = self.rollups(school_id, period)
         return self.record(
             "STUDENT_COUNTS",
             school_id,
@@ -290,14 +274,12 @@ class QueryTools:
         """Consulta um resumo consolidado de entradas, previsão, distribuição e erros no intervalo."""
         self.scope.require("indicators")
         period = self.period(start_date, end_date)
-        teacher = self.scope.role == Membership.Role.TEACHER
-        rows = self.rollups(school_id, period, entry_only=teacher)
-        fields = [METRICS["entries"]] if teacher else LABELS
+        rows = self.rollups(school_id, period)
         return self.record(
             "DAILY_METRICS",
             school_id,
             period,
-            [self.compact(row, fields) for row in rows],
+            [self.compact(row, LABELS) for row in rows],
         )
 
     @tool_query
@@ -338,9 +320,6 @@ class QueryTools:
     ) -> dict:
         """Compara dois intervalos inclusivos. Variação relativa ao período anterior, quando definida."""
         self.scope.require("indicators")
-        teacher = self.scope.role == Membership.Role.TEACHER
-        if teacher and (metric != "entries" or meal_type):
-            raise AIError("AI_PERMISSION_DENIED")
         if metric not in METRICS or (metric == "entries" and meal_type):
             raise AIError("AI_INVALID_ARGUMENTS")
         current = self.period(start_date, end_date)
@@ -349,14 +328,10 @@ class QueryTools:
         periods = [current, previous]
         rows = []
         for period in periods:
-            row = self.rollups(
-                school_id, period, meal_type=meal_type, entry_only=teacher
-            )[0]
+            row = self.rollups(school_id, period, meal_type=meal_type)[0]
             rows.append(
                 {
-                    **self.compact(
-                        row, [field, "compared_services"] if not teacher else [field]
-                    ),
+                    **self.compact(row, [field, "compared_services"]),
                     "period": period,
                 }
             )

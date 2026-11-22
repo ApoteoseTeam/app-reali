@@ -355,15 +355,10 @@ def test_tenant_permissions_and_exports(site):
     secretary.save()
     assert restricted.get(ROOT + "dashboard/").status_code == 403
     teacher = api(membership(site.school, "TEACHER"))
-    summary = teacher.get(ROOT + "dashboard/", filters).json()
-    assert summary["meal_services"] == [] and summary["total_student_entries"] == 24
-    assert summary["total_forecast_plates"] is None and summary["stale"] is None
+    assert teacher.get(ROOT + "dashboard/", filters).status_code == 403
     assert teacher.get(ROOT + "meal-services/", filters).status_code == 403
     assert teacher.get(ROOT + "reports/export/", filters).status_code == 403
-    assert (
-        teacher.get(ROOT + "history/", {**filters, "meal_type": "LUNCH"}).status_code
-        == 400
-    )
+    assert teacher.get(ROOT + "history/", filters).status_code == 403
     assert (
         api(membership(site.school, "COOK"))
         .get(ROOT + "history/", {"date": site.day - timedelta(days=45)})

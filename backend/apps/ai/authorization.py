@@ -25,7 +25,10 @@ class Scope:
 
     @property
     def key(self):
-        scope = f"{self.role}|" + ",".join(map(str, self.school_ids))
+        return self.key_for_role(self.role)
+
+    def key_for_role(self, role):
+        scope = f"{role}|" + ",".join(map(str, self.school_ids))
         return sha256(scope.encode()).hexdigest()
 
     def require(self, action):
@@ -62,10 +65,16 @@ class Scope:
             user_id=self.user_id, organization_id=self.organization_id
         )
         if readable:
-            rows = rows.filter(access_role=self.role).filter(
-                Q(school_id__in=self.school_ids)
-                | Q(school__isnull=True, scope_key=self.key)
+            school_scope = Q(school_id__in=self.school_ids)
+            scope = Q(access_role=self.role) & (
+                school_scope | Q(school__isnull=True, scope_key=self.key)
             )
+            if self.role == Membership.Role.DIRECTOR:
+                scope |= Q(access_role="ADMIN") & (
+                    school_scope
+                    | Q(school__isnull=True, scope_key=self.key_for_role("ADMIN"))
+                )
+            rows = rows.filter(scope)
         return rows.order_by("-updated_at", "-pk")
 
 

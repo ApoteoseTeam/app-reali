@@ -15,7 +15,7 @@ from apps.users.models import Membership, SchoolAccess, User, normalize_email
 from .account_mail import account_link, send_account_mail
 from .account_service import check_password_policy
 from .audit import audit
-from .membership_service import canonical_role, locked_staff, validate_grant
+from .membership_service import locked_staff, validate_grant
 from .models import UserInvitation
 from .permissions import DIRECTORS, schools_for
 
@@ -137,7 +137,7 @@ def issue_invitation(organization, actor, *, email, role, all_schools_access, sc
         organization=organization,
         invited_by=actor,
         email=email,
-        role=canonical_role(role),
+        role=role,
         all_schools_access=all_schools_access,
     )
     rotate_token(invite, "INVITATION_CREATED", actor)
@@ -278,7 +278,7 @@ def accept_invitation(request_user, *, token, full_name=None, password=None):
     membership = Membership.objects.create(
         user=user,
         organization=invite.organization,
-        role=canonical_role(invite.role),
+        role=invite.role,
         all_schools_access=invite.all_schools_access,
     )
     SchoolAccess.objects.bulk_create(

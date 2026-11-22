@@ -2,7 +2,7 @@
 
 O banco SQLite local do Reali contém **50 tabelas** e **455 colunas**. O inventário inclui as tabelas de associação, as tabelas do Django e a tabela interna `sqlite_sequence`.
 
-Fonte do inventário físico: `backend/db.sqlite3`. O histórico local contém 52 migrações aplicadas, das quais 22 correspondem aos arquivos de migração dos aplicativos em `backend/apps`.
+Fonte do inventário físico: `backend/db.sqlite3`. O histórico local contém 54 migrações aplicadas, das quais 24 correspondem aos arquivos de migração dos aplicativos em `backend/apps`.
 
 Os tipos declarados e valores padrão são os do SQLite. O esquema de instâncias PostgreSQL não foi consultado.
 
@@ -943,7 +943,7 @@ Os tipos declarados e valores padrão são os do SQLite. O esquema de instância
 
 #### `users_membership`
 
-**Finalidade.** Vincula um usuário a uma organização e define seu papel, o estado do vínculo e se pode acessar todas as escolas.
+**Finalidade.** Vincula um usuário a uma organização e define seu papel, o estado do vínculo e se pode acessar todas as escolas. Os cargos vigentes são `DIRECTOR`, `MANAGER`, `NUTRITIONIST`, `COOK` e `SECRETARIAT`. Vínculos históricos `TEACHER` ficam inativos até receberem um cargo vigente e serem reativados.
 
 | Coluna | Tipo declarado | Aceita NULL | Padrão SQL | Chaves e referências |
 | --- | --- | --- | --- | --- |

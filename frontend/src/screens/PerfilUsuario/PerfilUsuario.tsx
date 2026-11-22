@@ -66,7 +66,7 @@ export default function PerfilUsuario({ onVoltar }: { onVoltar?: () => void } = 
 
         <View style={styles.avatarArea}>
           <View style={styles.avatarBorda}>
-            <Image source={require('../../assets/perfil.jpeg')} style={styles.avatar} />
+            <Image source={require('../../assets/foto-de-perfil.jpg')} style={styles.avatar} />
           </View>
           <IconButton
             icon={Pencil}

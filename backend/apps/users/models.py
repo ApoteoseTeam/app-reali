@@ -56,12 +56,10 @@ class User(AbstractUser):
 
 class Membership(BaseModel):
     class Role(models.TextChoices):
-        ADMIN = "ADMIN", "Administrador (legado)"
         DIRECTOR = "DIRECTOR", "Diretor"
         MANAGER = "MANAGER", "Gestor"
         NUTRITIONIST = "NUTRITIONIST", "Nutricionista"
         COOK = "COOK", "Merendeira(o)"
-        TEACHER = "TEACHER", "Professor(a)"
         SECRETARIAT = "SECRETARIAT", "Secretaria de Educação"
 
     user = models.ForeignKey(

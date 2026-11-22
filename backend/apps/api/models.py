@@ -86,7 +86,11 @@ class UserInvitation(BaseModel):
 
     @property
     def valid(self):
-        return self.status == self.Status.PENDING and self.expires_at > timezone.now()
+        return (
+            self.status == self.Status.PENDING
+            and self.expires_at > timezone.now()
+            and self.role in Membership.Role.values
+        )
 
     class Meta:
         constraints = [

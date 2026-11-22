@@ -4,10 +4,9 @@ Todo acesso exige JWT de sessão e `X-Organization-ID`. O backend confere a sess
 
 | Papel | Escopo efetivo |
 | --- | --- |
-| DIRECTOR, ADMIN, MANAGER, NUTRITIONIST, SECRETARIAT | Indicadores e comparações dentro das escolas ativas autorizadas. Comparação entre escolas exige uma conversa no escopo institucional. |
+| DIRECTOR, MANAGER, NUTRITIONIST, SECRETARIAT | Indicadores e comparações dentro das escolas ativas autorizadas. Comparação entre escolas exige uma conversa no escopo institucional. |
 | COOK | Indicadores e serviços dos últimos 30 dias em uma escola autorizada. |
-| TEACHER | Entradas registradas dos últimos 30 dias em uma escola autorizada. Inclui comparação de períodos para entradas. |
 
-Quando COOK ou TEACHER possui uma única escola, ela é selecionada automaticamente ao criar uma conversa sem `school_id`. Com mais de uma, indique a unidade. Os perfis institucionais podem omitir a unidade para consultar seu conjunto autorizado. Apenas direção com acesso institucional amplo recebe os totais de utilização da organização em `GET /ai/usage/`. Os demais papéis consultam sua própria utilização.
+Quando um usuário com papel COOK possui uma única escola, ela é selecionada automaticamente ao criar uma conversa sem `school_id`. Com mais de uma, indique a unidade. Os perfis institucionais podem omitir a unidade para consultar seu conjunto autorizado. Apenas direção com acesso institucional amplo recebe os totais de utilização da organização em `GET /ai/usage/`. Os demais papéis consultam sua própria utilização.
 
 A conversa vinculada a escola continua limitada à unidade escolhida. A conversa institucional resguarda o conjunto de escolas permitido no momento da criação. Uma mudança no papel, no conjunto institucional de escolas ou na autorização da escola vinculada torna o conteúdo indisponível. A validação também ocorre na ferramenta e antes da entrega da resposta. O proprietário com vínculo ativo pode apagar um histórico que perdeu autorização de ler.

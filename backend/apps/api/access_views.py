@@ -40,13 +40,11 @@ from .invitation_service import (
     valid_invitation,
 )
 from .membership_service import (
-    canonical_role,
     manageable_memberships,
     update_membership,
 )
 from .models import InstitutionRequest
 from .permissions import (
-    DIRECTORS,
     internal_operator,
     membership_for,
     require_role,
@@ -383,10 +381,7 @@ class MembershipViewSet(viewsets.ReadOnlyModelViewSet):
                 Q(all_schools_access=True) | Q(school_accesses__school=school)
             )
         if "role" in filters:
-            role = canonical_role(filters["role"])
-            memberships = memberships.filter(
-                role__in=DIRECTORS if role in DIRECTORS else [role]
-            )
+            memberships = memberships.filter(role=filters["role"])
         if "is_active" in filters:
             memberships = memberships.filter(is_active=filters["is_active"])
         return memberships

@@ -430,7 +430,7 @@ def test_limits_are_scoped_and_tools_apply_rbac(site, provider):
     DailyMetrics.objects.create(
         school=site.foreign, reference_date=site.day, total_student_entries=98765
     )
-    for role in ("DIRECTOR", "MANAGER", "COOK", "TEACHER", "SECRETARIAT"):
+    for role in ("DIRECTOR", "MANAGER", "COOK", "SECRETARIAT"):
         member = site.director if role == "DIRECTOR" else membership(site.school, role)
         scope = user_scope(
             member.user_id, site.org.pk, member.user.session_version
@@ -446,25 +446,16 @@ def test_limits_are_scoped_and_tools_apply_rbac(site, provider):
         report = tools.get_daily_metrics(day)["rows"][0]
         assert report["data_status"] == "PROVISIONAL"
         plates = tools.get_plate_counts(day, meal_service_id=str(meals[0].pk))
-        if role == "TEACHER":
-            assert plates["error"] == "AI_PERMISSION_DENIED"
-            assert tools.get_meal_forecasts(day)["error"] == "AI_PERMISSION_DENIED"
-            assert "total_served_plates" not in report
-            assert (
-                tools.compare_periods(day, day, day, day, "served")["error"]
-                == "AI_PERMISSION_DENIED"
-            )
-        else:
-            assert plates["rows"][0]["total_served_plates"] == 16
-            assert tools.get_meal_forecasts(day)["rows"][0]["snapshot_entries"] == 24
-            assert tools.get_school_performance(day)["rows"][0]["mae"] == 6
-            assert (
-                tools.compare_periods(day, day, day, day, "served")["rows"][0][
-                    "delta_percent"
-                ]
-                == 0
-            )
-        if role in ("COOK", "TEACHER"):
+        assert plates["rows"][0]["total_served_plates"] == 16
+        assert tools.get_meal_forecasts(day)["rows"][0]["snapshot_entries"] == 24
+        assert tools.get_school_performance(day)["rows"][0]["mae"] == 6
+        assert (
+            tools.compare_periods(day, day, day, day, "served")["rows"][0][
+                "delta_percent"
+            ]
+            == 0
+        )
+        if role == "COOK":
             assert (
                 tools.get_student_counts(str(site.day - timedelta(days=60)))["error"]
                 == "AI_INVALID_ARGUMENTS"
@@ -474,6 +465,24 @@ def test_limits_are_scoped_and_tools_apply_rbac(site, provider):
             assert str(site.foreign.pk) not in json.dumps(comparison, default=str)
     usage = client_for(member).get(ROOT + "usage/").json()
     assert usage["organization"] is None
+
+
+def test_director_retains_legacy_admin_conversations_for_same_scope(site):
+    member = site.director
+    scope = user_scope(member.user_id, site.org.pk, member.user.session_version)
+    legacy = AIConversation.objects.create(
+        user=member.user,
+        organization=site.org,
+        access_role="ADMIN",
+        scope_key=scope.key_for_role("ADMIN"),
+    )
+    AIConversation.objects.create(
+        user=member.user,
+        organization=site.org,
+        access_role="ADMIN",
+        scope_key="previous-school-scope",
+    )
+    assert list(scope.conversations()) == [legacy]
 
 
 def test_prompt_manipulation_cannot_invent_sources_or_query_foreign_school(
