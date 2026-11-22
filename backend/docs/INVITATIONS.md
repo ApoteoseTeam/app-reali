@@ -1,0 +1,11 @@
+# Convites
+
+1. O site envia a solicitação a `POST /api/v1/institution-requests/`. A equipe Reali aprova ou rejeita pelo endpoint administrativo. Na aprovação, os dados da própria solicitação alimentam a organização, e o operador fornece as escolas e, opcionalmente, um e-mail de direção diferente do contato. O provisionamento direto recebe todos esses dados no corpo.
+2. O primeiro diretor recebe um convite com acesso institucional explícito. A ativação cria o vínculo. Se houver problema de transporte, a equipe Reali pode reenviar pelo ID. Se for necessário trocar o endereço antes de haver uma direção ativa, revogue o convite pendente e emita outro pela recuperação administrativa da organização.
+3. A direção institucional envia e-mail, papel e escolas autorizadas. Um diretor restrito convida somente para escolas de seu escopo e papéis não diretivos. Um par organização/e-mail admite um convite pendente. Um vínculo já existente na mesma organização é gerenciado como funcionário.
+4. O botão **Ativar minha conta** abre um link HTTPS com a prova no fragmento. A verificação pública informa apenas a validade. Conta nova envia nome, senha e confirmação. Quem já tem conta faz login e aceita como o próprio destinatário, com o mesmo e-mail normalizado. O vínculo novo preserva a conta, a senha e os outros vínculos.
+5. Aceitação é transacional e de uso único, mesmo em requisições simultâneas. A validade é de 48 horas. O reenvio do mesmo registro gera uma nova prova e invalida imediatamente a anterior. Revogação e expiração impedem a aceitação.
+
+O banco guarda somente o hash do token de convite. O transporte SMTP é chamado após o commit. `delivery_status` indica `PENDING`, `SENT` (aceito pelo transporte) ou `FAILED`. O reenvio recupera uma falha ou um envio pendente sem criar convite duplicado. Confirmação de ativação e aviso de revogação do vínculo são enviados após commit, em melhor esforço.
+
+Um aviso de falha registra tipo e ID de referência sem destinatário, senha ou token. Use o histórico de auditoria para rastrear emissão, reenvio, transporte, revogação e aceite. O endpoint antigo `/auth/activate/` continua como alias de transição. O endpoint novo exige confirmação da senha em contas novas.

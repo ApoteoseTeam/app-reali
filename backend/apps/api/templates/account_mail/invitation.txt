@@ -1,0 +1,4 @@
+Você recebeu um convite para {{ organization }} no Reali.
+Função: {{ role }}. O link expira em 48 horas.
+Ativar minha conta: {{ link }}
+Se você não esperava este convite, ignore a mensagem.

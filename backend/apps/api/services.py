@@ -1,0 +1,1 @@
+from apps.analytics.services import rebuild_daily_metrics as rebuild_daily_metrics
