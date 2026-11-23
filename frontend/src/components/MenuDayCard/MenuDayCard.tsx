@@ -22,16 +22,16 @@ export const MenuDayCard = ({ dia, refeicoes, variante, planejamento }: Props) =
       .join(', ');
       
     return (
-      <View style={[styles.container, destaque && styles.destaque]}>
-        <Text style={[styles.dia, destaque && styles.textoClaro]}>
+      <View style={[styles.container, destaque && styles.emphasis]}>
+        <Text style={[styles.day, destaque && styles.clearText]}>
           {dia}
         </Text>
 
-        <Text style={[styles.preparacoes, destaque && styles.textoClaro]}>
+        <Text style={[styles.preparations, destaque && styles.clearText]}>
           {preparacoes}
         </Text>
 
-        <Text style={[styles.situacao, destaque && styles.textoClaro]}>
+        <Text style={[styles.situation, destaque && styles.clearText]}>
           {destaque
             ? `Hoje · planejamento para ${planejamento.toLocaleString('pt-BR')} alunos`
             : 'Presença do dia ainda não informada'}

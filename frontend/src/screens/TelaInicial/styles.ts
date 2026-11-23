@@ -5,6 +5,7 @@ export const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#F6F8F2',
     },
+
     topBlob: {
         position: 'absolute',
         top: 0,
@@ -12,6 +13,7 @@ export const styles = StyleSheet.create({
         width: 190,
         height: 150,
     },
+
     content: {
         flex: 1,
         alignItems: 'center',
@@ -20,20 +22,24 @@ export const styles = StyleSheet.create({
         paddingBottom: 90, 
         zIndex: 2,
     },
+
     headerGroup: {
         alignItems: 'center',
         marginBottom: 24,
     },
+
     logo: {
         width: 240,
         height: 110,
     },
+
     subtitle: {
         fontSize: 12,
         fontWeight: '700',
         color: '#163254',
         marginTop: 4,
     },
+
     description: {
         fontSize: 13.5,
         color: '#2B2B2B',
@@ -42,10 +48,12 @@ export const styles = StyleSheet.create({
         marginBottom: 34,
         paddingHorizontal: 8,
     },
+
     buttonContainer: {
         width: '100%',
         gap: 14,
     },
+
     buttonOne: {
         backgroundColor: '#163254',
         borderRadius: 10,
@@ -53,11 +61,13 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+
     buttonOneText: {
         color: '#FFFFFF',
         fontWeight: '600',
         fontSize: 15,
     },
+
     buttonTwo: {
         backgroundColor: '#FFFFFF',
         borderWidth: 1.5,
@@ -67,11 +77,13 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+
     buttonTwoText: {
         color: '#163254',
         fontWeight: '600',
         fontSize: 15,
     },
+
     bottomWave: {
         position: 'absolute',
         bottom: 0,
@@ -81,6 +93,7 @@ export const styles = StyleSheet.create({
         height: 165,
         zIndex: 1,
     },
+    
     foodImage: {
         position: 'absolute',
         bottom: -10,

@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
     paddingVertical: 4,
   },
 
-  texto: {
+  text: {
     color: colors.secondary,
     fontSize: 12,
   },

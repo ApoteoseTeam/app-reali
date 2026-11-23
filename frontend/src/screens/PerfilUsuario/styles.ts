@@ -9,11 +9,11 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   
-  perfilTopo: {
+  topProfile: {
     position: 'relative',
   },
 
-  fundoTopo: {
+  topBackground: {
     position: 'absolute',
     top: 0,
     left: 0,
@@ -22,7 +22,7 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.primary,
   },
 
-  topo: {
+  top: {
     alignSelf: 'stretch',
     flexDirection: 'row',
     alignItems: 'center',
@@ -32,7 +32,7 @@ export const styles = StyleSheet.create({
     paddingBottom: 12,
   },
 
-  titulo: {
+  title: {
     fontFamily: FONT,
     fontSize: 16,
     fontWeight: '700',
@@ -40,11 +40,11 @@ export const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 
-  iconeTopo: {
+  topIcon: {
     padding: 4,
   },
 
-  iconeEspacador: {
+  iconSpacer: {
     width: 32,
   },
 
@@ -53,7 +53,7 @@ export const styles = StyleSheet.create({
     marginTop: 12,
   },
 
-  avatarBorda: {
+  avatarBorder: {
     width: 140,
     height: 140,
     borderRadius: 70,
@@ -68,7 +68,7 @@ export const styles = StyleSheet.create({
     height: '100%',
   },
 
-  editar: {
+  edit: {
     position: 'absolute',
     right: 2,
     bottom: 2,
@@ -82,7 +82,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  nome: {
+  name: {
     fontFamily: FONT,
     fontSize: 17,
     fontWeight: '700',
@@ -91,7 +91,7 @@ export const styles = StyleSheet.create({
     marginTop: 14,
   },
 
-  cargo: {
+  position: {
     fontFamily: FONT,
     fontSize: 13,
     fontWeight: '600',
@@ -100,7 +100,7 @@ export const styles = StyleSheet.create({
     marginTop: 2,
   },
 
-  conteudo: {
+  content: {
     paddingHorizontal: 38,
     marginTop: 26,
     gap: 20,
@@ -122,11 +122,11 @@ export const styles = StyleSheet.create({
     elevation: 2,
   },
   
-  cardConta: {
+  cardAccount: {
     paddingBottom: 28,
   },
 
-  cardTitulo: {
+  cardTitle: {
     fontFamily: FONT,
     fontSize: 13,
     fontWeight: '700',
@@ -134,20 +134,20 @@ export const styles = StyleSheet.create({
     marginBottom: 2,
   },
 
-  linha: {
+  line: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
   },
 
-  linhaTexto: {
+  lineText: {
     fontFamily: FONT,
     fontSize: 12.5,
     color: colors.primary,
     flexShrink: 1,
   },
 
-  botaoSair: {
+  exitButton: {
     backgroundColor: colors.primary,
     borderWidth: 1.5,
     borderColor: colors.secondary,
@@ -158,7 +158,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  botaoSairTexto: {
+  exitButtonText: {
     fontFamily: FONT,
     fontSize: 14,
     fontWeight: '700',

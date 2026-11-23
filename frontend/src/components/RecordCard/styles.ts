@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
         backgroundColor: colors.background,
     },
 
-    data: {
+    date: {
         width: 48,
         minHeight: 48,
         alignItems: 'center',
@@ -27,48 +27,48 @@ export const styles = StyleSheet.create({
         backgroundColor: '#E6F2DA',
     },
 
-    dia: {
+    day: {
         fontSize: 18,
         fontWeight: typography.weights.bold,
         color: colors.secondary,
     },
 
-    mes: {
+    month: {
         fontSize: 12,
         color: '#44544B',
     },
 
-    conteudo: {
+    content: {
         flexGrow: 1,
         flexShrink: 1,
         flexBasis: 130,
         gap: 4,
     },
 
-    refeicao: {
+    snack: {
         fontSize: 14,
         fontWeight: typography.weights.bold,
         color: '#1E2B25',
     },
 
-    resumo: {
+    summary: {
         fontSize: 12,
         lineHeight: 17,
         color: '#44544B',
     },
 
-    indicador: {
+    indicator: {
         alignSelf: 'flex-start',
         maxWidth: '100%',
     },
 
-    acoes: {
+    actions: {
         flexDirection: 'row',
         gap: 4,
         marginLeft: 'auto',
     },
 
-    botaoEditar: {
+    editButton: {
         width: 44,
         height: 44,
         borderRadius: 22,
@@ -77,7 +77,7 @@ export const styles = StyleSheet.create({
         backgroundColor: '#E6F2DA',
     },
 
-    botaoExcluir: {
+    deleteButton: {
         width: 44,
         height: 44,
         borderRadius: 22,

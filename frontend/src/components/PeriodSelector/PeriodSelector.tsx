@@ -23,11 +23,11 @@ export function PeriodSelector({ periodo, onAnterior, onProximo, labelAnterior =
                 accessibilityLabel={labelAnterior}
                 color={colors.secondary}
                 size={20}
-                style={styles.botao}
+                style={styles.button}
             />
 
             <Text
-                style={styles.periodo}
+                style={styles.period}
                 accessibilityLiveRegion="polite"
             >
                 {periodo}
@@ -39,7 +39,7 @@ export function PeriodSelector({ periodo, onAnterior, onProximo, labelAnterior =
                 accessibilityLabel={labelProximo}
                 color={colors.secondary}
                 size={20}
-                style={styles.botao}
+                style={styles.button}
             />
         </View>
     );

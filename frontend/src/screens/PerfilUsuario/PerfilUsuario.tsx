@@ -19,14 +19,14 @@ const Linha = ({ icone: Icone, texto, onPress }: LinhaProps) => {
   const conteudo = (
     <>
       <Icone size={20} color={colors.primary} />
-      <Text style={styles.linhaTexto}>{texto}</Text>
+      <Text style={styles.lineText}>{texto}</Text>
     </>
   );
 
   if (onPress) {
     return (
       <TouchableOpacity
-        style={styles.linha}
+        style={styles.line}
         onPress={onPress}
         activeOpacity={0.7}
       >
@@ -35,7 +35,7 @@ const Linha = ({ icone: Icone, texto, onPress }: LinhaProps) => {
     );
   }
 
-  return <View style={styles.linha}>{conteudo}</View>;
+  return <View style={styles.line}>{conteudo}</View>;
 };
 
 export default function PerfilUsuario({ onVoltar }: { onVoltar?: () => void } = {}) {
@@ -44,54 +44,54 @@ export default function PerfilUsuario({ onVoltar }: { onVoltar?: () => void } = 
   const role = workspace?.member.role;
   return (
     <View style={styles.container}>
-      <View style={styles.perfilTopo}>
-        <View style={styles.fundoTopo} />
+      <View style={styles.topProfile}>
+        <View style={styles.topBackground} />
 
         <Header
           name="MEU PERFIL"
-          containerStyle={styles.topo}
-          titleStyle={styles.titulo}
+          containerStyle={styles.top}
+          titleStyle={styles.title}
           left={
             <IconButton
               icon={Undo2}
               color={colors.white}
               size={24}
-              style={styles.iconeTopo}
+              style={styles.topIcon}
               accessibilityLabel="Voltar"
               onPress={() => onVoltar?.()}
             />
           }
-          right={<View style={styles.iconeEspacador} />}
+          right={<View style={styles.iconSpacer} />}
         />
 
         <View style={styles.avatarArea}>
-          <View style={styles.avatarBorda}>
+          <View style={styles.avatarBorder}>
             <Image source={require('../../assets/foto-de-perfil.jpg')} style={styles.avatar} />
           </View>
           <IconButton
             icon={Pencil}
             color={colors.white}
             size={16}
-            style={styles.editar}
+            style={styles.edit}
             accessibilityLabel="Editar foto do perfil"
             onPress={unavailable}
           />
         </View>
       </View>
 
-      <Text style={styles.nome}>{me?.user.full_name || me?.user.email || "—"}</Text>
-      <Text style={styles.cargo}>{role ? roleNames[role] ?? role : "—"}</Text>
+      <Text style={styles.name}>{me?.user.full_name || me?.user.email || "—"}</Text>
+      <Text style={styles.position}>{role ? roleNames[role] ?? role : "—"}</Text>
 
-      <View style={styles.conteudo}>
+      <View style={styles.content}>
         <View style={styles.card}>
-          <Text style={styles.cardTitulo}>Dados pessoais</Text>
+          <Text style={styles.cardTitle}>Dados pessoais</Text>
           <Linha icone={CircleUser} texto={me?.user.email ?? "—"} />
           <Linha icone={Phone} texto="—" />
           <Linha icone={MapPin} texto={workspace?.school?.name ?? "—"} />
         </View>
 
-        <View style={[styles.card, styles.cardConta]}>
-          <Text style={styles.cardTitulo}>Minha conta</Text>
+        <View style={[styles.card, styles.cardAccount]}>
+          <Text style={styles.cardTitle}>Minha conta</Text>
           <Linha
             icone={Settings}
             texto="Editar perfil"
@@ -106,8 +106,8 @@ export default function PerfilUsuario({ onVoltar }: { onVoltar?: () => void } = 
 
         <Button
           label="Sair da conta"
-          style={styles.botaoSair}
-          textStyle={styles.botaoSairTexto}
+          style={styles.exitButton}
+          textStyle={styles.exitButtonText}
           onPress={signOut}
         />
       </View>

@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef } from 'react';
 import { ScrollView, Text, View, Pressable } from 'react-native';
 import { ClipboardList, History, House, TrendingUp } from 'lucide-react-native';
@@ -50,6 +51,7 @@ export default function Relatorio({ onBaixarPdf, onInicioPress, onRelatoriosPres
         { titulo: 'Cardápio', Icone: ClipboardList, onPress: onCardapioPress },
         { titulo: 'Histórico', Icone: History, ativa: initialMode === 'Diário', onPress: onHistoricoPress },
     ];
+
     const [modo, setModo] = useState<string>(initialMode);
     const { workspace } = useSession();
     const [selectedMonth, setMes] = useState('');
@@ -62,15 +64,18 @@ export default function Relatorio({ onBaixarPdf, onInicioPress, onRelatoriosPres
         const key = date.toISOString().slice(0, 7);
         return { key, label: date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' }) };
     });
+
     const month = months.find(item => item.label === selectedMonth) ?? months[0];
     const query = { school: school?.id, ...monthRange(month.key) };
     const report = useRemote('report/' + month.key, signal => api.summary(scope!, query, signal), Boolean(scope && school && modo === 'Mensal'));
     const meals = useRemote('meal-metrics/' + month.key, signal =>
         api.all(() => api.mealMetrics(scope!, query, signal), { scope, signal }),
         Boolean(scope && school && modo === 'Diário'));
+
     const mealOptions = (meals.data ?? []).map(item => ({
         item, label: dateLabel(item.reference_date) + ' · ' + mealTypes[item.meal_type],
     }));
+
     const meal = mealOptions.find(option => option.label === selectedMeal) ?? mealOptions[0];
     const diaRefeicao = meal?.label ?? '';
     const [compartilharAberto, setCompartilharAberto] = useState(false);
@@ -84,6 +89,7 @@ export default function Relatorio({ onBaixarPdf, onInicioPress, onRelatoriosPres
         alunos: metrics?.total_student_entries ?? 0,
         previsao: metrics?.total_forecast_plates ?? 0,
     };
+
     const served = metrics?.total_served_plates ?? 0;
     const previous = report.data?.previous.total_forecast_plates;
     const difference = report.data?.comparison.total_forecast_plates;
@@ -155,15 +161,15 @@ export default function Relatorio({ onBaixarPdf, onInicioPress, onRelatoriosPres
     }
 
     return (
-        <View style={styles.tela}>
+        <View style={styles.screen}>
             <Header
                 name="Relatório"
                 right={null}
-                containerStyle={styles.cabecalho}
-                titleStyle={styles.tituloCabecalho}
+                containerStyle={styles.header}
+                titleStyle={styles.headerTitle}
             />
 
-            <ScrollView contentContainerStyle={styles.conteudo}>
+            <ScrollView contentContainerStyle={styles.content}>
                 <SegmentedControl
                     opcoes={['Mensal', 'Diário']}
                     selecionado={modo}
@@ -180,10 +186,10 @@ export default function Relatorio({ onBaixarPdf, onInicioPress, onRelatoriosPres
                             onChange={setMes}
                         />
 
-                        <Card style={styles.relatorio}>
-                            <Logo style={styles.marca} />
+                        <Card style={styles.report}>
+                            <Logo style={styles.brand} />
 
-                            <Text accessibilityRole="header" style={styles.tituloRelatorio}>
+                            <Text accessibilityRole="header" style={styles.reportTitle}>
                                 Resumo do atendimento escolar
                             </Text>
 
@@ -191,17 +197,17 @@ export default function Relatorio({ onBaixarPdf, onInicioPress, onRelatoriosPres
                                 {school?.name ?? '—'} · {relatorio.periodo}
                             </Text>
 
-                            <View style={styles.indicadores}>
-                                <View style={styles.indicador}>
+                            <View style={styles.indicators}>
+                                <View style={styles.indicator}>
                                     <Kpicard title="Total de alunos registrados" value={metrics?.total_student_entries ?? null} />
                                 </View>
 
-                                <View style={styles.indicador}>
+                                <View style={styles.indicator}>
                                     <Kpicard title="Refeições servidas" value={metrics?.total_served_plates ?? null} />
                                 </View>
                             </View>
 
-                            <Text accessibilityRole="header" style={styles.subtitulo}>
+                            <Text accessibilityRole="header" style={styles.subtitle}>
                                 Quantidade de alunos
                             </Text>
 
@@ -212,13 +218,14 @@ export default function Relatorio({ onBaixarPdf, onInicioPress, onRelatoriosPres
                                 ]}
                                 unidade=""
                             />
+
                             {Boolean(variacao) && (
-                                <Text style={styles.comparacao}>
+                                <Text style={styles.comparison}>
                                     {simbolo} Em relação ao período anterior: {textoComparacao}
                                 </Text>
                             )}
 
-                            <Text accessibilityRole="header" style={styles.subtitulo}>
+                            <Text accessibilityRole="header" style={styles.subtitle}>
                                 Pontos de Atenção
                             </Text>
 
@@ -231,10 +238,9 @@ export default function Relatorio({ onBaixarPdf, onInicioPress, onRelatoriosPres
                             </Text>
                         </Card>
                     </>
-
                 ) : (
-                    <View style={styles.diario}>
-                        <Text style={styles.rotuloDiario}>Data e refeição</Text>
+                    <View style={styles.daily}>
+                        <Text style={styles.dailyLabel}>Data e refeição</Text>
 
                         <Select
                             variant="relatorio"
@@ -244,7 +250,7 @@ export default function Relatorio({ onBaixarPdf, onInicioPress, onRelatoriosPres
                             onChange={setDiaRefeicao}
                         />
 
-                        <Text style={styles.rotuloDiario}>Total de alunos registrados</Text>
+                        <Text style={styles.dailyLabel}>Total de alunos registrados</Text>
 
                         <Input
                             accessibilityLabel="Total de alunos registrados"
@@ -253,21 +259,21 @@ export default function Relatorio({ onBaixarPdf, onInicioPress, onRelatoriosPres
                             placeholderTextColor="#E6F2DA"
                             value={meal?.item.snapshot_entries?.toString() ?? ''}
                             editable={false}
-                            style={styles.inputDiario}
+                            style={styles.dailyInput}
                         />
 
-                        <Text style={styles.ajudaDiario}>
+                        <Text style={styles.dailyHelp}>
                             {meals.error?.message ?? 'Total registrado pelo Django.'}
                         </Text>
 
-                        <Card style={styles.cardMargem}>
-                            <Text style={styles.tituloMargem}>Margem de segurança</Text>
-                            <Text style={styles.ajudaDiario}>
+                        <Card style={styles.marginCard}>
+                            <Text style={styles.marginTitle}>Margem de segurança</Text>
+                            <Text style={styles.dailyHelp}>
                                 A previsão segue a configuração do Django.
                             </Text>
                         </Card>
 
-                        <Text style={styles.rotuloDiario}>Ajuste para evento (opcional)</Text>
+                        <Text style={styles.dailyLabel}>Ajuste para evento (opcional)</Text>
 
                         <Input //adicionar uma condicional para limitar as unidades inseridas
                             accessibilityLabel="Alunos extras para evento"
@@ -276,12 +282,12 @@ export default function Relatorio({ onBaixarPdf, onInicioPress, onRelatoriosPres
                             placeholderTextColor="#315F52"
                             value=""
                             editable={false}
-                            style={styles.inputExtras}
+                            style={styles.extraInput}
                         />
 
-                        <View style={styles.totalDiario}>
-                            <Text style={styles.totalLegenda}>Preparo planejado para</Text>
-                            <Text style={styles.totalValor}>
+                        <View style={styles.dailyTotal}>
+                            <Text style={styles.totalLabel}>Preparo planejado para</Text>
+                            <Text style={styles.totalValue}>
                                 {totalPlanejado == null ? '—' : `${totalPlanejado.toLocaleString('pt-BR')} alunos`}
                             </Text>
                         </View>
@@ -290,29 +296,29 @@ export default function Relatorio({ onBaixarPdf, onInicioPress, onRelatoriosPres
                             label="Salvar planejamento"
                             accessibilityRole="button"
                             disabled={!podeSalvar}
-                            style={[styles.salvarDiario, !podeSalvar && styles.desabilitado]}
+                            style={[styles.saveDaily, !podeSalvar && styles.disabled]}
                         />
 
                         {!podeSalvar && (
-                            <Text accessibilityLiveRegion="polite" style={styles.ajudaDiario}>
+                            <Text accessibilityLiveRegion="polite" style={styles.dailyHelp}>
                                 A API não aceita planejamento manual com estes campos.
                             </Text>
                         )}
                     </View>
                 )}
             </ScrollView>
+
             {mensal && (
-                <View style={styles.acoes}>
+                <View style={styles.actions}>
                     <Button
                         label="Compartilhar"
                         accessibilityRole="button"
                         onPress={() => setCompartilharAberto(true)}
                         style={[
-                            styles.botao,
-                            styles.botaoSecundario,
+                            styles.button,
+                            styles.secondaryButton,
                         ]}
-                        textStyle={styles.textoSecundario}
-
+                        textStyle={styles.secondaryText}
                     />
 
                     <Button
@@ -320,10 +326,11 @@ export default function Relatorio({ onBaixarPdf, onInicioPress, onRelatoriosPres
                         accessibilityRole="button"
                         disabled={!onBaixarPdf || estadoPdf?.tipo === 'gerando'}
                         onPress={baixarPdf}
-                        style={[styles.botao, !onBaixarPdf && styles.desabilitado]}
+                        style={[styles.button, !onBaixarPdf && styles.disabled]}
                     />
                 </View>
             )}
+
             <CompartilharRelatorioModal
                 visivel={compartilharAberto}
                 periodo={relatorio.periodo.toLocaleLowerCase('pt-BR')}
@@ -342,11 +349,12 @@ export default function Relatorio({ onBaixarPdf, onInicioPress, onRelatoriosPres
                 status="error"
                 totalAlunos={totalPlanejado ?? 0}
                 dataRefeicao={diaRefeicao}
-                onClose={() => {}}
-                onRetry={() => {}}
+                onClose={() => { }}
+                onRetry={() => { }}
                 onViewHistory={() => { }}
             />
-            <View style={styles.rodape}>
+
+            <View style={styles.footer}>
                 {abas.map(({ titulo, Icone, ativa, onPress }) => {
                     const cor = ativa ? '#C8DFB9' : '#FFFFFF';  // adicionar navegação entre os icones do rodape
 
@@ -357,15 +365,14 @@ export default function Relatorio({ onBaixarPdf, onInicioPress, onRelatoriosPres
                             accessibilityState={{ selected: !!ativa, disabled: !ativa && !onPress }}
                             disabled={!ativa && !onPress}
                             onPress={onPress}
-                            style={styles.aba}
+                            style={styles.tab}
                         >
                             <Icone color={cor} size={22} />
-                            <Text style={[styles.textoAba, { color: cor }]}>{titulo}</Text>
+                            <Text style={[styles.tabText, { color: cor }]}>{titulo}</Text>
                         </Pressable>
                     );
                 })}
             </View>
-
         </View>
     );
 }

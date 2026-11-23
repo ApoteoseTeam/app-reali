@@ -31,19 +31,19 @@ export default function CardapioSemanaGestao({
         { titulo: 'Histórico', Icone: History, onPress: onHistoricoPress },
     ];
     return (
-        <View style={styles.tela}>
+        <View style={styles.screen}>
             <Header
                 name="Cardápio da semana"
                 right={null}
-                containerStyle={styles.cabecalho}
-                titleStyle={styles.titulo}
+                containerStyle={styles.header}
+                titleStyle={styles.title}
             />
 
             <ScrollView
                 style={styles.scroll}
-                contentContainerStyle={styles.conteudo}
+                contentContainerStyle={styles.content}
             >
-                <Text style={styles.periodo}>{periodo}</Text>
+                <Text style={styles.period}>{periodo}</Text>
 
                 {dias.map(({ dia, refeicoes, planejamento }) => (
                     <MenuDayCard
@@ -55,18 +55,18 @@ export default function CardapioSemanaGestao({
                     />
                 ))}
 
-                <Card style={styles.medidas}>
-                    <Text style={styles.tituloMedidas}>
+                <Card style={styles.measurements}>
+                    <Text style={styles.titleMeasures}>
                         Medidas padronizadas da escola
                     </Text>
-                    <Text style={styles.textoMedidas}>
+                    <Text style={styles.textMeasures}>
                         Pacotes, xícaras e unidades cadastrados pela gestão para orientar o preparo.
                     </Text>
                 </Card>
             </ScrollView>
 
 
-            <View style={styles.rodape}>
+            <View style={styles.footer}>
                 {abas.map(({ titulo, Icone, ativa, onPress }) => {
                     const cor = ativa ? '#C8DFB9' : '#FFFFFF';  // adicionar navegação entre os icones do rodape
 
@@ -77,10 +77,10 @@ export default function CardapioSemanaGestao({
                             accessibilityState={{ selected: !!ativa, disabled: !ativa && !onPress }}
                             disabled={!ativa && !onPress}
                             onPress={onPress}
-                            style={styles.aba}
+                            style={styles.tab}
                         >
                             <Icone color={cor} size={22} />
-                            <Text style={[styles.textoAba, { color: cor }]}>{titulo}</Text>
+                            <Text style={[styles.textTab, { color: cor }]}>{titulo}</Text>
                         </Pressable>
                     );
                 })}

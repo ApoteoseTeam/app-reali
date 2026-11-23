@@ -72,13 +72,13 @@ export const styles = StyleSheet.create({
     color: colors.text,
   },
 
-  inputRelatorio: {
+  reportInput: {
     backgroundColor: colors.secondary,
     borderColor: colors.secondary,
     borderRadius: 12,
   },
 
-  textoRelatorio: {
+  reportText: {
     color: '#FFFFFF',
     fontWeight: '700',
   },

@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { FlatList, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { ArrowLeft, Trash2 } from 'lucide-react-native';
@@ -72,11 +73,11 @@ export default function AdicionarCardapio({
     }
 
     return (
-        <View style={styles.tela}>
+        <View style={styles.screen}>
             <Header
                 name="Adicionar cardápio"
-                containerStyle={styles.cabecalho}
-                titleStyle={styles.titulo}
+                containerStyle={styles.header}
+                titleStyle={styles.title}
                 left={
                     <IconButton
                         icon={ArrowLeft}
@@ -84,13 +85,13 @@ export default function AdicionarCardapio({
                         color="#FFFFFF"
                         accessibilityLabel="Voltar"
                         onPress={cancelar}
-                        style={styles.voltar}
+                        style={styles.back}
                     />
                 }
-                right={<View style={styles.espacoCabecalho} />}
+                right={<View style={styles.headerSpacer} />}
             />
 
-            <ScrollView style={styles.scroll} contentContainerStyle={styles.conteudo}>
+            <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
                 <DateField label="Data" value={data} onChange={setData} />
 
                 <Select
@@ -100,16 +101,16 @@ export default function AdicionarCardapio({
                     onChange={setRefeicao}
                 />
 
-                <View style={styles.lista}>
-                    <Text accessibilityRole="header" style={styles.rotulo}>
+                <View style={styles.list}>
+                    <Text accessibilityRole="header" style={styles.label}>
                         Ingredientes do cardápio
                     </Text>
 
                     {selecionados.map(({ id, nome, medida }) => (
-                        <View key={id} style={styles.ingrediente}>
-                            <View style={styles.textosIngrediente}>
-                                <Text style={styles.nome}>{nome}</Text>
-                                <Text style={styles.medida}>Medida padrão: {medida}</Text>
+                        <View key={id} style={styles.ingredient}>
+                            <View style={styles.ingredientTexts}>
+                                <Text style={styles.name}>{nome}</Text>
+                                <Text style={styles.measurement}>Medida padrão: {medida}</Text>
                             </View>
 
                             <IconButton
@@ -118,7 +119,7 @@ export default function AdicionarCardapio({
                                 size={18}
                                 accessibilityLabel={`Remover ${nome}`}
                                 onPress={() => removerIngrediente(id)}
-                                style={styles.remover}
+                                style={styles.remove}
                             />
                         </View>
                     ))}
@@ -129,30 +130,30 @@ export default function AdicionarCardapio({
                         disabled={disponiveis.length === 0}
                         onPress={() => setSeletorAberto(true)}
                         style={[
-                            styles.botao,
-                            styles.contorno,
-                            disponiveis.length === 0 && styles.desabilitado,
+                            styles.button,
+                            styles.outlined,
+                            disponiveis.length === 0 && styles.disabled,
                         ]}
-                        textStyle={styles.textoAzul}
+                        textStyle={styles.blueText}
                     />
                 </View>
             </ScrollView>
 
-            <View style={styles.rodape}>
+            <View style={styles.footer}>
                 <Button
                     label="Salvar cardápio"
                     accessibilityRole="button"
                     disabled={!podeSalvar}
                     onPress={() => onSalvar?.({ data, refeicao, ingredienteIds })}
-                    style={[styles.botao, styles.preenchido, !podeSalvar && styles.desabilitado]}
+                    style={[styles.button, styles.filled, !podeSalvar && styles.disabled]}
                 />
 
                 <Button
                     label="Cancelar"
                     accessibilityRole="button"
                     onPress={cancelar}
-                    style={[styles.botao, styles.contorno]}
-                    textStyle={styles.textoAzul}
+                    style={[styles.button, styles.outlined]}
+                    textStyle={styles.blueText}
                 />
             </View>
 
@@ -162,9 +163,9 @@ export default function AdicionarCardapio({
                 animationType="fade"
                 onRequestClose={() => setSeletorAberto(false)}
             >
-                <View style={styles.fundoModal}>
+                <View style={styles.modalBackground}>
                     <View style={styles.modal} accessibilityViewIsModal>
-                        <Text accessibilityRole="header" style={styles.rotulo}>
+                        <Text accessibilityRole="header" style={styles.label}>
                             Escolher ingrediente
                         </Text>
 
@@ -175,10 +176,10 @@ export default function AdicionarCardapio({
                                 <Pressable
                                     accessibilityRole="button"
                                     onPress={() => adicionarIngrediente(item.id)}
-                                    style={styles.opcao}
+                                    style={styles.option}
                                 >
-                                    <Text style={styles.nome}>{item.nome}</Text>
-                                    <Text style={styles.medida}>{item.medida}</Text>
+                                    <Text style={styles.name}>{item.nome}</Text>
+                                    <Text style={styles.measurement}>{item.medida}</Text>
                                 </Pressable>
                             )}
                         />
@@ -187,8 +188,8 @@ export default function AdicionarCardapio({
                             label="Fechar"
                             accessibilityRole="button"
                             onPress={() => setSeletorAberto(false)}
-                            style={[styles.botao, styles.contorno]}
-                            textStyle={styles.textoAzul}
+                            style={[styles.button, styles.outlined]}
+                            textStyle={styles.blueText}
                         />
                     </View>
                 </View>

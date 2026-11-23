@@ -12,7 +12,7 @@ export const style = StyleSheet.create({
         backgroundColor: colors.secondary,
     },
 
-    container_name: {
+    containerName: {
         padding: 15,
         justifyContent: 'center',
         alignItems: 'center',

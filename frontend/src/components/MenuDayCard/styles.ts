@@ -12,27 +12,30 @@ export const styles = StyleSheet.create({
     gap: 8,
   },
 
-  dia: {
+  day: {
     fontSize: 14,
     fontWeight: "700",
     color: colors.primary,
   },
 
-  destaque: {
+  emphasis: {
     backgroundColor: colors.secondary,
     borderColor: '#102B53',
     borderWidth: 3,
   },
-  preparacoes: {
+
+  preparations: {
     color: '#102B53',
     fontSize: 14,
     fontWeight: '600',
   },
-  situacao: {
+
+  situation: {
     color: '#102B53',
     fontSize: 12,
   },
-  textoClaro: {
+
+  clearText: {
     color: '#FFFFFF',
   },
 })

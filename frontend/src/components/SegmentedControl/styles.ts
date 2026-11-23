@@ -9,22 +9,27 @@ export const styles = StyleSheet.create({
     padding: 4,
     gap: 4,
   },
-  opcao: {
+
+  option: {
     flex: 1,
     paddingVertical: 10,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 10,
   },
-  opcaoAtiva: {
+
+  activeOption: {
     backgroundColor: colors.primary,
   },
-  texto: {
+
+  text: {
     fontSize: 14,
     color: colors.primary,
   },
-  textoAtivo: {
+
+  activeText: {
     color: "#FFFFFF",
     fontWeight: "700",
-  },
+  }
+
 })

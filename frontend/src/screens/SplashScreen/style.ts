@@ -9,12 +9,14 @@ export const styles = StyleSheet.create({
         padding: 32,
         backgroundColor: colors.white,
     },
+
     logo: {
         width: 220,
         height: 120,
         resizeMode: "contain",
     },
-    texto: {
+    
+    text: {
         marginTop: 8,
         fontSize: 8,
         color: colors.gray,

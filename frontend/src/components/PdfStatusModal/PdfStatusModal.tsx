@@ -41,12 +41,12 @@ export function PdfStatusModal({estado, onFechar, onTentarNovamente, onAbrirPdf}
             animationType="fade"
             onRequestClose={onFechar}
         >
-            <View style={styles.fundo}>
-                <View style={styles.cartao} accessibilityViewIsModal>
+            <View style={styles.background}>
+                <View style={styles.card} accessibilityViewIsModal>
                     {gerando ? (
                         <ActivityIndicator color={azul} size="large" />
                     ) : (
-                        <View style={[styles.icone, erro && styles.iconeErro]}>
+                        <View style={[styles.icon, erro && styles.errorIcon]}>
                             {erro ? (
                                 <CircleAlert color="#B92D23" size={24} />
                             ) : (
@@ -55,26 +55,26 @@ export function PdfStatusModal({estado, onFechar, onTentarNovamente, onAbrirPdf}
                         </View>
                     )}
 
-                    <Text accessibilityRole="header" style={styles.titulo}>
+                    <Text accessibilityRole="header" style={styles.title}>
                         {titulo}
                     </Text>
 
                     {estado.tipo === 'gerando' && (
                         <>
-                            <Text style={styles.descricao}>
+                            <Text style={styles.description}>
                                 Relatório de {estado.periodo}
                             </Text>
 
                             {estado.progresso !== null && (
                                 <View
-                                    style={styles.trilho}
+                                    style={styles.rail}
                                     accessible
                                     accessibilityRole="progressbar"
                                     accessibilityLabel="Geração do PDF"
                                     accessibilityValue={{ min: 0, max: 100, now: estado.progresso }}
                                 >
                                     <View
-                                        style={[styles.barra, { width: `${estado.progresso}%` }]}
+                                        style={[styles.bar, { width: `${estado.progresso}%` }]}
                                     />
                                 </View>
                             )}
@@ -82,31 +82,31 @@ export function PdfStatusModal({estado, onFechar, onTentarNovamente, onAbrirPdf}
                     )}
 
                     {estado.tipo === 'erro' && (
-                        <Text style={styles.descricao}>
+                        <Text style={styles.description}>
                             Tente novamente. Seus dados continuam no relatório.
                         </Text>
                     )}
 
                     {estado.tipo === 'pronto' && (
                         <>
-                            <Text style={styles.arquivo}>{estado.arquivo.nome}</Text>
+                            <Text style={styles.archive}>{estado.arquivo.nome}</Text>
 
                             {estado.erroAoAbrir && (
-                                <Text accessibilityRole="alert" style={styles.descricao}>
+                                <Text accessibilityRole="alert" style={styles.description}>
                                     {estado.erroAoAbrir}
                                 </Text>
                             )}
                         </>
                     )}
 
-                    <View style={styles.acoes}>
+                    <View style={styles.actions}>
                         {!gerando && (
                             <Button
                                 label={erro ? 'Tentar novamente' : 'Abrir PDF'}
                                 accessibilityRole="button"
                                 onPress={erro ? onTentarNovamente : onAbrirPdf}
-                                style={[styles.botao, styles.botaoPrincipal]}
-                                textStyle={styles.textoBranco}
+                                style={[styles.button, styles.mainButton]}
+                                textStyle={styles.whiteText}
                             />
                         )}
 
@@ -114,8 +114,8 @@ export function PdfStatusModal({estado, onFechar, onTentarNovamente, onAbrirPdf}
                             label={estado.tipo === 'pronto' ? 'Fechar' : 'Cancelar'}
                             accessibilityRole="button"
                             onPress={onFechar}
-                            style={[styles.botao, !gerando && styles.botaoContorno]}
-                            textStyle={styles.textoAzul}
+                            style={[styles.button, !gerando && styles.outlineButton]}
+                            textStyle={styles.blueText}
                         />
                     </View>
                 </View>

@@ -25,7 +25,7 @@ function CampoSenha({ style, ...props }: TextInputProps) {
     <View>
       <Input
         {...props}
-        style={[style, styles.inputComOlho]}
+        style={[style, styles.inputWithEye]}
         secureTextEntry={!visivel}
       />
       <IconButton
@@ -34,7 +34,7 @@ function CampoSenha({ style, ...props }: TextInputProps) {
         onPress={() => setVisivel(valor => !valor)}
         color="#14385F"
         size={20}
-        style={styles.olhoSenha}
+        style={styles.passwordEye}
       />
     </View>
   );
@@ -71,24 +71,24 @@ export default function TelaAutenticacao() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <View style={styles.conteudo}>
-        <View style={styles.cabecalho}>
+      <View style={styles.content}>
+        <View style={styles.header}>
           <Text style={styles.logo}>
             <Image source={require('../../assets/reali-branco.png')} style={styles.logo} resizeMode="contain"/>
           </Text>
 
-          <Text style={styles.subtitulo}>
+          <Text style={styles.subtitle}>
             Mais controle. Menos desperdício.
           </Text>
         </View>
 
         <ScrollView
-          style={styles.paginas}
-          contentContainerStyle={styles.formulario}
+          style={styles.pages}
+          contentContainerStyle={styles.form}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.grupo}>
+          <View style={styles.group}>
             <Text style={styles.label}>E-mail</Text>
 
             <Input
@@ -104,7 +104,7 @@ export default function TelaAutenticacao() {
             />
           </View>
 
-          <View style={styles.grupo}>
+          <View style={styles.group}>
             <Text style={styles.label}>Senha</Text>
 
             <CampoSenha
@@ -119,7 +119,7 @@ export default function TelaAutenticacao() {
             />
           </View>
 
-          <View style={styles.termos}>
+          <View style={styles.terms}>
             <Checkbox
               text="Li e aceito os termos e a política de privacidade."
               checked={termosLogin}
@@ -129,11 +129,11 @@ export default function TelaAutenticacao() {
 
           <Button
             label="Entrar"
-            style={styles.botao}
+            style={styles.button}
             onPress={handleLogin}
           />
 
-          <Text style={styles.nota}>
+          <Text style={styles.note}>
             Não coletamos dados de alunos. Só pesos por preparação.
           </Text>
         </ScrollView>

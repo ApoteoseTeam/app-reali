@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
         gap: 12,
     },
 
-    botao: {
+    button: {
         width: 44,
         height: 44,
         flexShrink: 0,
@@ -24,7 +24,7 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
     },
 
-    periodo: {
+    period: {
         flex: 1,
         textAlign: 'center',
         fontSize: typography.sizes.body,

@@ -2,13 +2,12 @@ import { StyleSheet } from 'react-native';
 import { colors } from '../../theme/colors';
 
 export const styles = StyleSheet.create({
-
-  tela: {
+  screen: {
     flex: 1,
     backgroundColor: '#FFFFFF'
   },
 
-  cabecalho: {
+  header: {
     minHeight: 64,
     paddingHorizontal: 20,
     flexDirection: 'row',
@@ -22,7 +21,7 @@ export const styles = StyleSheet.create({
     height: 53,
   },
 
-  perfil: {
+  profile: {
     width: 44,
     height: 44,
     borderRadius: 22,
@@ -32,8 +31,11 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  scroll: { flex: 1 },
-  conteudo: {
+  scroll: {
+    flex: 1
+  },
+
+  content: {
     width: '100%',
     maxWidth: 640,
     alignSelf: 'center',
@@ -44,32 +46,32 @@ export const styles = StyleSheet.create({
     gap: 14,
   },
 
-  saudacao: {
+  greeting: {
     gap: 3
   },
 
-  titulo: {
+  title: {
     color: colors.azulGestao,
     fontSize: 24,
     fontWeight: '700'
   },
 
-  textoSecundario: {
+  secundaryText: {
     color: '#4D6257',
     fontSize: 13
   },
 
-  indicador: {
+  indicator: {
     gap: 6
   },
 
-  data: {
+  date: {
     color: colors.secondary,
     fontSize: 14,
     fontWeight: '700'
   },
 
-  refeicao: {
+  snack: {
     padding: 14,
     gap: 3,
     borderWidth: 1,
@@ -78,33 +80,34 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
 
-  tituloRefeicao: {
+  titleSnack: {
     color: colors.azulGestao,
     fontSize: 15,
     fontWeight: '700'
   },
 
-  textoRefeicao: {
+  textSnack: {
     color: colors.text,
     fontSize: 13
   },
 
-  aviso: {
+  alert: {
     padding: 14,
     borderRadius: 12,
     backgroundColor: '#FFF3D5'
   },
 
-  textoAviso: {
+  textAlert: {
     color: '#624900',
     fontSize: 13,
     lineHeight: 19
   },
-  negrito: {
+
+  bold: {
     fontWeight: '700'
   },
 
-  assistente: {
+  assistent: {
     marginTop: 'auto',
     paddingTop: 20,
     flexDirection: 'row',
@@ -112,7 +115,8 @@ export const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     gap: 8,
   },
-  balao: {
+
+  balloon: {
     flexShrink: 1,
     maxWidth: 218,
     borderRadius: 20,
@@ -123,7 +127,8 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
   },
-  botaoAssistente: {
+
+  assistantButton: {
     width: 64,
     height: 64,
     borderRadius: 32,
@@ -132,13 +137,13 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  rodape: {
+  footer: {
     flexDirection: 'row',
     paddingHorizontal: 8,
     backgroundColor: colors.azulGestao,
   },
 
-  aba: {
+  tab: {
     flex: 1,
     minHeight: 52,
     paddingVertical: 6,
@@ -147,7 +152,7 @@ export const styles = StyleSheet.create({
     gap: 3,
   },
 
-  textoAba: {
+  textTab: {
     fontSize: 11,
     fontWeight: '600'
   },

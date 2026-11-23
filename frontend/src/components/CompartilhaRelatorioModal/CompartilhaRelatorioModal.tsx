@@ -41,14 +41,14 @@ export function CompartilharRelatorioModal({
             animationType="slide"
             onRequestClose={onFechar}
         >
-            <View style={styles.fundo}>
-                <View style={styles.painel} accessibilityViewIsModal>
-                    <View style={styles.cabecalho}>
-                        <View style={styles.textos}>
-                            <Text accessibilityRole="header" style={styles.titulo}>
+            <View style={styles.background}>
+                <View style={styles.panel} accessibilityViewIsModal>
+                    <View style={styles.header}>
+                        <View style={styles.texts}>
+                            <Text accessibilityRole="header" style={styles.title}>
                                 Compartilhar relatório
                             </Text>
-                            <Text style={styles.descricao}>Resumo de {periodo}</Text>
+                            <Text style={styles.description}>Resumo de {periodo}</Text>
                         </View>
 
                         <IconButton
@@ -57,11 +57,11 @@ export function CompartilharRelatorioModal({
                             color="#102B53"
                             accessibilityLabel="Fechar opções de compartilhamento"
                             onPress={onFechar}
-                            style={styles.fechar}
+                            style={styles.close}
                         />
                     </View>
 
-                    <ScrollView contentContainerStyle={styles.opcoes}>
+                    <ScrollView contentContainerStyle={styles.options}>
                         {opcoes.map(({ titulo, descricao, Icone, acao }) => (
                             <Pressable
                                 key={titulo}
@@ -70,15 +70,15 @@ export function CompartilharRelatorioModal({
                                 accessibilityState={{ disabled: !acao }}
                                 disabled={!acao}
                                 onPress={acao}
-                                style={[styles.opcao, !acao && styles.desabilitada]}
+                                style={[styles.option, !acao && styles.disabled]}
                             >
-                                <View style={styles.icone}>
+                                <View style={styles.icon}>
                                     <Icone size={21} color="#102B53" />
                                 </View>
 
-                                <View style={styles.textos}>
-                                    <Text style={styles.nomeOpcao}>{titulo}</Text>
-                                    <Text style={styles.descricao}>{descricao}</Text>
+                                <View style={styles.texts}>
+                                    <Text style={styles.optionName}>{titulo}</Text>
+                                    <Text style={styles.description}>{descricao}</Text>
                                 </View>
                             </Pressable>
                         ))}

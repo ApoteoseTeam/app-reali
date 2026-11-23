@@ -27,7 +27,7 @@ export function Select({ label, options, value, onChange, placeholder = "Selecio
       {!isRelatorio && <Text style={styles.label}>{label}</Text>}
 
       <Pressable
-        style={[styles.input, isRelatorio && styles.inputRelatorio]}
+        style={[styles.input, isRelatorio && styles.reportInput]}
         onPress={() => setVisible(true)}
         accessibilityRole="button"
         accessibilityLabel={value ? `${label}, ${value}` : label}
@@ -35,7 +35,7 @@ export function Select({ label, options, value, onChange, placeholder = "Selecio
         <Text
           style={[
             value ? styles.value : styles.placeholder,
-            isRelatorio && styles.textoRelatorio,
+            isRelatorio && styles.reportText,
           ]}
         >
           {value || placeholder}
