@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { ScrollView, Text, View, Pressable } from 'react-native';
+import { Modal, Platform, ScrollView, Text, View, Pressable } from 'react-native';
 import { ClipboardList, History, House, TrendingUp } from 'lucide-react-native';
 
 import { BarList } from '../../components/BarList/BarList';
@@ -12,21 +12,15 @@ import { Select } from '../../components/select/Select';
 import { Logo } from '../../components/Logo/Logo';
 import { Input } from '../../components/Input/Input';
 import { CompartilharRelatorioModal } from '../../components/CompartilhaRelatorioModal/CompartilhaRelatorioModal';
-import { PdfStatusModal, type ArquivoPdf, type EstadoPdf } from '../../components/PdfStatusModal/PdfStatusModal';
+import { PdfStatusModal, type EstadoPdf } from '../../components/PdfStatusModal/PdfStatusModal';
 import { StatusModal } from '../../components/StatusModal/StatusModal';
 
 import { mealTypes } from '../../api/reali';
 import { api, useSession } from '../../session/provider';
 import { useRemote } from '../../hooks/useRemote';
 import { dateLabel, localDate, monthRange } from '../../services/dates';
+import { prepararArquivoPdf, type CanalRelatorio } from '../../services/reportPdf';
 import { styles } from './styles';
-
-type DadosRelatorio = {
-    month: string;
-    periodo: string;
-    alunos: number;
-    previsao: number;
-};
 
 type FormularioResumoProps = {
     onInicioPress?: () => void;
@@ -34,16 +28,9 @@ type FormularioResumoProps = {
     onCardapioPress?: () => void;
     onHistoricoPress?: () => void;
     initialMode?: 'Mensal' | 'Diário';
-    onBaixarPdf?: (
-        relatorio: DadosRelatorio,
-        opcoes: {
-            signal: AbortSignal;
-            onProgresso: (percentual: number) => void;
-        }
-    ) => Promise<ArquivoPdf>;
 };
 
-export default function Relatorio({ onBaixarPdf, onInicioPress, onRelatoriosPress, onCardapioPress, onHistoricoPress, initialMode = "Mensal" }: FormularioResumoProps = {}) {
+export default function Relatorio({ onInicioPress, onRelatoriosPress, onCardapioPress, onHistoricoPress, initialMode = "Mensal" }: FormularioResumoProps = {}) {
     const abas = [
         { titulo: 'Início', Icone: House, onPress: onInicioPress },
         { titulo: 'Relatórios', Icone: TrendingUp, ativa: initialMode === 'Mensal', onPress: onRelatoriosPress },
@@ -63,7 +50,8 @@ export default function Relatorio({ onBaixarPdf, onInicioPress, onRelatoriosPres
         return { key, label: date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' }) };
     });
     const month = months.find(item => item.label === selectedMonth) ?? months[0];
-    const query = { school: school?.id, ...monthRange(month.key) };
+    const range = monthRange(month.key);
+    const query = { school: school?.id, ...range, end_date: range.end_date > today ? today : range.end_date };
     const report = useRemote('report/' + month.key, signal => api.summary(scope!, query, signal), Boolean(scope && school && modo === 'Mensal'));
     const meals = useRemote('meal-metrics/' + month.key, signal =>
         api.all(() => api.mealMetrics(scope!, query, signal), { scope, signal }),
@@ -75,11 +63,12 @@ export default function Relatorio({ onBaixarPdf, onInicioPress, onRelatoriosPres
     const diaRefeicao = meal?.label ?? '';
     const [compartilharAberto, setCompartilharAberto] = useState(false);
     const [estadoPdf, setEstadoPdf] = useState<EstadoPdf | null>(null);
+    const [acaoEmCurso, setAcaoEmCurso] = useState(false);
     const exportacao = useRef<AbortController | null>(null);
+    const acionando = useRef(false);
     const mensal = modo === 'Mensal';
     const metrics = report.data?.summary;
     const relatorio = {
-        month: month.key,
         periodo: month.label,
         alunos: metrics?.total_student_entries ?? 0,
         previsao: metrics?.total_forecast_plates ?? 0,
@@ -93,40 +82,43 @@ export default function Relatorio({ onBaixarPdf, onInicioPress, onRelatoriosPres
     const textoComparacao = `a previsão de atendimento ${(variacao ?? 0) > 0 ? 'aumentou' : 'caiu'} ${percentual}%.`;
     const totalPlanejado = meal?.item.total_forecast_plates;
     const podeSalvar = false;
+    const periodoPdf = mensal ? month.label : diaRefeicao;
+    const podeExportar = Boolean(scope && school && (mensal || meal));
 
-    useEffect(() => () => exportacao.current?.abort(), []);
+    useEffect(() => () => {
+        exportacao.current?.abort();
+        exportacao.current = null;
+    }, []);
 
-    async function baixarPdf() {
-        if (!onBaixarPdf || exportacao.current) return;
+    async function gerarPdf(canal?: CanalRelatorio) {
+        if (!scope || !school || exportacao.current) return;
+        const refeicao = meal?.item;
+        if (!mensal && !refeicao) return;
 
         const controle = new AbortController();
-        const periodo = relatorio.periodo.toLocaleLowerCase('pt-BR');
+        const diaria = !mensal ? refeicao : undefined;
+        const filtros = diaria
+            ? { school: school.id, date: diaria.reference_date, meal_type: diaria.meal_type, group: 'daily' }
+            : { ...query, group: 'monthly' };
+        const nome = diaria ? `reali-${diaria.reference_date}-${diaria.meal_type}.pdf` : `reali-${month.key}.pdf`;
 
+        setCompartilharAberto(false);
         exportacao.current = controle;
-        setEstadoPdf({ tipo: 'gerando', periodo, progresso: null });
+        setEstadoPdf({ tipo: 'gerando', periodo: periodoPdf });
 
         try {
-            const arquivo = await onBaixarPdf(relatorio, {
-                signal: controle.signal,
-                onProgresso: (percentual) => {
-                    if (controle.signal.aborted || exportacao.current !== controle) return;
-                    if (!Number.isFinite(percentual)) return;
-
-                    const progresso = Math.min(100, Math.max(0, Math.round(percentual)));
-                    setEstadoPdf({ tipo: 'gerando', periodo, progresso });
-                },
+            const pdf = await api.report(scope, filtros, 'pdf', controle.signal);
+            const arquivo = prepararArquivoPdf(pdf, nome, `Relatório Reali · ${periodoPdf}`, school.id, () => {
+                if (controle.signal.aborted || scope.signal?.aborted) throw new Error('A exportação foi cancelada.');
             });
 
             if (!controle.signal.aborted && exportacao.current === controle) {
-                setEstadoPdf({ tipo: 'pronto', arquivo });
+                setEstadoPdf({ tipo: 'pronto', arquivo, canal });
             }
         } catch {
             if (!controle.signal.aborted && exportacao.current === controle) {
-                setEstadoPdf({ tipo: 'erro' });
-            }
-        } finally {
-            if (exportacao.current === controle) {
                 exportacao.current = null;
+                setEstadoPdf({ tipo: 'erro', canal });
             }
         }
     }
@@ -138,19 +130,40 @@ export default function Relatorio({ onBaixarPdf, onInicioPress, onRelatoriosPres
         setEstadoPdf(null);
     }
 
-    async function abrirPdf() {
-        if (estadoPdf?.tipo !== 'pronto') return;
+    async function executarAcaoPdf(acao: 'baixar' | 'compartilhar' | 'abrirCanal') {
+        if (estadoPdf?.tipo !== 'pronto' || acionando.current) return;
 
-        const { arquivo } = estadoPdf;
+        const { arquivo, canal } = estadoPdf;
+        acionando.current = true;
+        setAcaoEmCurso(true);
+        setEstadoPdf({ ...estadoPdf, erroAcao: undefined });
 
         try {
-            await arquivo.abrir();
-        } catch {
+            if (acao === 'baixar') {
+                await arquivo.baixar();
+                setEstadoPdf(atual => atual?.tipo === 'pronto' && atual.arquivo === arquivo
+                    ? { ...atual, avisoAcao: Platform.OS === 'web' ? 'Download iniciado.' : 'PDF salvo.' }
+                    : atual);
+            } else if (acao === 'compartilhar' && canal) await arquivo.compartilhar?.(canal);
+            else if (canal) await arquivo.abrirCanal(canal);
+        } catch (error) {
+            if (error instanceof Error && (
+                error.name === 'AbortError' || /picker\s+was cancelled|picking was cancelled/i.test(error.message)
+            )) return;
             setEstadoPdf((atual) =>
                 atual?.tipo === 'pronto' && atual.arquivo === arquivo
-                    ? { ...atual, erroAoAbrir: 'Não foi possível abrir o PDF.' }
+                    ? {
+                        ...atual,
+                        semAnexo: atual.semAnexo || acao === 'compartilhar',
+                        erroAcao: acao === 'baixar'
+                            ? 'Não foi possível salvar o PDF.'
+                            : acao === 'abrirCanal' ? `Não foi possível abrir ${canal}.` : 'Não foi possível compartilhar o arquivo.',
+                    }
                     : atual
             );
+        } finally {
+            acionando.current = false;
+            setAcaoEmCurso(false);
         }
     }
 
@@ -301,41 +314,52 @@ export default function Relatorio({ onBaixarPdf, onInicioPress, onRelatoriosPres
                     </View>
                 )}
             </ScrollView>
-            {mensal && (
-                <View style={styles.acoes}>
-                    <Button
-                        label="Compartilhar"
-                        accessibilityRole="button"
-                        onPress={() => setCompartilharAberto(true)}
-                        style={[
-                            styles.botao,
-                            styles.botaoSecundario,
-                        ]}
-                        textStyle={styles.textoSecundario}
+            <View style={styles.acoes}>
+                <Button
+                    label="Compartilhar"
+                    accessibilityRole="button"
+                    disabled={!podeExportar}
+                    onPress={() => setCompartilharAberto(true)}
+                    style={[styles.botao, styles.botaoSecundario, !podeExportar && styles.desabilitado]}
+                    textStyle={styles.textoSecundario}
+                />
 
+                <Button
+                    label="Baixar PDF"
+                    accessibilityRole="button"
+                    disabled={!podeExportar}
+                    onPress={() => void gerarPdf()}
+                    style={[styles.botao, !podeExportar && styles.desabilitado]}
+                />
+            </View>
+            <Modal
+                visible={compartilharAberto || estadoPdf !== null}
+                transparent
+                animationType="fade"
+                onRequestClose={() => {
+                    if (compartilharAberto) setCompartilharAberto(false);
+                    else if (!acaoEmCurso) fecharPdf();
+                }}
+            >
+                {compartilharAberto ? (
+                    <CompartilharRelatorioModal
+                        periodo={periodoPdf}
+                        onFechar={() => setCompartilharAberto(false)}
+                        onWhatsApp={() => void gerarPdf('WhatsApp')}
+                        onEmail={() => void gerarPdf('E-mail')}
                     />
-
-                    <Button
-                        label="Baixar PDF"
-                        accessibilityRole="button"
-                        disabled={!onBaixarPdf || estadoPdf?.tipo === 'gerando'}
-                        onPress={baixarPdf}
-                        style={[styles.botao, !onBaixarPdf && styles.desabilitado]}
+                ) : (
+                    <PdfStatusModal
+                        estado={estadoPdf}
+                        onFechar={fecharPdf}
+                        ocupado={acaoEmCurso}
+                        onTentarNovamente={() => void gerarPdf(estadoPdf?.tipo === 'erro' ? estadoPdf.canal : undefined)}
+                        onBaixarPdf={() => void executarAcaoPdf('baixar')}
+                        onCompartilhar={() => void executarAcaoPdf('compartilhar')}
+                        onAbrirCanal={() => void executarAcaoPdf('abrirCanal')}
                     />
-                </View>
-            )}
-            <CompartilharRelatorioModal
-                visivel={compartilharAberto}
-                periodo={relatorio.periodo.toLocaleLowerCase('pt-BR')}
-                onFechar={() => setCompartilharAberto(false)}
-            />
-
-            <PdfStatusModal
-                estado={estadoPdf}
-                onFechar={fecharPdf}
-                onTentarNovamente={baixarPdf}
-                onAbrirPdf={abrirPdf}
-            />
+                )}
+            </Modal>
 
             <StatusModal
                 visible={false}

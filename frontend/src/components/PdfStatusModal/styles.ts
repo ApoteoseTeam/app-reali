@@ -42,14 +42,6 @@ export const styles = StyleSheet.create({
         paddingVertical: 6,
         textAlign: 'center',
     },
-    trilho: {
-        width: '100%',
-        height: 6,
-        borderRadius: 3,
-        overflow: 'hidden',
-        backgroundColor: '#DCE8CF',
-    },
-    barra: { height: '100%', borderRadius: 3, backgroundColor: azul },
     acoes: { width: '100%', gap: 8 },
     botao: {
         minHeight: 44,
