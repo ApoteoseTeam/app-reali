@@ -1,5 +1,7 @@
+from base64 import b64decode, b64encode
 from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
+from io import BytesIO
 from threading import Barrier
 from urllib.parse import parse_qs, urlsplit
 from uuid import uuid4
@@ -19,6 +21,7 @@ from django.db import (
     transaction,
 )
 from django.utils import timezone
+from PIL import Image
 from rest_framework.test import APIClient
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -246,6 +249,36 @@ def test_login_throttles_repeated_authentication_attempts(monkeypatch):
     assert login("missing@example.test").status_code == 401
     assert login("missing@example.test").status_code == 401
     assert login("missing@example.test").status_code == 429
+
+
+@pytest.mark.django_db
+def test_user_can_update_own_name_and_photo_independently(tenant):
+    _, _, _, director = tenant
+    user = director.user
+    client = client_for(access=login(user.email).json()["access"])
+    path = ROOT + "auth/me/"
+    assert client.get(path).json()["user"]["profile_photo"] == ""
+
+    image_data = BytesIO()
+    Image.new("RGB", (768, 512), "green").save(image_data, format="PNG")
+    photo = b64encode(image_data.getvalue()).decode("ascii")
+    response = client.patch(path, {"profile_photo": photo}, format="json")
+    assert response.status_code == 200
+    saved_photo = response.json()["profile_photo"]
+    with Image.open(BytesIO(b64decode(saved_photo))) as image:
+        assert image.format == "JPEG"
+        assert image.size == (384, 256)
+
+    response = client.patch(path, {"full_name": "Novo nome"}, format="json")
+    assert response.status_code == 200
+    assert response.json()["profile_photo"] == saved_photo
+    response = client.patch(
+        path, {"full_name": "Nome inválido", "profile_photo": "aGVsbG8="}, format="json"
+    )
+    assert response.status_code == 400
+    profile = client.get(path).json()["user"]
+    assert profile["full_name"] == "Novo nome"
+    assert profile["profile_photo"] == saved_photo
 
 
 @pytest.mark.django_db

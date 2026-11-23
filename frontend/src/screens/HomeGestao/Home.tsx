@@ -8,6 +8,7 @@ import { styles } from './styles';
 
 type HomeProps = {
     resumo?: Resumo;
+    profilePhoto?: string;
     onPerfilPress?: () => void;
     onAssistentePress?: () => void;
     onRelatoriosPress?: () => void;
@@ -22,6 +23,7 @@ type Resumo = {
 
 export default function Home({
     resumo,
+    profilePhoto,
     onPerfilPress,
     onAssistentePress,
     onRelatoriosPress,
@@ -38,16 +40,28 @@ export default function Home({
     return (
         <View style={styles.tela}>
             <View style={styles.cabecalho}>
-                <Image style={styles.logo} source={require ('../../assets/r-logotipo-branca.png')}></Image>  
-
-                <IconButton //adicionar imagem real de uma pessoal
-                    icon={UserRound}
-                    size={19}
-                    color="#FFFFFF"
-                    accessibilityLabel="Abrir perfil"
-                    onPress={() => onPerfilPress?.()}
-                    style={styles.perfil}
+                <Image
+                    source={require('../../assets/r-logotipo-branca.png')}
+                    style={styles.logo}
+                    resizeMode="contain"
+                    accessibilityLabel="Reali"
                 />
+
+                <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Abrir perfil"
+                    onPress={onPerfilPress}
+                    style={styles.perfil}
+                >
+                    {profilePhoto ? (
+                        <Image
+                            source={{ uri: 'data:image/jpeg;base64,' + profilePhoto }}
+                            style={styles.fotoPerfil}
+                        />
+                    ) : (
+                        <UserRound size={19} color="#FFFFFF" />
+                    )}
+                </Pressable>
             </View>
 
             <ScrollView

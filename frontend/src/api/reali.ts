@@ -7,7 +7,9 @@ export type Tokens = { access: string; refresh: string };
 export type Organization = { id: string; name: string; is_active: boolean };
 export type School = { id: string; organization: string; name: string; code: string; is_active: boolean };
 export type Member = { id: string; user: User; organization: string; role: string; is_active: boolean; all_schools_access: boolean; capabilities?: string[] };
-export type Me = { user: User; memberships: Member[] };
+export type ProfileUser = User & { profile_photo?: string };
+export type ProfileUpdate = { full_name?: string; profile_photo?: string };
+export type Me = { user: ProfileUser; memberships: Member[] };
 export type MealType = "BREAKFAST" | "LUNCH" | "SNACK" | "DINNER";
 export type MealStatus = "PLANNED" | "PREPARING" | "SERVING" | "FINISHED" | "CANCELLED";
 export type Metrics = {
@@ -48,6 +50,9 @@ export class RealiApi {
 
   login = (email: string, password: string) => this.http.request<Tokens & { user: User }>("auth/login/", {method:"POST", auth:false, body:{email,password}});
   me = (signal?: AbortSignal) => this.http.request<Me>("auth/me/", {signal});
+  updateProfile = (body: ProfileUpdate) => this.http.request<ProfileUser>("auth/me/", {method:"PATCH", body});
+  changePassword = (current_password: string, password: string, password_confirmation: string) =>
+    this.http.request<void>("auth/change-password/", {method:"POST", body:{current_password,password,password_confirmation}});
 
   organizations = (signal?: AbortSignal) => this.all<Organization>(() => this.http.request("organizations/", {signal}), {signal});
   schools = (scope: Scope) => this.all<School>(() => this.http.request("auth/me/schools/", {scope}), {scope});

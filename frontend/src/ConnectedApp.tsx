@@ -84,7 +84,8 @@ function SignedIn() {
       presentes={data?.total_student_entries} totalPlanejado={data?.total_forecast_plates}
       onPerfilPress={profile} onCardapioPress={cardapio} />;
   }
-  return <Home onPerfilPress={profile} onCardapioPress={cardapio} onRelatoriosPress={report}
+  return <Home profilePhoto={me?.user.profile_photo} onPerfilPress={profile}
+    onCardapioPress={cardapio} onRelatoriosPress={report}
     onHistoricoPress={history} resumo={{
       nome: name, escola: school?.name ?? '—', data: dateLabel(data?.reference_date ?? today),
       alunos: data?.total_student_entries ?? null, refeicoesServidas: data?.total_served_plates ?? null,

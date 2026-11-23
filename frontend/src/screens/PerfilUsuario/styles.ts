@@ -102,8 +102,17 @@ export const styles = StyleSheet.create({
 
   conteudo: {
     paddingHorizontal: 38,
+    paddingBottom: 24,
     marginTop: 26,
     gap: 20,
+  },
+
+  input: {
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: 8,
+    color: colors.text,
+    padding: 10,
   },
 
   card: {

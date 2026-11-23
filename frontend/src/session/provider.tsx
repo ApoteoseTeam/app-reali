@@ -3,7 +3,7 @@ import { AppState, Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 
 import { apiBase, ApiError, HttpClient, type Scope } from "../api/client";
-import { RealiApi, type Me, type Member, type Organization, type School } from "../api/reali";
+import { RealiApi, type Me, type Member, type Organization, type ProfileUpdate, type School } from "../api/reali";
 import { SessionTokens } from "./tokens";
 
 const refreshKey = "reali.refresh.v1";
@@ -33,6 +33,7 @@ const initial: State = {status:"INITIALIZING",me:null,organizations:[],workspace
 type Session = State & {
   signIn(email: string, password: string): Promise<void>;
   signOut(): Promise<void>;
+  updateProfile(update: ProfileUpdate): Promise<void>;
   select(organization: string, school?: string): Promise<void>;
   revalidate(): Promise<void>;
   retry(): void;
@@ -191,7 +192,17 @@ export function SessionProvider({children}:{children:ReactNode}) {
     } finally { signing.current=false; }
   };
 
-  return <Context.Provider value={{...state, signIn, signOut, select:(organization,school)=>hydrate({organization,school}),
+  const updateProfile = async (update: ProfileUpdate) => {
+    const generation = tokens.credentials().generation;
+    const user = await api.updateProfile(update);
+    await refreshContext.current;
+    const current = saved.current;
+    if (tokens.credentials().generation === generation && current.me?.user.id === user.id) {
+      commit({...current, me:{...current.me, user}});
+    }
+  };
+
+  return <Context.Provider value={{...state, signIn, signOut, updateProfile, select:(organization,school)=>hydrate({organization,school}),
     revalidate, retry:()=>{ void initialize(); },can:name=>state.workspace?.member.capabilities?.includes(name) ?? false}}>
     {children}
   </Context.Provider>;
