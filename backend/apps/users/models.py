@@ -36,6 +36,7 @@ class User(AbstractUser):
     username = None
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=160)
+    profile_photo = models.TextField(blank=True, default="")
     session_version = models.PositiveIntegerField(default=0, editable=False)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["full_name"]

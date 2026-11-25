@@ -1,4 +1,9 @@
+from base64 import b64decode, b64encode
+from binascii import Error as Base64Error
+from io import BytesIO
+
 from django.utils import timezone
+from PIL import Image, ImageOps
 from rest_framework import serializers
 
 from apps.users.models import Membership
@@ -31,13 +36,46 @@ class SessionMembershipSerializer(MembershipSerializer):
         )
 
 
+class ProfileUserSerializer(UserSerializer):
+    class Meta(UserSerializer.Meta):
+        fields = (*UserSerializer.Meta.fields, "profile_photo")
+        read_only_fields = fields
+
+
 class MeSerializer(serializers.Serializer):
-    user = UserSerializer()
+    user = ProfileUserSerializer()
     memberships = SessionMembershipSerializer(many=True)
 
 
 class UpdateProfileSerializer(serializers.Serializer):
-    full_name = serializers.CharField(max_length=160)
+    full_name = serializers.CharField(max_length=160, required=False)
+    profile_photo = serializers.CharField(max_length=2_000_000, required=False)
+
+    def validate(self, attrs):
+        if not attrs:
+            raise serializers.ValidationError("Informe o nome ou a foto do perfil.")
+        return attrs
+
+    def validate_profile_photo(self, value):
+        try:
+            with Image.open(
+                BytesIO(b64decode(value, validate=True)),
+                formats=("JPEG", "PNG", "WEBP"),
+            ) as image:
+                if image.width * image.height > 20_000_000:
+                    raise serializers.ValidationError(
+                        "A foto tem resolução muito alta."
+                    )
+                image.thumbnail((384, 384))
+                photo = ImageOps.exif_transpose(image).convert("RGB")
+                photo.info.clear()
+                output = BytesIO()
+                photo.save(output, format="JPEG", quality=85)
+        except (Base64Error, OSError, ValueError, Image.DecompressionBombError) as exc:
+            raise serializers.ValidationError(
+                "Selecione uma imagem JPEG, PNG ou WebP válida."
+            ) from exc
+        return b64encode(output.getvalue()).decode("ascii")
 
 
 class MessageSerializer(serializers.Serializer):

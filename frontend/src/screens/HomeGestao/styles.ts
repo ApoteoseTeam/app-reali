@@ -27,6 +27,7 @@ export const styles = StyleSheet.create({
     borderRadius: 22,
     borderWidth: 1,
     borderColor: '#FFFFFF',
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -35,6 +36,12 @@ export const styles = StyleSheet.create({
     flex: 1
   },
 
+  profilePhoto: {
+    width: '100%',
+    height: '100%',
+  },
+
+  scroll: { flex: 1 },
   content: {
     width: '100%',
     maxWidth: 640,

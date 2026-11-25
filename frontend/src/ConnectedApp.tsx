@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Alert, Platform } from 'react-native';
+import { Alert } from 'react-native';
 import { api, SessionProvider, useSession } from './session/provider';
 import { mealTypes } from './api/reali';
 import { useRemote } from './hooks/useRemote';
-import { dateLabel, localDate, monthRange, weekDays } from './services/dates';
+import { dateLabel, localDate, weekDays } from './services/dates';
 import TelaInicial from './screens/TelaInicial/TelaInicial';
 import CardapioGestao from './screens/CardapioGestao/CardapioGestao';
 import Login from './screens/loginCadastro/loginCadastro';
@@ -61,20 +61,7 @@ function SignedIn() {
   }
   if (screen === 'relatorio' || screen === 'historico') {
     return <Relatorio key={screen} initialMode={screen === 'historico' ? 'Diário' : 'Mensal'}
-      onInicioPress={home} onRelatoriosPress={report} onCardapioPress={cardapio} onHistoricoPress={history}
-      onBaixarPdf={Platform.OS === 'web' && scope && school ? async ({ month }, { signal }) => {
-        const pdf = await api.report(scope, { ...monthRange(month), school: school.id, group: 'monthly' }, 'pdf', signal);
-        const nome = `reali-${month}.pdf`;
-        return { nome, abrir: async () => {
-          if (signal.aborted || scope.signal?.aborted) throw new Error('Exportação cancelada.');
-          const url = URL.createObjectURL(new Blob([pdf], { type: 'application/pdf' }));
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = nome;
-          link.click();
-          setTimeout(() => URL.revokeObjectURL(url), 1000);
-        } };
-      } : undefined} />;
+      onInicioPress={home} onRelatoriosPress={report} onCardapioPress={cardapio} onHistoricoPress={history} />;
   }
   const data = dashboard.data;
   const meal = data?.meal_services[0];
@@ -84,7 +71,8 @@ function SignedIn() {
       presentes={data?.total_student_entries} totalPlanejado={data?.total_forecast_plates}
       onPerfilPress={profile} onCardapioPress={cardapio} />;
   }
-  return <Home onPerfilPress={profile} onCardapioPress={cardapio} onRelatoriosPress={report}
+  return <Home profilePhoto={me?.user.profile_photo} onPerfilPress={profile}
+    onCardapioPress={cardapio} onRelatoriosPress={report}
     onHistoricoPress={history} resumo={{
       nome: name, escola: school?.name ?? '—', data: dateLabel(data?.reference_date ?? today),
       alunos: data?.total_student_entries ?? null, refeicoesServidas: data?.total_served_plates ?? null,

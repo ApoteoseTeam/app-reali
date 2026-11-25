@@ -54,7 +54,6 @@ from .serializers import (
     InstitutionRequestSerializer,
     MembershipSerializer,
     SchoolSerializer,
-    UserSerializer,
 )
 from .session_auth import LoginSerializer, LogoutSerializer, RefreshSerializer
 
@@ -105,20 +104,21 @@ class MeView(APIView):
         ).order_by("id")
         return Response(
             {
-                "user": UserSerializer(request.user).data,
+                "user": s.ProfileUserSerializer(request.user).data,
                 "memberships": s.SessionMembershipSerializer(
                     memberships, many=True
                 ).data,
             }
         )
 
-    @extend_schema(request=s.UpdateProfileSerializer, responses=UserSerializer)
+    @extend_schema(request=s.UpdateProfileSerializer, responses=s.ProfileUserSerializer)
     def patch(self, request):
         data = validated(s.UpdateProfileSerializer, request.data)
         user = request.user
-        user.full_name = data["full_name"]
-        user.save(update_fields=["full_name"])
-        return Response(UserSerializer(user).data)
+        for field, value in data.items():
+            setattr(user, field, value)
+        user.save(update_fields=list(data))
+        return Response(s.ProfileUserSerializer(user).data)
 
 
 class MySchoolsView(generics.ListAPIView):
