@@ -2,7 +2,6 @@ import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { ClipboardList, House, UserRound } from 'lucide-react-native';
 
 import { Card } from '../../components/Card/Card';
-import { Logo } from '../../components/Logo/Logo';
 import { styles, coresRodape } from './styles';
 
 type HomeCozinhaProps = {

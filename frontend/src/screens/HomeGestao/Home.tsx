@@ -1,5 +1,5 @@
-import { Pressable, ScrollView, Text, View,Image } from 'react-native';
-import { ClipboardList, History, House, MessageCircle, TrendingUp, UserRound} from 'lucide-react-native';
+import { Pressable, ScrollView, Text, View, Image } from 'react-native';
+import { ClipboardList, History, House, MessageCircle, TrendingUp, UserRound } from 'lucide-react-native';
 
 import { Card } from '../../components/Card/Card';
 import { IconButton } from '../../components/IconButton/IconButton';
@@ -40,16 +40,15 @@ export default function Home({
     return (
         <View style={styles.screen}>
             <View style={styles.header}>
-                <Image style={styles.logo} 
-                    source={require ('../../assets/r-logotipo-branca.png')} 
+                <Image style={styles.logo}
+                    source={require('../../assets/r-logotipo-branca.png')}
                     resizeMode="contain"
-                    accessibilityLabel="Reali"></Image>  
+                    accessibilityLabel="Reali"></Image>
                 <Pressable
                     accessibilityRole="button"
                     accessibilityLabel="Abrir perfil"
                     onPress={() => onPerfilPress?.()}
                     style={styles.profile}
-                />
                 >
                     {profilePhoto ? (
                         <Image
@@ -111,7 +110,8 @@ export default function Home({
                         Oi! Aqui é o seu assistente virtual. No que posso te ajudar?
                     </Text>
 
-                    <IconButton // dar funcionalidade a mensagem flutuante do chatbot
+                    {/* dar funcionalidade a mensagem flutuante do chatbot */}
+                    <IconButton 
                         icon={MessageCircle}
                         size={29}
                         color="#FFFFFF"
@@ -122,10 +122,10 @@ export default function Home({
                 </View>
             </ScrollView>
 
-            <View style={styles.footer}> 
+            <View style={styles.footer}>
                 {abas.map(({ titulo, Icone, ativa, onPress }) => {
-                    const cor = ativa ? '#C8DFB9' : '#FFFFFF';  // adicionar navegação entre os icones do rodape
-
+                    const cor = ativa ? '#C8DFB9' : '#FFFFFF';  
+                    // adicionar navegação entre os icones do rodape
                     return (
                         <Pressable
                             key={titulo}
@@ -141,6 +141,6 @@ export default function Home({
                     );
                 })}
             </View>
-        </View>
+        </View >
     );
 }

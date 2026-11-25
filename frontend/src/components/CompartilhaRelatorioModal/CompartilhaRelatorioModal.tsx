@@ -53,7 +53,7 @@ export function CompartilharRelatorioModal({
                     />
                 </View>
 
-                <ScrollView contentContainerStyle={styles.opcoes}>
+                <ScrollView contentContainerStyle={styles.option}>
                     {opcoes.map(({ titulo, descricao, Icone, acao }) => (
                         <Pressable
                             key={titulo}

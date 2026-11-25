@@ -4,7 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Undo2, Settings, Pencil, CircleUser, Phone, MapPin, Lock, type LucideIcon } from 'lucide-react-native';
 import { Button } from '../../components/Button/Button';
 import { IconButton } from '../../components/IconButton/IconButton';
-import { Header } from '../../components/header/header';
+import { Header } from '../../components/Header/Header';
 import { colors } from '../../theme/colors';
 import { api, useSession } from '../../session/provider';
 import { roleNames } from '../../api/reali';
@@ -183,7 +183,7 @@ export default function PerfilUsuario({ onVoltar }: { onVoltar?: () => void } = 
 
         {editor && (
           <View style={styles.card}>
-            <Text style={styles.cardTitulo}>{editor === 'profile' ? 'Editar perfil' : 'Editar senha'}</Text>
+            <Text style={styles.cardTitle}>{editor === 'profile' ? 'Editar perfil' : 'Editar senha'}</Text>
             {editor === 'profile' ? (
               <>
                 <Text>Nome completo</Text>

@@ -6,10 +6,10 @@ import { ClipboardList, History, House, TrendingUp } from 'lucide-react-native';
 import { BarList } from '../../components/BarList/BarList';
 import { Button } from '../../components/Button/Button';
 import { Card } from '../../components/Card/Card';
-import { Header } from '../../components/header/header';
+import { Header } from '../../components/Header/Header';
 import { Kpicard } from '../../components/KpiCard/KpiCard';
 import { SegmentedControl } from '../../components/SegmentedControl/SegmentedControl';
-import { Select } from '../../components/select/Select';
+import { Select } from '../../components/Select/Select';
 import { Logo } from '../../components/Logo/Logo';
 import { Input } from '../../components/Input/Input';
 import { CompartilharRelatorioModal } from '../../components/CompartilhaRelatorioModal/CompartilhaRelatorioModal';
@@ -326,7 +326,7 @@ export default function Relatorio({ onInicioPress, onRelatoriosPress, onCardapio
                     accessibilityRole="button"
                     disabled={!podeExportar}
                     onPress={() => setCompartilharAberto(true)}
-                    style={[styles.button, styles.secondaryButton, !podeExportar && styles.desabilitado]}
+                    style={[styles.button, styles.secondaryButton, !podeExportar && styles.disabled]}
                     textStyle={styles.secondaryText}
                 />
 
@@ -335,7 +335,7 @@ export default function Relatorio({ onInicioPress, onRelatoriosPress, onCardapio
                     accessibilityRole="button"
                     disabled={!podeExportar}
                     onPress={() => void gerarPdf()}
-                    style={[styles.button, !podeExportar && styles.desabilitado]}
+                    style={[styles.button, !podeExportar && styles.disabled]}
                 />
             </View>
             <Modal
