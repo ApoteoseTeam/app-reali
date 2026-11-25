@@ -9,6 +9,7 @@ import { colors } from '../../theme/colors';
 import { api, useSession } from '../../session/provider';
 import { roleNames } from '../../api/reali';
 import { styles } from './styles';
+import { LogoutModal } from '../../components/LogoutModal/LogoutModal';
 
 type LinhaProps = {
   icone: LucideIcon;
@@ -52,6 +53,7 @@ export default function PerfilUsuario({ onVoltar }: { onVoltar?: () => void } = 
   const running = useRef(false);
   const role = workspace?.member.role;
   const photo = me?.user.profile_photo;
+  const [logoutVisible, setLogoutVisible] = useState(false);
 
   function openEditor(next: typeof editor) {
     if (running.current) return;
@@ -210,8 +212,17 @@ export default function PerfilUsuario({ onVoltar }: { onVoltar?: () => void } = 
           label="Sair da conta"
           style={styles.botaoSair}
           textStyle={styles.botaoSairTexto}
-          onPress={signOut}
+          onPress={() => setLogoutVisible(true)}
           disabled={busy}
+        />
+
+        <LogoutModal
+          visible={logoutVisible}
+          onCancel={() => setLogoutVisible(false)}
+          onConfirm={() => {
+            setLogoutVisible(false);
+            void run(signOut);
+          }}
         />
       </View>
     </ScrollView>
