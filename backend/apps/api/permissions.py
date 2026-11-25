@@ -26,8 +26,12 @@ ROLE_PERMISSIONS = {
     "camera_status": FULL_REPORT_ROLES | {Role.COOK},
     "camera_history": FULL_REPORT_ROLES,
     "camera_admin": DIRECTORS,
-    "realinova_full": FULL_REPORT_ROLES,
-    "realinova_limited": {Role.COOK},
+    
+}
+
+REALINOVA_ACCESS = {
+    Role.MANAGER,
+    Role.SECRETARIAT,
 }
 
 

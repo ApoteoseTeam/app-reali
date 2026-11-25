@@ -6,7 +6,7 @@ from io import StringIO
 from threading import Event, Thread
 from uuid import uuid4
 
-import pytest
+import pytest  # pyright: ignore[reportMissingImports]
 from django.core.management import call_command
 from django.db import close_old_connections, connection
 from django.utils import timezone
@@ -18,9 +18,11 @@ from apps.analytics.test_analytics import site as site
 from apps.api.models import AuditLog
 from apps.api.session_auth import LoginSerializer
 from apps.users.models import Membership
+from apps.api.permissions import schools_for
 
 from . import services
-from .authorization import user_scope
+from .authorization import Scope, user_scope
+from .errors import AIError
 from .models import AIConversation, AIExecution, AIMessage
 from .tools import QueryTools
 
@@ -430,11 +432,18 @@ def test_limits_are_scoped_and_tools_apply_rbac(site, provider):
     DailyMetrics.objects.create(
         school=site.foreign, reference_date=site.day, total_student_entries=98765
     )
-    for role in ("DIRECTOR", "MANAGER", "COOK", "SECRETARIAT"):
-        member = site.director if role == "DIRECTOR" else membership(site.school, role)
-        scope = user_scope(
-            member.user_id, site.org.pk, member.user.session_version
-        ).bind(None)
+    for role in ("MANAGER", "SECRETARIAT"):
+        member = membership(site.school, role)
+        scope = Scope(
+            member_id=member.pk,
+            user_id=member.user_id,
+            organization_id=member.organization_id,
+            session_version=member.user.session_version,
+            role=member.role,
+            school_ids=tuple(
+                schools_for(member, active_only=True).values_list("pk", flat=True)
+    ),
+)
         tools = QueryTools(scope, 100)
         day = str(site.day)
         result = tools.get_student_counts(day, school_id=str(site.school.pk))
@@ -455,11 +464,6 @@ def test_limits_are_scoped_and_tools_apply_rbac(site, provider):
             ]
             == 0
         )
-        if role == "COOK":
-            assert (
-                tools.get_student_counts(str(site.day - timedelta(days=60)))["error"]
-                == "AI_INVALID_ARGUMENTS"
-            )
         if role in ("DIRECTOR", "SECRETARIAT", "MANAGER"):
             comparison = tools.compare_schools(day)
             assert str(site.foreign.pk) not in json.dumps(comparison, default=str)
@@ -677,7 +681,6 @@ def test_organization_quota_is_shared_across_users(site, provider, settings):
     )
     assert not provider.requests
 
-
 def test_quality_planning_summarizes_closed_observations(site, provider):
     for offset, served in enumerate((12, 15, 22)):
         DailyMetrics.objects.create(
@@ -708,3 +711,118 @@ def test_quality_planning_summarizes_closed_observations(site, provider):
     assert result.status_code == 200
     assert "3 intervalos fechados" in result.json()["answer"]
     assert "em 2 e abaixo em 1" in result.json()["answer"]
+
+def test_real_inova_access_is_limited_to_manager_and_secretariat(site):
+    allowed_roles = ("MANAGER", "SECRETARIAT")
+    denied_roles = ("DIRECTOR", "COOK", "NUTRITIONIST")
+
+    for role in allowed_roles:
+        member = membership(site.school, role)
+
+        scope = user_scope(
+            member.user_id,
+            site.org.pk,
+            member.user.session_version,
+        )
+
+        assert scope.role == role
+
+    for role in denied_roles:
+        member = (
+            site.director
+            if role == "DIRECTOR"
+            else membership(site.school, role)
+        )
+
+        with pytest.raises(AIError):
+            user_scope(
+                member.user_id,
+                site.org.pk,
+                member.user.session_version,
+            )
+
+def test_tool_permissions_remain_unchanged():
+    expected = {
+        "DIRECTOR": {
+            "meal_history",
+            "forecast",
+            "indicators",
+            "analytics_reports",
+        },
+        "MANAGER": {
+            "meal_history",
+            "forecast",
+            "indicators",
+            "analytics_reports",
+        },
+        "COOK": {
+            "meal_history",
+            "forecast",
+            "indicators",
+        },
+        "NUTRITIONIST": {
+            "meal_history",
+            "forecast",
+            "indicators",
+            "analytics_reports",
+        },
+        "SECRETARIAT": {
+            "meal_history",
+            "forecast",
+            "indicators",
+            "analytics_reports",
+        },
+    }
+
+    for role, permissions in expected.items():
+        scope = Scope(
+            member_id=uuid4(),
+            user_id=1,
+            organization_id=uuid4(),
+            session_version=0,
+            role=role,
+            school_ids=(),
+        )
+
+        for action in permissions:
+            scope.require(action)
+
+        for action in {
+            "meal_history",
+            "forecast",
+            "indicators",
+            "analytics_reports",
+        } - permissions:
+            with pytest.raises(AIError):
+                scope.require(action)
+                
+def test_director_cannot_access_real_inova_but_legacy_conversations_remain(site):
+    member = site.director
+
+    legacy = AIConversation.objects.create(
+        user=member.user,
+        organization=site.org,
+        access_role="ADMIN",
+        scope_key="legacy-admin-scope",
+    )
+    AIConversation.objects.create(
+        user=member.user,
+        organization=site.org,
+        access_role="ADMIN",
+        scope_key="previous-school-scope",
+    )
+
+    with pytest.raises(AIError):
+        user_scope(
+            member.user_id,
+            site.org.pk,
+            member.user.session_version,
+        )
+
+    assert AIConversation.objects.filter(
+        user=member.user,
+        organization=site.org,
+        access_role="ADMIN",
+    ).count() == 2
+
+    assert AIConversation.objects.filter(pk=legacy.pk).exists()

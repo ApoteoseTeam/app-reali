@@ -4,7 +4,7 @@ from uuid import UUID
 
 from django.db.models import Q
 
-from apps.api.permissions import ROLE_PERMISSIONS, schools_for
+from apps.api.permissions import REALINOVA_ACCESS, ROLE_PERMISSIONS, schools_for
 from apps.api.session_revocations import is_revoked
 from apps.users.models import Membership
 
@@ -36,10 +36,6 @@ class Scope:
             raise AIError("AI_PERMISSION_DENIED")
 
     def bind(self, school_id):
-        if school_id is None and self.role in ROLE_PERMISSIONS["realinova_limited"]:
-            if len(self.school_ids) != 1:
-                raise AIError("AI_INVALID_MESSAGE")
-            school_id = self.school_ids[0]
         if school_id is not None:
             if school_id not in self.school_ids:
                 raise AIError("AI_PERMISSION_DENIED")
@@ -89,12 +85,7 @@ def user_scope(user_id, organization_id, session_version, *, session_id=None):
         user__is_active=True,
         user__session_version=session_version,
     ).first()
-    if (
-        not member
-        or member.role
-        not in ROLE_PERMISSIONS["realinova_full"]
-        | ROLE_PERMISSIONS["realinova_limited"]
-    ):
+    if not member or member.role not in REALINOVA_ACCESS:
         raise AIError("AI_PERMISSION_DENIED")
     school_ids = tuple(
         schools_for(member, active_only=True).values_list("pk", flat=True)
