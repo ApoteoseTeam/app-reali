@@ -22,20 +22,20 @@ export function ChatMessage({
     return (
         <View
             style={[
-                styles.balao,
-                isUsuario ? styles.balaoUsuario : styles.balaoAssistente,
+                styles.balloon,
+                isUsuario ? styles.userBubble : styles.assistantBubble,
             ]}
         >
             <Text
-                style={[styles.mensagem, isUsuario && styles.mensagemUsuario]}
+                style={[styles.message, isUsuario && styles.userMessage]}
                 accessibilityLabel={`${nomeRemetente}: ${mensagem}`}
             >
                 {mensagem}
             </Text>
 
             {fonte ? (
-                <View style={styles.caixaFonte}>
-                    <Text style={styles.textoFonte}>Fonte: {fonte}</Text>
+                <View style={styles.sourceBox}>
+                    <Text style={styles.sourceText}>Fonte: {fonte}</Text>
                 </View>
             ) : null}
 

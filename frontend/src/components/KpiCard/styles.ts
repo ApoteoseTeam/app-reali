@@ -4,7 +4,6 @@ import { spacing } from "../../theme/spacing";
 import { typography } from "../../theme/typography";
 
 export const kpicardStyles = StyleSheet.create({
-
     KpicardBox: {
         padding: spacing.md,
         borderRadius: 8,
@@ -80,18 +79,18 @@ export const kpicardStyles = StyleSheet.create({
         fontSize: 14,
     },
 
-    gestaoBox: {
+    boxManagement: {
         minHeight: 108,
         padding: 14,
         gap: 3,
         borderRadius: 12,
         backgroundColor: colors.secondary,
     },
-    gestaoTitulo: {
+    titleManagement: {
         color: '#FFFFFF',
         fontSize: 17,
     },
-    gestaoValor: {
+    valueManagement: {
         color: '#FFFFFF',
         fontSize: 34,
         fontWeight: '700',

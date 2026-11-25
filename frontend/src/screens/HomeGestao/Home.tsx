@@ -38,25 +38,23 @@ export default function Home({
     ];
 
     return (
-        <View style={styles.tela}>
-            <View style={styles.cabecalho}>
-                <Image
-                    source={require('../../assets/r-logotipo-branca.png')}
-                    style={styles.logo}
+        <View style={styles.screen}>
+            <View style={styles.header}>
+                <Image style={styles.logo} 
+                    source={require ('../../assets/r-logotipo-branca.png')} 
                     resizeMode="contain"
-                    accessibilityLabel="Reali"
-                />
-
+                    accessibilityLabel="Reali"></Image>  
                 <Pressable
                     accessibilityRole="button"
                     accessibilityLabel="Abrir perfil"
-                    onPress={onPerfilPress}
-                    style={styles.perfil}
+                    onPress={() => onPerfilPress?.()}
+                    style={styles.profile}
+                />
                 >
                     {profilePhoto ? (
                         <Image
                             source={{ uri: 'data:image/jpeg;base64,' + profilePhoto }}
-                            style={styles.fotoPerfil}
+                            style={styles.profilePhoto}
                         />
                     ) : (
                         <UserRound size={19} color="#FFFFFF" />
@@ -66,17 +64,17 @@ export default function Home({
 
             <ScrollView
                 style={styles.scroll}
-                contentContainerStyle={styles.conteudo}
+                contentContainerStyle={styles.content}
             >
-                <View style={styles.saudacao}>
-                    <Text accessibilityRole="header" style={styles.titulo}>
+                <View style={styles.greeting}>
+                    <Text accessibilityRole="header" style={styles.title}>
                         Bom dia, {resumo?.nome}
                     </Text>
-                    <Text style={styles.textoSecundario}>{resumo?.escola}</Text>
+                    <Text style={styles.secundaryText}>{resumo?.escola}</Text>
                 </View>
 
-                <View style={styles.indicador}>
-                    <Text style={styles.data}>{resumo?.data}</Text>
+                <View style={styles.indicator}>
+                    <Text style={styles.date}>{resumo?.data}</Text>
                     <Kpicard
                         variant="gestao"
                         title="Alunos registrados"
@@ -84,8 +82,8 @@ export default function Home({
                     />
                 </View>
 
-                <View style={styles.indicador}>
-                    <Text style={styles.data}>{resumo?.data}</Text>
+                <View style={styles.indicator}>
+                    <Text style={styles.date}>{resumo?.data}</Text>
                     <Kpicard
                         variant="gestao"
                         title="Refeições servidas"
@@ -93,23 +91,23 @@ export default function Home({
                     />
                 </View>
 
-                <Card style={styles.refeicao}>
-                    <Text style={styles.textoSecundario}>Refeição do dia</Text>
-                    <Text style={styles.tituloRefeicao}>{resumo?.refeicao}</Text>
-                    <Text style={styles.textoRefeicao}>
+                <Card style={styles.snack}>
+                    <Text style={styles.secundaryText}>Refeição do dia</Text>
+                    <Text style={styles.titleSnack}>{resumo?.refeicao}</Text>
+                    <Text style={styles.textSnack}>
                         {resumo?.cardapio} · {resumo?.consumo}
                     </Text>
                 </Card>
 
-                <View style={styles.aviso}>
-                    <Text style={styles.textoAviso}>
-                        <Text style={styles.negrito}>Ponto de atenção: </Text>
+                <View style={styles.alert}>
+                    <Text style={styles.textAlert}>
+                        <Text style={styles.bold}>Ponto de atenção: </Text>
                         {resumo?.aviso}
                     </Text>
                 </View>
 
-                <View style={styles.assistente}>
-                    <Text style={styles.balao}>
+                <View style={styles.assistent}>
+                    <Text style={styles.balloon}>
                         Oi! Aqui é o seu assistente virtual. No que posso te ajudar?
                     </Text>
 
@@ -119,12 +117,12 @@ export default function Home({
                         color="#FFFFFF"
                         accessibilityLabel="Abrir assistente virtual"
                         onPress={() => onAssistentePress?.()}
-                        style={styles.botaoAssistente}
+                        style={styles.assistantButton}
                     />
                 </View>
             </ScrollView>
 
-            <View style={styles.rodape}> 
+            <View style={styles.footer}> 
                 {abas.map(({ titulo, Icone, ativa, onPress }) => {
                     const cor = ativa ? '#C8DFB9' : '#FFFFFF';  // adicionar navegação entre os icones do rodape
 
@@ -135,10 +133,10 @@ export default function Home({
                             accessibilityState={{ selected: !!ativa, disabled: !ativa && !onPress }}
                             disabled={!ativa && !onPress}
                             onPress={onPress}
-                            style={styles.aba}
+                            style={styles.tab}
                         >
                             <Icone color={cor} size={22} />
-                            <Text style={[styles.textoAba, { color: cor }]}>{titulo}</Text>
+                            <Text style={[styles.textTab, { color: cor }]}>{titulo}</Text>
                         </Pressable>
                     );
                 })}

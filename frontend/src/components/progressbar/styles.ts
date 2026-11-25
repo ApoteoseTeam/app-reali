@@ -6,7 +6,6 @@ import { StyleSheet } from "react-native";
 
 export const progressBarStyles = StyleSheet.create({
     track: {
-        // Fundo, altura e arredondamento
         backgroundColor: colors.textSecondary,
         borderRadius: 20,
         height: 4,
@@ -14,7 +13,6 @@ export const progressBarStyles = StyleSheet.create({
     },
 
     fill: {
-        // Cor de preenchimento e altura
         backgroundColor: colors.primary,
         height: "100%",
     },

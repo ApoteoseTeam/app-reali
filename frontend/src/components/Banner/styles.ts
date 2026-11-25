@@ -17,17 +17,17 @@ export const styles = StyleSheet.create({
     gap: 12,
   },
 
-  conteudo: {
+  content: {
     flex: 1,
     gap: 4,
   },
 
-  titulo: {
+  title: {
     fontSize: 15,
     fontWeight: "bold",
   },
 
-  mensagem: {
+  message: {
     fontSize: 13,
     lineHeight: 19,
     color: coresGlobais.text,

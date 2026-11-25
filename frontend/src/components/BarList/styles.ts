@@ -5,29 +5,34 @@ export const styles = StyleSheet.create({
   container: {
     gap: 12,
   },
-  linha: {
+
+  line: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
   },
-  nome: {
+
+  name: {
     width: 60,
     fontSize: 12,
     color: colors.text,
   },
-  fundoBarra: {
+
+  barBackground: {
     flex: 1,
     height: 12,
     backgroundColor: colors.border,
     borderRadius: 4,
     overflow: "hidden",
   },
-  barra: {
+
+  bar: {
     height: "100%",
     backgroundColor: colors.primary,
     borderRadius: 4,
   },
-  valor: {
+
+  value: {
     width: 55,
     fontSize: 12,
     color: colors.text,

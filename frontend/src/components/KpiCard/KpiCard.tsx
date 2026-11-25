@@ -67,10 +67,10 @@ export const Kpicard = ({ title, value, unit, variant = "primary", change, lower
             <View
                 accessible
                 accessibilityLabel={accessibilityDescription}
-                style={kpicardStyles.gestaoBox}
+                style={kpicardStyles.boxManagement}
             >
-                <Text style={kpicardStyles.gestaoTitulo}>{title}</Text>
-                <Text style={kpicardStyles.gestaoValor}>
+                <Text style={kpicardStyles.titleManagement}>{title}</Text>
+                <Text style={kpicardStyles.valueManagement}>
                     {formattedValue}{unit ? ` ${unit}` : ''}
                 </Text>
             </View>

@@ -26,7 +26,7 @@ export function Header({ name, left, right, containerStyle, titleStyle }: Header
       {left}
 
       {left == null ? (
-        <View style={style.container_name}>{title}</View>
+        <View style={style.containerName}>{title}</View>
       ) : (
         title
       )}

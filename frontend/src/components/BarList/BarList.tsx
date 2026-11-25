@@ -24,19 +24,19 @@ export const BarList = ({ itens, unidade = "%" }: Props) => {
           : 0
 
         return (
-          <View key={index} style={styles.linha}>
-            <Text style={styles.nome}>{item.nome}</Text>
+          <View key={index} style={styles.line}>
+            <Text style={styles.name}>{item.nome}</Text>
 
-            <View style={styles.fundoBarra}>
+            <View style={styles.barBackground}>
               <View
                 style={[
-                  styles.barra,
+                  styles.bar,
                   { width: `${largura}%` }
                 ]}
               />
             </View>
 
-            <Text style={styles.valor}>
+            <Text style={styles.value}>
               {item.valor} {unidade}
             </Text>
           </View>

@@ -8,7 +8,7 @@ type Props = {
 export const Chip = ({ texto }: Props) => {
   return (
     <View style={styles.chip}>
-      <Text style={styles.texto}>{texto}</Text>
+      <Text style={styles.text}>{texto}</Text>
     </View>
   )
 }

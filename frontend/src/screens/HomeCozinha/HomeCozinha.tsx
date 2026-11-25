@@ -30,43 +30,43 @@ export default function HomeCozinha({
         },
     ];
     return (
-        <View style={styles.tela}>
-            <View style={styles.cabecalho}>
+        <View style={styles.screen}>
+            <View style={styles.header}>
                 <Image style={styles.logo} source={require ('../../assets/r-logotipo-branca.png')}></Image>
             </View>
 
             <ScrollView
                 style={styles.scroll}
-                contentContainerStyle={styles.conteudo}
+                contentContainerStyle={styles.content}
             >
-                <View style={styles.saudacao}>
-                    <Text accessibilityRole="header" style={styles.titulo}>
+                <View style={styles.greeting}>
+                    <Text accessibilityRole="header" style={styles.title}>
                         Olá, {nome}
                     </Text>
-                    <Text style={styles.data}>{dataTurno}</Text>
+                    <Text style={styles.date}>{dataTurno}</Text>
                 </View>
 
-                <Card style={styles.cartao}>
+                <Card style={styles.card}>
                     <View>
-                        <Text style={styles.rotulo}>ALUNOS DE HOJE</Text>
-                        <Text style={styles.numero}>{presentes?.toLocaleString('pt-BR') ?? '—'}</Text>
-                        <Text style={styles.presentes}>entradas registradas</Text>
+                        <Text style={styles.label}>ALUNOS DE HOJE</Text>
+                        <Text style={styles.number}>{presentes?.toLocaleString('pt-BR') ?? '—'}</Text>
+                        <Text style={styles.presence}>entradas registradas</Text>
                     </View>
 
-                    <Text style={styles.planejamento}>
+                    <Text style={styles.planning}>
                         Preparar comida para {totalPlanejado?.toLocaleString('pt-BR') ?? '—'} alunos
                     </Text>
 
                     <Image
                         source={require('../../assets/pratos-de-comida.jpg')} //alterar foto posteriomente, e adicionar fotos variaveis pelo turno e dia da semana
-                        style={styles.foto}
+                        style={styles.photo}
                         resizeMode="cover"
                         accessible={false}
                     />
                 </Card>
             </ScrollView>
 
-            <View style={styles.rodape}>
+            <View style={styles.footer}>
                 {abas.map(({ titulo, Icone, ativa, onPress }) => {
                     return (
                         <Pressable
@@ -75,10 +75,10 @@ export default function HomeCozinha({
                             accessibilityState={{ selected: !!ativa, disabled: !ativa && !onPress }}
                             disabled={!ativa && !onPress}
                             onPress={onPress}
-                            style={styles.aba}
+                            style={styles.tab}
                         >
                             <Icone color={ativa ? coresRodape.ativa : coresRodape.inativa} size={22} />
-                            <Text style={[ styles.textoAba,{ color: ativa ? coresRodape.ativa : coresRodape.inativa }, ]}>
+                            <Text style={[ styles.textTab,{ color: ativa ? coresRodape.ativa : coresRodape.inativa }, ]}>
                                 {titulo}
                             </Text>
                         </Pressable>

@@ -10,12 +10,12 @@ export const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
 
-  conteudo: {
+  content: {
     flex: 1,
   },
 
   
-  cabecalho: {
+  header: {
     backgroundColor: "#14385F",
     alignItems: "center",
     paddingTop: 36,
@@ -28,24 +28,24 @@ export const styles = StyleSheet.create({
       height: 120,
   },
 
-  logoDestaque: {
+  featuredLogo: {
     color: "#FFFFFF",
   },
 
-  subtitulo: {
+  subtitle: {
     marginTop: 8,
     fontSize: 11,
     color: "#FFFFFF",
     textAlign: "center",
   },
 
-  abas: {
+  tabs: {
     flexDirection: "row",
     borderBottomWidth: 1,
     borderBottomColor: "#E3E8E5",
   },
 
-  aba: {
+  tab: {
     flex: 1,
     minHeight: spacing.xxl,
     alignItems: "center",
@@ -54,36 +54,36 @@ export const styles = StyleSheet.create({
     borderBottomColor: "transparent",
   },
 
-  abaSelecionada: {
+  selectedTab: {
     borderBottomColor: "#2F6B3A",
   },
 
-  textoAba: {
+  textTab: {
     fontSize: 13,
     color: "#667B70",
   },
 
-  textoAbaSelecionada: {
+  selectedTabText: {
     color: "#14385F",
     fontWeight: typography.weights.bold,
   },
 
-  paginas: {
+  pages: {
     flex: 1,
   },
 
-  formulario: {
+  form: {
     flexGrow: 1,
     paddingHorizontal: 22,
     paddingTop: 18,
     paddingBottom: spacing.xl,
   },
 
-  grupo: {
+  group: {
     marginBottom: 14,
   },
 
-  grupoSenha: {
+  passwordGroup: {
     marginBottom: spacing.xs,
   },
 
@@ -107,11 +107,11 @@ export const styles = StyleSheet.create({
     fontSize: 14,
   },
 
-  inputComOlho: {
+  inputWithEye: {
     paddingRight: 48,
   },
 
-  olhoSenha: {
+  passwordEye: {
     position: "absolute",
     right: 2,
     top: 0,
@@ -121,27 +121,27 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  inputErro: {
+  inputError: {
     borderColor: colors.error,
     backgroundColor: "#FFFFFF",
   },
 
-  ajuda: {
+  help: {
     marginTop: 6,
     fontSize: 11,
     color: "#667B70",
   },
 
-  textoErro: {
+  textError: {
     color: colors.error,
   },
 
-  termos: {
+  terms: {
     marginTop: 10,
     marginBottom: 10,
   },
 
-  botao: {
+  button: {
     ...globalStyles.button,
     minHeight: 46,
     paddingVertical: 12,
@@ -150,7 +150,7 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  nota: {
+  note: {
     marginTop: 12,
     fontSize: 11,
     color: "#667B70",

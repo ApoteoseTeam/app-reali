@@ -39,12 +39,12 @@ export function PdfStatusModal({
         && estado.arquivo.compartilhar && !estado.semAnexo;
 
     return (
-        <View style={styles.fundo}>
-            <View style={styles.cartao} accessibilityViewIsModal>
+        <View style={styles.background}>
+            <View style={styles.card} accessibilityViewIsModal>
                 {gerando ? (
                     <ActivityIndicator color={azul} size="large" />
                 ) : (
-                    <View style={[styles.icone, erro && styles.iconeErro]}>
+                    <View style={[styles.icon, erro && styles.errorIcon]}>
                         {erro ? (
                             <CircleAlert color="#B92D23" size={24} />
                         ) : (
@@ -53,51 +53,51 @@ export function PdfStatusModal({
                     </View>
                 )}
 
-                <Text accessibilityRole="header" style={styles.titulo}>
+                <Text accessibilityRole="header" style={styles.title}>
                     {titulo}
                 </Text>
 
                 {estado.tipo === 'gerando' && (
-                    <Text style={styles.descricao}>Relatório de {estado.periodo}</Text>
+                    <Text style={styles.description}>Relatório de {estado.periodo}</Text>
                 )}
 
                 {estado.tipo === 'erro' && (
-                    <Text style={styles.descricao}>
+                    <Text style={styles.description}>
                         Tente novamente. Seus dados continuam no relatório.
                     </Text>
                 )}
 
                 {estado.tipo === 'pronto' && (
                     <>
-                        <Text style={styles.arquivo}>{estado.arquivo.nome}</Text>
+                        <Text style={styles.archive}>{estado.arquivo.nome}</Text>
 
                         {canal && (
-                            <Text style={styles.descricao}>
+                            <Text style={styles.description}>
                                 {compartilharDireto
                                     ? `Escolha ${canal} na lista de aplicativos.`
                                     : `Baixe o PDF e anexe o arquivo em ${canal}.`}
                             </Text>
                         )}
                         {estado.erroAcao && (
-                            <Text accessibilityRole="alert" style={styles.descricao}>
+                            <Text accessibilityRole="alert" style={styles.description}>
                                 {estado.erroAcao}
                             </Text>
                         )}
                         {estado.avisoAcao && (
-                            <Text accessibilityLiveRegion="polite" style={styles.descricao}>{estado.avisoAcao}</Text>
+                            <Text accessibilityLiveRegion="polite" style={styles.description}>{estado.avisoAcao}</Text>
                         )}
                     </>
                 )}
 
-                <View style={styles.acoes}>
+                <View style={styles.actions}>
                     {!gerando && (
                         <Button
                             label={erro ? 'Tentar novamente' : compartilharDireto ? 'Compartilhar PDF' : 'Baixar PDF'}
                             accessibilityRole="button"
                             disabled={ocupado}
                             onPress={erro ? onTentarNovamente : compartilharDireto ? onCompartilhar : onBaixarPdf}
-                            style={[styles.botao, styles.botaoPrincipal]}
-                            textStyle={styles.textoBranco}
+                            style={[styles.button, styles.mainButton]}
+                            textStyle={styles.whiteText}
                         />
                     )}
 
@@ -107,8 +107,8 @@ export function PdfStatusModal({
                             accessibilityRole="button"
                             disabled={ocupado}
                             onPress={onAbrirCanal}
-                            style={[styles.botao, styles.botaoContorno]}
-                            textStyle={styles.textoAzul}
+                            style={[styles.button, styles.outlineButton]}
+                            textStyle={styles.blueText}
                         />
                     )}
                     <Button
@@ -116,8 +116,8 @@ export function PdfStatusModal({
                         accessibilityRole="button"
                         onPress={onFechar}
                         disabled={ocupado}
-                        style={[styles.botao, !gerando && styles.botaoContorno]}
-                        textStyle={styles.textoAzul}
+                        style={[styles.button, !gerando && styles.outlineButton]}
+                        textStyle={styles.blueText}
                     />
                 </View>
             </View>

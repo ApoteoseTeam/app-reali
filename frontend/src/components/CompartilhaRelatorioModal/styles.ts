@@ -5,13 +5,14 @@ const azul = '#102B53';
 const verdeClaro = '#E6F2DA';
 
 export const styles = StyleSheet.create({
-    fundo: {
+    background: {
         flex: 1,
         justifyContent: 'flex-end',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.48)',
     },
-    painel: {
+
+    panel: {
         width: '100%',
         maxWidth: 560,
         maxHeight: '90%',
@@ -21,15 +22,30 @@ export const styles = StyleSheet.create({
         padding: 20,
         gap: 14,
     },
-    cabecalho: {
+
+    header: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 12,
     },
-    textos: { flex: 1 },
-    titulo: { color: azul, fontSize: 20, fontWeight: '700' },
-    descricao: { color: '#465950', fontSize: 13, lineHeight: 18 },
-    fechar: {
+
+    texts: {
+        flex: 1
+    },
+
+    title: {
+        color: azul,
+        fontSize: 20,
+        fontWeight: '700'
+    },
+
+    description: {
+        color: '#465950',
+        fontSize: 13,
+        lineHeight: 18
+    },
+
+    close: {
         width: 46,
         height: 46,
         borderRadius: 23,
@@ -37,8 +53,12 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: verdeClaro,
     },
-    opcoes: { gap: 12 },
-    opcao: {
+
+    options: {
+        gap: 12
+    },
+
+    option: {
         minHeight: 68,
         flexDirection: 'row',
         alignItems: 'center',
@@ -49,7 +69,8 @@ export const styles = StyleSheet.create({
         borderColor: colors.surface,
         borderRadius: 14,
     },
-    icone: {
+
+    icon: {
         width: 46,
         height: 46,
         borderRadius: 23,
@@ -57,6 +78,14 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: verdeClaro,
     },
-    nomeOpcao: { color: azul, fontSize: 16, fontWeight: '700' },
-    desabilitada: { opacity: 0.55 },
+
+    optionName: {
+        color: azul,
+        fontSize: 16,
+        fontWeight: '700'
+    },
+
+    disabled: {
+        opacity: 0.55
+    },
 });

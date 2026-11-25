@@ -8,13 +8,13 @@ export const styles = StyleSheet.create({
     gap: 8,
   },
 
-  refeicao: {
+  snack: {
     color: colors.text,
     fontSize: 12,
     fontWeight: "500",
   },
 
-  preparacoes: {
+  preparations: {
     flex: 1,
     flexDirection: "row",
     flexWrap: "wrap",
