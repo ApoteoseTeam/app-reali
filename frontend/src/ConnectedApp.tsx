@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Alert } from 'react-native';
+import { Alert, Modal } from 'react-native';
 import { api, SessionProvider, useSession } from './session/provider';
 import { mealTypes } from './api/reali';
 import { useRemote } from './hooks/useRemote';
@@ -14,13 +14,15 @@ import Cardapio from './screens/CardapioCozinha/CardapioCozinha';
 import Relatorio from './screens/Relatorio/Relatorio';
 import TelaAssistente from './screens/TelaAssistente/TelaAssistente';
 import Historico from './screens/Historico/Historico';
+import SelecionarContexto from './screens/SelecionarContexto/SelecionarContexto';
 
 type Screen = 'home' | 'perfil' | 'cardapio' | 'relatorio' | 'historico' | 'assistente';
 
 function SignedIn() {
   const [screen, setScreen] = useState<Screen>('home');
+  const [showContext, setShowContext] = useState(false);
   const assistant = () => setScreen('assistente');
-  const { me, workspace } = useSession();
+  const { me, workspace, selecting } = useSession();
   const scope = workspace?.scope;
   const school = workspace?.school;
   const today = localDate();
@@ -48,7 +50,15 @@ function SignedIn() {
   if (screen === 'assistente') {
     return <TelaAssistente onVoltar={home} />;
   }
-  if (screen === 'perfil') return <PerfilUsuario onVoltar={home} />;
+  if (screen === 'perfil') {
+    const closeContext = () => { if (!selecting) setShowContext(false); };
+    return <>
+      <PerfilUsuario onVoltar={home} onSelecionarContexto={() => setShowContext(true)} />
+      {showContext && <Modal visible animationType="slide" onRequestClose={closeContext}>
+        <SelecionarContexto onCancel={closeContext} onComplete={() => setShowContext(false)} />
+      </Modal>}
+    </>;
+  }
   if (screen === 'cardapio') {
     const menuProps = {
       periodo: `${dateLabel(days[0])} a ${dateLabel(days[6])}`,
@@ -88,19 +98,22 @@ function SignedIn() {
       refeicao: meal ? mealTypes[meal.meal_type] : 'Sem refeição registrada',
       cardapio: meal?.total_forecast_plates == null ? 'Previsão indisponível' : `Previsão: ${meal.total_forecast_plates} pratos`,
       consumo: meal?.total_served_plates == null ? 'Sem contagem' : `${meal.total_served_plates} pratos servidos`,
-      aviso: !school ? 'Nenhuma escola selecionada. A seleção manual não está disponível nesta interface.'
-        : data?.calculated_at ? `Atualizado em ${new Date(data.calculated_at).toLocaleString('pt-BR')}` : 'Sem atualização registrada.',
+      aviso: data?.calculated_at ? `Atualizado em ${new Date(data.calculated_at).toLocaleString('pt-BR')}` : 'Sem atualização registrada.',
     }} />;
 }
 
 function SessionScreen() {
   const { status, me, workspace, error } = useSession();
+  const hasSchool = Boolean(workspace?.school);
 
   useEffect(() => {
-    if (error) Alert.alert('Reali', error);
-  }, [error]);
+    if (error && (status !== 'AUTHENTICATED' || hasSchool)) Alert.alert('Reali', error);
+  }, [error, status, hasSchool]);
 
-  if (status === 'AUTHENTICATED') return <SignedIn key={workspace?.key ?? me?.user.id} />;
+  if (status === 'AUTHENTICATED') {
+    if (!workspace?.school) return <SelecionarContexto key={me?.user.id} />;
+    return <SignedIn key={workspace.key} />;
+  }
   return <SignedOut sessionExpired={status === 'SESSION_EXPIRED'} />;
 }
 

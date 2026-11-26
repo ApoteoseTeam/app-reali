@@ -42,12 +42,21 @@ type Session = State & {
 const Context = createContext<Session | null>(null);
 
 async function readPreference(user: number): Promise<Selection> {
-  if (Platform.OS === "web") return {};
-  try { return JSON.parse(await SecureStore.getItemAsync(`reali.scope.${user}`) ?? "{}") as Selection; }
+  const key = `reali.scope.${user}`;
+  try {
+    const value = Platform.OS === "web" ? localStorage.getItem(key) : await SecureStore.getItemAsync(key);
+    return (JSON.parse(value ?? "{}") ?? {}) as Selection;
+  }
   catch { return {}; }
 }
 function savePreference(user:number, selection:Selection) {
-  if (Platform.OS !== "web") void SecureStore.setItemAsync(`reali.scope.${user}`,JSON.stringify(selection)).catch(() => undefined);
+  const key = `reali.scope.${user}`;
+  const value = JSON.stringify(selection);
+  if (Platform.OS === "web") {
+    try { localStorage.setItem(key, value); } catch { /* Storage can be disabled. */ }
+  } else {
+    void SecureStore.setItemAsync(key, value).catch(() => undefined);
+  }
 }
 
 export function SessionProvider({children}:{children:ReactNode}) {
@@ -70,17 +79,18 @@ export function SessionProvider({children}:{children:ReactNode}) {
   const hydrate = useCallback(async (selection?:Selection, preserve=false) => {
     if (refreshContext.current && preserve) return refreshContext.current;
     const original = saved.current;
-    const run = preserve ? ++revision.current : isolate();
+    const run = preserve || selection ? ++revision.current : isolate();
     loading.current?.abort();
     const controller = new AbortController();
     loading.current = controller;
-    if (!preserve) commit({...original,workspace:null,selecting:true,error:null});
+    if (!preserve) commit({...original,workspace:selection ? original.workspace : null,selecting:true,error:null});
     const task = (async () => {
       try {
         const [me, allOrganizations] = await Promise.all([api.me(controller.signal), api.organizations(controller.signal)]);
         const organizations = allOrganizations.filter(org => org.is_active && me.memberships.some(member => member.is_active && member.organization === org.id));
         const pref = selection ?? (original.workspace ? {organization:original.workspace.organization.id,school:original.workspace.school?.id} : await readPreference(me.user.id));
-        let organization = organizations.find(item=>item.id===pref.organization) ?? (organizations.length===1 ? organizations[0] : undefined);
+        let organization = organizations.find(item=>item.id===pref.organization)
+          ?? (!selection && organizations.length===1 ? organizations[0] : undefined);
         let member = me.memberships.find(item=>item.is_active && item.organization===organization?.id);
         let schools:School[] = [];
         if (organization && member) {
@@ -92,9 +102,13 @@ export function SessionProvider({children}:{children:ReactNode}) {
           }
         }
         if (run !== revision.current) return;
-        const school = schools.find(item=>item.id===pref.school) ?? (schools.length===1 ? schools[0]:null);
+        const school = schools.find(item=>item.id===pref.school) ?? (!selection?.school && schools.length===1 ? schools[0]:null);
+        if (selection && (!organization || !member || !school)) {
+          throw new ApiError(404, "SELECTION_UNAVAILABLE", "A organização ou escola selecionada está indisponível. Atualize os acessos.");
+        }
         const previous = original.workspace;
         const same = preserve && previous && organization?.id === previous.organization.id && school?.id === previous.school?.id
+          && member?.role === previous.member.role
           && JSON.stringify(member?.capabilities) === JSON.stringify(previous.member.capabilities)
           && JSON.stringify(schools.map(item=>item.id)) === JSON.stringify(previous.schools.map(item=>item.id));
         if (!same) {
@@ -107,8 +121,8 @@ export function SessionProvider({children}:{children:ReactNode}) {
               {key:`${me.user.id}:${organization.id}:${school?.id??""}:${run}`,cache:new Map<string,unknown>(),scope:{organization:organization.id,signal:tenantAbort.current?.signal}}),
               organization,member,schools,school}
           : null;
-        if (workspace) savePreference(me.user.id,{organization:workspace.organization.id,school:workspace.school?.id});
-        const lostAccess = Boolean(pref.organization && !organization || pref.school && !schools.some(item=>item.id===pref.school));
+        if (workspace?.school) savePreference(me.user.id,{organization:workspace.organization.id,school:workspace.school.id});
+        const lostAccess = Boolean(pref.organization && organization?.id !== pref.organization || pref.school && school?.id !== pref.school);
         commit({status:"AUTHENTICATED",me,organizations,workspace,selecting:false,error:lostAccess?"Seu acesso institucional mudou. Confira as escolas disponíveis.":null});
       } catch (cause) {
         if (run !== revision.current) return;
@@ -117,6 +131,9 @@ export function SessionProvider({children}:{children:ReactNode}) {
           tokens.clear();
           isolate();
           commit({...initial,status:"SESSION_EXPIRED",error:message});
+        } else if (selection) {
+          commit({...saved.current,selecting:false});
+          throw cause;
         } else {
           commit({...saved.current,selecting:false,error:message});
         }

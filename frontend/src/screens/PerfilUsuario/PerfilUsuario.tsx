@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { View, Text, Image, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { Undo2, Settings, Pencil, CircleUser, Phone, MapPin, Lock, type LucideIcon } from 'lucide-react-native';
+import { Undo2, Settings, Pencil, CircleUser, Phone, MapPin, Building2, Lock, type LucideIcon } from 'lucide-react-native';
 import { Button } from '../../components/Button/Button';
 import { IconButton } from '../../components/IconButton/IconButton';
 import { Header } from '../../components/header/header';
@@ -32,6 +32,7 @@ const Linha = ({ icone: Icone, texto, onPress }: LinhaProps) => {
         style={styles.line}
         onPress={onPress}
         activeOpacity={0.7}
+        accessibilityRole="button"
       >
         {conteudo}
       </TouchableOpacity>
@@ -41,7 +42,10 @@ const Linha = ({ icone: Icone, texto, onPress }: LinhaProps) => {
   return <View style={styles.line}>{conteudo}</View>;
 };
 
-export default function PerfilUsuario({ onVoltar }: { onVoltar?: () => void } = {}) {
+export default function PerfilUsuario({ onVoltar, onSelecionarContexto }: {
+  onVoltar?: () => void;
+  onSelecionarContexto?: () => void;
+} = {}) {
   const { me, workspace, signOut, updateProfile } = useSession();
   const [editor, setEditor] = useState<'profile' | 'password' | null>(null);
   const [name, setName] = useState('');
@@ -169,6 +173,9 @@ export default function PerfilUsuario({ onVoltar }: { onVoltar?: () => void } = 
 
         <View style={[styles.card, styles.cardAccount]}>
           <Text style={styles.cardTitle}>Minha conta</Text>
+          {onSelecionarContexto && (
+            <Linha icone={Building2} texto="Trocar organização ou escola" onPress={onSelecionarContexto} />
+          )}
           <Linha
             icone={Settings}
             texto="Editar perfil"
