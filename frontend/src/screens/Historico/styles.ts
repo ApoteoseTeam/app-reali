@@ -26,40 +26,40 @@ export const styles = StyleSheet.create({
         color: colors.primary,
     },
 
-    sobra: {
+    leftOver: {
         fontSize: 13,
         color: colors.secondary,
         marginTop: spacing.sm,
     },
 
-    indicadores: {
+    indicators: {
         flexDirection: "row",
         gap: spacing.sm,
         marginBottom: spacing.md,
     },
 
-    indicador: {
+    indicator: {
         flex: 1,
     },
 
-    apresentacao: {
+    presentation: {
         marginBottom: spacing.md,
         gap: spacing.xs,
     },
 
-    tituloApresentacao: {
+    titlePresentation: {
         fontSize: 22,
         fontWeight: "700",
         color: colors.primary,
     },
 
-    subtituloApresentacao: {
+    subtitlePresentation: {
         fontSize: 14,
         color:"#63756E"
 ,
     },
 
-    mensagemVazia: {
+    messageVacated: {
         fontSize: 14,
         color: "#17365D",
         textAlign: "center",

@@ -113,12 +113,12 @@ export default function Historico() {
             <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
                 <View style={[styles.content, { flexGrow: 1 }]}>
 
-                    <View style={styles.apresentacao}>
-                        <Text style={styles.tituloApresentacao}>
+                    <View style={styles.presentation}>
+                        <Text style={styles.titlePresentation}>
                             Histórico e resumo
                         </Text>
 
-                        <Text style={styles.subtituloApresentacao}>
+                        <Text style={styles.subtitlePresentation}>
                             Planejamento e registros em um só lugar.
                         </Text>
                     </View>
@@ -143,8 +143,8 @@ export default function Historico() {
                     />
 
 
-                    <View style={styles.indicadores}>
-                        <View style={styles.indicador}>
+                    <View style={styles.indicators}>
+                        <View style={styles.indicator}>
                             <Kpicard
                                 variant="gestao"
                                 title="Dias planejados"
@@ -152,7 +152,7 @@ export default function Historico() {
                             />
                         </View>
 
-                        <View style={styles.indicador}>
+                        <View style={styles.indicator}>
                             <Kpicard
                                 variant="gestao"
                                 title="Dias com pesagem"
@@ -166,7 +166,7 @@ export default function Historico() {
                     <Text style={styles.description}> Consulte os planejamentos registrados anteriormente</Text>
 
                     {planejamentosFiltrados.length === 0 ? (
-                        <Text style={styles.mensagemVazia}>
+                        <Text style={styles.messageVacated}>
                             Nenhum planejamento encontrado para {refeicaoSelecionada}.
                         </Text>
                     ) : (
@@ -176,7 +176,7 @@ export default function Historico() {
                                 title={`${planejamento.data} · ${planejamento.refeicao}`}
                                 description={`${planejamento.presentes} presentes → preparo para ${planejamento.preparo}`}
                             >
-                                <Text style={styles.sobra}>
+                                <Text style={styles.leftOver}>
                                     {planejamento.sobra}
                                 </Text>
                             </Card>
