@@ -104,7 +104,7 @@ No terminal do frontend, com o emulador aberto, rode `npm run android`. Para um 
 
 O perfil `preview` em [eas.json](frontend/eas.json) usa distribuição interna, que gera um APK para instalação direta. Confira estes pontos antes do build:
 
-1. Restaure os arquivos de ícone, splash e favicon que o [app.json](frontend/app.json) referencia em `frontend/assets/` ou ajuste as referências para imagens compatíveis. Essa pasta está ausente no checkout atual. A mesma dependência de imagens vale para a compilação nativa local.
+1. Os arquivos de ícone, splash e favicon usados pelo [app.json](frontend/app.json) ficam em `frontend/src/assets/`. Mantenha os caminhos do Expo atualizados caso substitua esses arquivos.
 2. Entre com uma conta Expo com acesso ao projeto EAS identificado por `extra.eas.projectId` no `app.json`.
 3. No ambiente EAS `preview`, defina `EXPO_PUBLIC_API_URL` como a URL HTTPS do backend com o caminho `/api/v1`. O endereço precisa estar acessível pelo celular. O app exige HTTPS nas compilações de release e incorpora essa URL no pacote. Mantenha credenciais no ambiente do backend.
 
