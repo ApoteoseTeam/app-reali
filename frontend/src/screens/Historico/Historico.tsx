@@ -27,31 +27,36 @@ const statuses: Record<MealStatus, string> = {
 
 type Props = {
     onInicioPress: () => void;
-    onRelatoriosPress: () => void;
-    onCardapioPress: () => void;
+    onRelatoriosPress?: () => void;
+    onCardapioPress?: () => void;
 };
 
 const quantity = (value: number | null) => value?.toLocaleString('pt-BR') ?? '—';
 
 export default function Historico({ onInicioPress, onRelatoriosPress, onCardapioPress }: Props) {
-    const { workspace } = useSession();
+    const { workspace, can } = useSession();
     const scope = workspace?.scope;
     const school = workspace?.school;
     const [mealType, setMealType] = useState<MealType>('LUNCH');
-    const [weekOffset, setWeekOffset] = useState(0);
+    const [selectedWeek, setSelectedWeek] = useState<string>();
     const [exporting, setExporting] = useState(false);
     const [exportError, setExportError] = useState('');
     const exportController = useRef<AbortController | null>(null);
 
     const today = localDate();
-    const week = weekDays(addDays(today, weekOffset * 7));
-    const start = week[0];
+    const earliestDate = workspace?.member.role === 'COOK' ? addDays(today, -29) : '1900-01-01';
+    const referenceDate = selectedWeek ?? today;
+    const week = weekDays(referenceDate < earliestDate ? earliestDate : referenceDate);
+    const start = week[0] < earliestDate ? earliestDate : week[0];
     const end = week[6] > today ? today : week[6];
+    const canPrevious = start > earliestDate;
+    const canNext = end < today;
+    const canExport = can('analytics_reports');
     const period = `${dateLabel(start)} a ${dateLabel(end)}`;
     const query = { school: school?.id, meal_type: mealType, start_date: start, end_date: end };
     const history = useRemote(`history/${start}/${end}/${mealType}`, signal => api.all(
         () => api.mealMetrics(scope!, query, signal), { scope, signal }
-    ), Boolean(scope && school));
+    ), Boolean(scope && school && can('meal_history')));
 
     const meals = history.data ?? [];
     const activeMeals = meals.filter(meal => meal.status !== 'CANCELLED');
@@ -64,7 +69,7 @@ export default function Historico({ onInicioPress, onRelatoriosPress, onCardapio
     }, []);
 
     async function download() {
-        if (!scope || !school || exportController.current || !activeMeals.length) return;
+        if (!canExport || !scope || !school || exportController.current || !activeMeals.length) return;
         const controller = new AbortController();
         exportController.current = controller;
         setExporting(true);
@@ -90,9 +95,9 @@ export default function Historico({ onInicioPress, onRelatoriosPress, onCardapio
     }
 
     const changeWeek = (offset: number) => {
-        if (exportController.current) return;
+        if (exportController.current || (offset < 0 ? !canPrevious : !canNext)) return;
         setExportError('');
-        setWeekOffset(current => Math.min(0, current + offset));
+        setSelectedWeek(addDays(week[0], offset * 7));
     };
 
     return (
@@ -111,7 +116,8 @@ export default function Historico({ onInicioPress, onRelatoriosPress, onCardapio
                             }
                         }} />
                     <PeriodSelector periodo={period} onAnterior={() => changeWeek(-1)} onProximo={() => changeWeek(1)}
-                        disableNext={weekOffset === 0 || exporting} labelAnterior="Semana anterior" labelProximo="Próxima semana" />
+                        disablePrevious={!canPrevious || exporting} disableNext={!canNext || exporting}
+                        labelAnterior="Semana anterior" labelProximo="Próxima semana" />
 
                     {history.loading && <ActivityIndicator accessibilityLabel="Carregando histórico" color={colors.secondary} />}
                     {history.error && <>
@@ -134,7 +140,7 @@ export default function Historico({ onInicioPress, onRelatoriosPress, onCardapio
                                 <Text style={styles.recordDetail}>Pratos servidos · {quantity(meal.total_served_plates)}</Text>
                             </Card>
                         ))}
-                        {!!activeMeals.length && (
+                        {canExport && !!activeMeals.length && (
                             <Button label={exporting ? 'Exportando…' : 'Exportar resumo em PDF'}
                                 onPress={() => void download()} disabled={exporting || history.loading || Boolean(history.error)} />
                         )}
@@ -143,7 +149,7 @@ export default function Historico({ onInicioPress, onRelatoriosPress, onCardapio
                 </> : <Text style={styles.message}>Nenhuma escola selecionada para consultar o histórico.</Text>}
             </ScrollView>
 
-            <BottomTabs activeTab="historico" showRelatorios showHistorico showPerfil={false}
+            <BottomTabs activeTab="historico" showRelatorios={Boolean(onRelatoriosPress)} showHistorico showPerfil={false}
                 onHomePress={onInicioPress} onRelatoriosPress={onRelatoriosPress}
                 onCardapiosPress={onCardapioPress} />
         </View>

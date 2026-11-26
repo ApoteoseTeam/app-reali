@@ -9,6 +9,7 @@ import { styles } from './styles';
 type HomeProps = {
     resumo?: Resumo;
     profilePhoto?: string;
+    showIndicators?: boolean;
     onPerfilPress?: () => void;
     onAssistentePress?: () => void;
     onRelatoriosPress?: () => void;
@@ -18,12 +19,13 @@ type HomeProps = {
 
 type Resumo = {
     nome: string; escola: string; data: string; alunos: number | null;
-    refeicoesServidas: number | null; refeicao: string; cardapio: string; consumo: string; aviso: string;
+    refeicoesServidas: number | null; refeicao: string; cardapio?: string; consumo: string; aviso: string;
 };
 
 export default function Home({
     resumo,
     profilePhoto,
+    showIndicators = true,
     onPerfilPress,
     onAssistentePress,
     onRelatoriosPress,
@@ -72,66 +74,65 @@ export default function Home({
                     <Text style={styles.secundaryText}>{resumo?.escola}</Text>
                 </View>
 
-                <View style={styles.indicator}>
-                    <Text style={styles.date}>{resumo?.data}</Text>
-                    <Kpicard
-                        variant="gestao"
-                        title="Alunos registrados"
-                        value={resumo?.alunos ?? null}
-                    />
-                </View>
+                {showIndicators ? <>
+                    <View style={styles.indicator}>
+                        <Text style={styles.date}>{resumo?.data}</Text>
+                        <Kpicard
+                            variant="gestao"
+                            title="Alunos registrados"
+                            value={resumo?.alunos ?? null}
+                        />
+                    </View>
 
-                <View style={styles.indicator}>
-                    <Text style={styles.date}>{resumo?.data}</Text>
-                    <Kpicard
-                        variant="gestao"
-                        title="Refeições servidas"
-                        value={resumo?.refeicoesServidas ?? null}
-                    />
-                </View>
+                    <View style={styles.indicator}>
+                        <Text style={styles.date}>{resumo?.data}</Text>
+                        <Kpicard
+                            variant="gestao"
+                            title="Refeições servidas"
+                            value={resumo?.refeicoesServidas ?? null}
+                        />
+                    </View>
 
-                <Card style={styles.snack}>
-                    <Text style={styles.secundaryText}>Refeição do dia</Text>
-                    <Text style={styles.titleSnack}>{resumo?.refeicao}</Text>
-                    <Text style={styles.textSnack}>
-                        {resumo?.cardapio} · {resumo?.consumo}
-                    </Text>
-                </Card>
+                    <Card style={styles.snack}>
+                        <Text style={styles.secundaryText}>Refeição do dia</Text>
+                        <Text style={styles.titleSnack}>{resumo?.refeicao}</Text>
+                        <Text style={styles.textSnack}>
+                            {resumo?.cardapio ? `${resumo.cardapio} · ` : ''}{resumo?.consumo}
+                        </Text>
+                    </Card>
 
-                <View style={styles.alert}>
-                    <Text style={styles.textAlert}>
-                        <Text style={styles.bold}>Ponto de atenção: </Text>
-                        {resumo?.aviso}
-                    </Text>
-                </View>
+                    <View style={styles.alert}>
+                        <Text style={styles.textAlert}>
+                            <Text style={styles.bold}>Ponto de atenção: </Text>
+                            {resumo?.aviso}
+                        </Text>
+                    </View>
+                </> : <Text style={styles.secundaryText}>Os indicadores da escola estão indisponíveis para seu acesso.</Text>}
 
-                <View style={styles.assistent}>
+                {onAssistentePress && <View style={styles.assistent}>
                     <Text style={styles.balloon}>
                         Oi! Aqui é o seu assistente virtual. No que posso te ajudar?
                     </Text>
 
-                    {/* dar funcionalidade a mensagem flutuante do chatbot */}
-                    <IconButton 
+                    <IconButton
                         icon={MessageCircle}
                         size={29}
                         color="#FFFFFF"
                         accessibilityLabel="Abrir assistente virtual"
-                        onPress={() => onAssistentePress?.()}
+                        onPress={onAssistentePress}
                         style={styles.assistantButton}
                     />
-                </View>
+                </View>}
             </ScrollView>
 
             <View style={styles.footer}>
-                {abas.map(({ titulo, Icone, ativa, onPress }) => {
+                {abas.filter(aba => aba.ativa || aba.onPress).map(({ titulo, Icone, ativa, onPress }) => {
                     const cor = ativa ? '#C8DFB9' : '#FFFFFF';  
-                    // adicionar navegação entre os icones do rodape
                     return (
                         <Pressable
                             key={titulo}
                             accessibilityRole="tab"
-                            accessibilityState={{ selected: !!ativa, disabled: !ativa && !onPress }}
-                            disabled={!ativa && !onPress}
+                            accessibilityState={{ selected: !!ativa }}
                             onPress={onPress}
                             style={styles.tab}
                         >

@@ -67,15 +67,14 @@ export default function CardapioSemanaGestao({
 
 
             <View style={styles.footer}>
-                {abas.map(({ titulo, Icone, ativa, onPress }) => {
+                {abas.filter(aba => aba.ativa || aba.onPress).map(({ titulo, Icone, ativa, onPress }) => {
                     const cor = ativa ? '#C8DFB9' : '#FFFFFF';  // adicionar navegação entre os icones do rodape
 
                     return (
                         <Pressable
                             key={titulo}
                             accessibilityRole="tab"
-                            accessibilityState={{ selected: !!ativa, disabled: !ativa && !onPress }}
-                            disabled={!ativa && !onPress}
+                            accessibilityState={{ selected: !!ativa }}
                             onPress={onPress}
                             style={styles.tab}
                         >

@@ -14,7 +14,6 @@ import { Logo } from '../../components/Logo/Logo';
 import { Input } from '../../components/Input/Input';
 import { CompartilharRelatorioModal } from '../../components/CompartilhaRelatorioModal/CompartilhaRelatorioModal';
 import { PdfStatusModal, type EstadoPdf } from '../../components/PdfStatusModal/PdfStatusModal';
-import { StatusModal } from '../../components/StatusModal/StatusModal';
 
 import { mealTypes } from '../../api/reali';
 import { api, useSession } from '../../session/provider';
@@ -28,19 +27,21 @@ type FormularioResumoProps = {
     onRelatoriosPress?: () => void;
     onCardapioPress?: () => void;
     onHistoricoPress?: () => void;
-    initialMode?: 'Mensal' | 'Diário';
 };
 
-export default function Relatorio({ onInicioPress, onRelatoriosPress, onCardapioPress, onHistoricoPress, initialMode = "Mensal" }: FormularioResumoProps = {}) {
+export default function Relatorio({ onInicioPress, onRelatoriosPress, onCardapioPress, onHistoricoPress }: FormularioResumoProps = {}) {
     const abas = [
         { titulo: 'Início', Icone: House, onPress: onInicioPress },
-        { titulo: 'Relatórios', Icone: TrendingUp, ativa: initialMode === 'Mensal', onPress: onRelatoriosPress },
+        { titulo: 'Relatórios', Icone: TrendingUp, ativa: true, onPress: onRelatoriosPress },
         { titulo: 'Cardápio', Icone: ClipboardList, onPress: onCardapioPress },
-        { titulo: 'Histórico', Icone: History, ativa: initialMode === 'Diário', onPress: onHistoricoPress },
+        { titulo: 'Histórico', Icone: History, onPress: onHistoricoPress },
     ];
 
-    const [modo, setModo] = useState<string>(initialMode);
-    const { workspace } = useSession();
+    const [modo, setModo] = useState('Mensal');
+    const { workspace, can } = useSession();
+    const canReport = can('analytics_reports');
+    const canDaily = can('meal_history');
+    const mensal = !canDaily || modo === 'Mensal';
     const [selectedMonth, setMes] = useState('');
     const [selectedMeal, setDiaRefeicao] = useState('');
     const school = workspace?.school;
@@ -55,10 +56,10 @@ export default function Relatorio({ onInicioPress, onRelatoriosPress, onCardapio
     const month = months.find(item => item.label === selectedMonth) ?? months[0];
     const range = monthRange(month.key);
     const query = { school: school?.id, ...range, end_date: range.end_date > today ? today : range.end_date };
-    const report = useRemote('report/' + month.key, signal => api.summary(scope!, query, signal), Boolean(scope && school && modo === 'Mensal'));
+    const report = useRemote('report/' + month.key, signal => api.summary(scope!, query, signal), Boolean(scope && school && canReport && mensal));
     const meals = useRemote('meal-metrics/' + month.key, signal =>
         api.all(() => api.mealMetrics(scope!, query, signal), { scope, signal }),
-        Boolean(scope && school && modo === 'Diário'));
+        Boolean(scope && school && canReport && !mensal));
 
     const mealOptions = (meals.data ?? []).map(item => ({
         item, label: dateLabel(item.reference_date) + ' · ' + mealTypes[item.meal_type],
@@ -71,7 +72,6 @@ export default function Relatorio({ onInicioPress, onRelatoriosPress, onCardapio
     const [acaoEmCurso, setAcaoEmCurso] = useState(false);
     const exportacao = useRef<AbortController | null>(null);
     const acionando = useRef(false);
-    const mensal = modo === 'Mensal';
     const metrics = report.data?.summary;
     const relatorio = {
         periodo: month.label,
@@ -87,9 +87,8 @@ export default function Relatorio({ onInicioPress, onRelatoriosPress, onCardapio
     const simbolo = (variacao ?? 0) > 0 ? '▲' : '▼';
     const textoComparacao = `a previsão de atendimento ${(variacao ?? 0) > 0 ? 'aumentou' : 'caiu'} ${percentual}%.`;
     const totalPlanejado = meal?.item.total_forecast_plates;
-    const podeSalvar = false;
     const periodoPdf = mensal ? month.label : diaRefeicao;
-    const podeExportar = Boolean(scope && school && (mensal || meal));
+    const podeExportar = canReport && Boolean(scope && school && (mensal || meal));
 
     useEffect(() => () => {
         exportacao.current?.abort();
@@ -97,7 +96,7 @@ export default function Relatorio({ onInicioPress, onRelatoriosPress, onCardapio
     }, []);
 
     async function gerarPdf(canal?: CanalRelatorio) {
-        if (!scope || !school || exportacao.current) return;
+        if (!podeExportar || !scope || !school || exportacao.current) return;
         const refeicao = meal?.item;
         if (!mensal && !refeicao) return;
 
@@ -183,11 +182,11 @@ export default function Relatorio({ onInicioPress, onRelatoriosPress, onCardapio
             />
 
             <ScrollView contentContainerStyle={styles.content}>
-                <SegmentedControl
+                {canDaily && <SegmentedControl
                     opcoes={['Mensal', 'Diário']}
                     selecionado={modo}
                     aoSelecionar={setModo}
-                />
+                />}
 
                 {mensal ? (
                     <>
@@ -286,18 +285,6 @@ export default function Relatorio({ onInicioPress, onRelatoriosPress, onCardapio
                             </Text>
                         </Card>
 
-                        <Text style={styles.dailyLabel}>Ajuste para evento (opcional)</Text>
-
-                        <Input //adicionar uma condicional para limitar as unidades inseridas
-                            accessibilityLabel="Alunos extras para evento"
-                            inputMode="numeric"
-                            placeholder="Adicionar alunos extras"
-                            placeholderTextColor="#315F52"
-                            value=""
-                            editable={false}
-                            style={styles.extraInput}
-                        />
-
                         <View style={styles.dailyTotal}>
                             <Text style={styles.totalLabel}>Preparo planejado para</Text>
                             <Text style={styles.totalValue}>
@@ -305,18 +292,6 @@ export default function Relatorio({ onInicioPress, onRelatoriosPress, onCardapio
                             </Text>
                         </View>
 
-                        <Button
-                            label="Salvar planejamento"
-                            accessibilityRole="button"
-                            disabled={!podeSalvar}
-                            style={[styles.saveDaily, !podeSalvar && styles.disabled]}
-                        />
-
-                        {!podeSalvar && (
-                            <Text accessibilityLiveRegion="polite" style={styles.dailyHelp}>
-                                A API não aceita planejamento manual com estes campos.
-                            </Text>
-                        )}
                     </View>
                 )}
             </ScrollView>
@@ -366,26 +341,15 @@ export default function Relatorio({ onInicioPress, onRelatoriosPress, onCardapio
                     />
                 )}
             </Modal>
-            <StatusModal
-                visible={false}
-                status="error"
-                totalAlunos={totalPlanejado ?? 0}
-                dataRefeicao={diaRefeicao}
-                onClose={() => { }}
-                onRetry={() => { }}
-                onViewHistory={() => { }}
-            />
-
             <View style={styles.footer}>
-                {abas.map(({ titulo, Icone, ativa, onPress }) => {
+                {abas.filter(aba => aba.ativa || aba.onPress).map(({ titulo, Icone, ativa, onPress }) => {
                     const cor = ativa ? '#C8DFB9' : '#FFFFFF';  // adicionar navegação entre os icones do rodape
 
                     return (
                         <Pressable
                             key={titulo}
                             accessibilityRole="tab"
-                            accessibilityState={{ selected: !!ativa, disabled: !ativa && !onPress }}
-                            disabled={!ativa && !onPress}
+                            accessibilityState={{ selected: !!ativa }}
                             onPress={onPress}
                             style={styles.tab}
                         >

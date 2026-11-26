@@ -158,17 +158,6 @@ export const styles = StyleSheet.create({
         fontWeight: '700',
     },
 
-    extraInput: {
-        minHeight: 44,
-        backgroundColor: '#E6F2DA',
-        borderWidth: 1,
-        borderColor: colors.surface,
-        borderRadius: 10,
-        paddingHorizontal: 14,
-        paddingVertical: 10,
-        color: azulGestao,
-    },
-
     dailyTotal: {
         marginTop: 24,
         padding: 14,
@@ -185,15 +174,6 @@ export const styles = StyleSheet.create({
         color: '#FFFFFF',
         fontSize: 22,
         fontWeight: '700',
-    },
-
-    saveDaily: {
-        marginTop: 20,
-        minHeight: 44,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: azulGestao,
-        borderRadius: 10,
     },
 
     footer: {

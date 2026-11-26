@@ -19,19 +19,32 @@ import SelecionarContexto from './screens/SelecionarContexto/SelecionarContexto'
 type Screen = 'home' | 'perfil' | 'cardapio' | 'relatorio' | 'historico' | 'assistente';
 
 function SignedIn() {
-  const [screen, setScreen] = useState<Screen>('home');
+  const [requestedScreen, setScreen] = useState<Screen>('home');
   const [showContext, setShowContext] = useState(false);
-  const assistant = () => setScreen('assistente');
-  const { me, workspace, selecting } = useSession();
+  const { me, workspace, selecting, can } = useSession();
+  const allowed: Record<Screen, boolean> = {
+    home: true,
+    perfil: true,
+    cardapio: can('meal_history'),
+    historico: can('meal_history'),
+    relatorio: can('analytics_reports'),
+    assistente: can('realinova_full') || can('realinova_limited'),
+  };
+  const screen = allowed[requestedScreen] ? requestedScreen : 'home';
+  const open = (target: Screen) => allowed[target] ? () => setScreen(target) : undefined;
+  const showIndicators = can('indicators');
+  const showForecast = can('forecast');
+  const kitchenLayout = can('prepare') && !can('manage_meals');
   const scope = workspace?.scope;
   const school = workspace?.school;
   const today = localDate();
   const query = { school: school?.id, date: today };
   const dashboard = useRemote('dashboard/' + today, signal => api.dashboard(scope!, query, signal),
-    Boolean(scope && school && screen === 'home'), 60000);
+    Boolean(scope && school && showIndicators && screen === 'home'), 60000);
   const days = weekDays(today);
-  const menu = useRemote('menu/' + days[0], signal => api.all(
-    () => api.mealMetrics(scope!, { school: school?.id, start_date: days[0], end_date: days[6] }, signal),
+  const end = days[6] > today ? today : days[6];
+  const menu = useRemote(`menu/${days[0]}/${end}`, signal => api.all(
+    () => api.mealMetrics(scope!, { school: school?.id, start_date: days[0], end_date: end }, signal),
     { scope, signal }), Boolean(scope && school && screen === 'cardapio'));
   const error = dashboard.error?.message ?? menu.error?.message;
 
@@ -41,11 +54,10 @@ function SignedIn() {
 
   const home = () => setScreen('home');
   const profile = () => setScreen('perfil');
-  const cardapio = () => setScreen('cardapio');
-  const report = () => setScreen('relatorio');
-
-  const history = () => setScreen('historico');
-  const isCook = workspace?.member.role === 'COOK';
+  const cardapio = open('cardapio');
+  const report = open('relatorio');
+  const history = open('historico');
+  const assistant = open('assistente');
 
   if (screen === 'assistente') {
     return <TelaAssistente onVoltar={home} />;
@@ -67,12 +79,12 @@ function SignedIn() {
         return {
           dia: dateLabel(day),
           refeicoes: meals.map(item => ({ nome: mealTypes[item.meal_type], preparacoes: [] })),
-          planejamento: meals.length === 1 ? meals[0].total_forecast_plates ?? undefined : undefined,
+          planejamento: showForecast && meals.length === 1 ? meals[0].total_forecast_plates ?? undefined : undefined,
         };
       }),
       onInicioPress: home,
     };
-    return isCook ? <Cardapio {...menuProps} onPerfilPress={profile} />
+    return kitchenLayout && !report ? <Cardapio {...menuProps} onPerfilPress={profile} onHistoricoPress={history} />
       : <CardapioGestao {...menuProps} onRelatoriosPress={report} onHistoricoPress={history} />;
   }
   if (screen === 'historico') {
@@ -85,18 +97,20 @@ function SignedIn() {
   const data = dashboard.data;
   const meal = data?.meal_services[0];
   const name = me?.user.full_name || me?.user.email || '—';
-  if (isCook) {
+  if (kitchenLayout && showIndicators) {
     return <HomeCozinha nome={name} dataTurno={dateLabel(data?.reference_date ?? today)}
       presentes={data?.total_student_entries} totalPlanejado={data?.total_forecast_plates}
-      onPerfilPress={profile} onCardapioPress={cardapio} />;
+      showForecast={showForecast} onPerfilPress={profile} onCardapioPress={cardapio}
+      onHistoricoPress={history} onRelatoriosPress={report} onAssistentePress={assistant} />;
   }
   return <Home onAssistentePress={assistant} profilePhoto={me?.user.profile_photo} onPerfilPress={profile}
+    showIndicators={showIndicators}
     onCardapioPress={cardapio} onRelatoriosPress={report}
     onHistoricoPress={history} resumo={{
       nome: name, escola: school?.name ?? '—', data: dateLabel(data?.reference_date ?? today),
       alunos: data?.total_student_entries ?? null, refeicoesServidas: data?.total_served_plates ?? null,
       refeicao: meal ? mealTypes[meal.meal_type] : 'Sem refeição registrada',
-      cardapio: meal?.total_forecast_plates == null ? 'Previsão indisponível' : `Previsão: ${meal.total_forecast_plates} pratos`,
+      cardapio: showForecast ? (meal?.total_forecast_plates == null ? 'Previsão indisponível' : `Previsão: ${meal.total_forecast_plates} pratos`) : undefined,
       consumo: meal?.total_served_plates == null ? 'Sem contagem' : `${meal.total_served_plates} pratos servidos`,
       aviso: data?.calculated_at ? `Atualizado em ${new Date(data.calculated_at).toLocaleString('pt-BR')}` : 'Sem atualização registrada.',
     }} />;
