@@ -6,8 +6,7 @@ import { typography } from '../../theme/typography';
 
 export const styles = StyleSheet.create({
     balloon: {
-        width: '100%',
-        maxWidth: 290,
+        maxWidth: '88%',
         paddingHorizontal: 14,
         paddingVertical: 10,
         borderRadius: 16,

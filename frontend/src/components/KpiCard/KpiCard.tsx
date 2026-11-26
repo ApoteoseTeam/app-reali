@@ -1,4 +1,4 @@
-import { View, Text } from "react-native"
+import { View, Text, type StyleProp, type ViewStyle } from "react-native"
 import { kpicardStyles } from "./styles";
 import { Feather } from "@expo/vector-icons";
 import { colors } from "../../theme/colors";
@@ -13,9 +13,10 @@ type KpicardProps = {
     change?: number
     lowerIsBetter?: boolean;
     description?: string;
+    style?: StyleProp<ViewStyle>;
 }
 
-export const Kpicard = ({ title, value, unit, variant = "primary", change, lowerIsBetter = false, description }: KpicardProps) => {
+export const Kpicard = ({ title, value, unit, variant = "primary", change, lowerIsBetter = false, description, style }: KpicardProps) => {
     const isFavorable =
         change !== undefined &&
         change !== 0 &&
@@ -49,7 +50,7 @@ export const Kpicard = ({ title, value, unit, variant = "primary", change, lower
 
     if (variant === "summary") {
         return (
-            <View style={kpicardStyles.summaryBox}>
+            <View style={[kpicardStyles.summaryBox, style]}>
                 <Text style={kpicardStyles.summaryValue}>
                     {formattedValue} {unit}
                 </Text>
@@ -67,7 +68,7 @@ export const Kpicard = ({ title, value, unit, variant = "primary", change, lower
             <View
                 accessible
                 accessibilityLabel={accessibilityDescription}
-                style={kpicardStyles.boxManagement}
+                style={[kpicardStyles.boxManagement, style]}
             >
                 <Text style={kpicardStyles.titleManagement}>{title}</Text>
                 <Text style={kpicardStyles.valueManagement}>
@@ -85,6 +86,7 @@ export const Kpicard = ({ title, value, unit, variant = "primary", change, lower
                 variant === "primary"
                     ? kpicardStyles.kpicardPrimary
                     : kpicardStyles.kpicardSecondary,
+                style,
             ]}>
             <Text style={kpicardStyles.kpicardTitle}>{title}</Text>
             <View style={kpicardStyles.kpicardValueContainer}>

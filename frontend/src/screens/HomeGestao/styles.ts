@@ -41,7 +41,6 @@ export const styles = StyleSheet.create({
     height: '100%',
   },
 
-  scroll: { flex: 1 },
   content: {
     width: '100%',
     maxWidth: 640,

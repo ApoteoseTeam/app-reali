@@ -1,69 +1,55 @@
-
-import { StyleSheet } from "react-native"
-import { colors } from "../../theme/colors"
-import { spacing } from "../../theme/spacing"
+import { StyleSheet } from 'react-native';
+import { colors } from '../../theme/colors';
+import { spacing } from '../../theme/spacing';
 
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.background
+        backgroundColor: colors.background,
     },
-
-    content: {
-        paddingTop: spacing.md,
-        gap: spacing.sm,
-        paddingHorizontal: spacing.md
-    },
-
-    title: {
-        fontSize: 20,
-        fontWeight: "700",
-        color: colors.primary,
-    },
-
-    description: {
-        fontSize: 14,
-        color: colors.primary,
-    },
-
-    leftOver: {
-        fontSize: 13,
-        color: colors.secondary,
-        marginTop: spacing.sm,
-    },
-
-    indicators: {
-        flexDirection: "row",
-        gap: spacing.sm,
-        marginBottom: spacing.md,
-    },
-
-    indicator: {
+    scroll: {
         flex: 1,
     },
-
-    presentation: {
-        marginBottom: spacing.md,
-        gap: spacing.xs,
+    content: {
+        width: '100%',
+        maxWidth: 640,
+        alignSelf: 'center',
+        padding: spacing.md,
+        gap: spacing.sm,
     },
-
-    titlePresentation: {
-        fontSize: 22,
-        fontWeight: "700",
+    headerTitle: {
+        color: colors.white,
+        fontSize: 20,
+        fontWeight: '700',
+    },
+    school: {
+        fontSize: 14,
+        color: colors.secondary,
+        marginBottom: spacing.xs,
+    },
+    indicators: {
+        flexDirection: 'row',
+        gap: spacing.sm,
+        marginVertical: spacing.sm,
+    },
+    indicator: {
+        flex: 1,
+        justifyContent: 'space-between',
+    },
+    title: {
+        fontSize: 20,
+        fontWeight: '700',
         color: colors.primary,
     },
-
-    subtitlePresentation: {
-        fontSize: 14,
-        color:"#63756E"
-,
+    recordDetail: {
+        fontSize: 13,
+        color: colors.secondary,
+        marginTop: spacing.xs,
     },
-
-    messageVacated: {
+    message: {
         fontSize: 14,
-        color: "#17365D",
-        textAlign: "center",
-        marginVertical: 24,
+        color: colors.primary,
+        textAlign: 'center',
+        marginVertical: spacing.sm,
     },
-
-})
+});

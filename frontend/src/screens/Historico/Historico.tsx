@@ -1,202 +1,151 @@
-import { View, Text, ScrollView } from "react-native"
-import { styles } from "./styles"
-import { useState } from "react"
+import { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 
-import { Header } from "../../components/Header/Header"
-import { Card } from "../../components/Card/Card"
-import { Kpicard } from "../../components/KpiCard/KpiCard"
-import { Select } from "../../components/Select/Select"
-import { PeriodSelector } from "../../components/PeriodSelector/PeriodSelector"
-import { Button } from "../../components/Button/Button"
-import { BottomTabs } from "../../components/BottomTabs/BottomTabs"
+import { mealTypes, type MealStatus, type MealType } from '../../api/reali';
+import { BottomTabs } from '../../components/BottomTabs/BottomTabs';
+import { Button } from '../../components/Button/Button';
+import { Card } from '../../components/Card/Card';
+import { Header } from '../../components/header/header';
+import { Kpicard } from '../../components/KpiCard/KpiCard';
+import { PeriodSelector } from '../../components/PeriodSelector/PeriodSelector';
+import { Select } from '../../components/select/Select';
+import { useRemote } from '../../hooks/useRemote';
+import { addDays, dateLabel, localDate, weekDays } from '../../services/dates';
+import { prepararArquivoPdf } from '../../services/reportPdf';
+import { api, useSession } from '../../session/provider';
+import { colors } from '../../theme/colors';
+import { styles } from './styles';
 
+const options = Object.entries(mealTypes) as [MealType, string][];
+const statuses: Record<MealStatus, string> = {
+    PLANNED: 'Planejada',
+    PREPARING: 'Em preparo',
+    SERVING: 'Em distribuição',
+    FINISHED: 'Finalizada',
+    CANCELLED: 'Cancelada',
+};
 
-const planejamentos = [
-    {
-        id: 1,
-        data: "09/11",
-        dataCompleta: "2026-11-09",
-        refeicao: "Almoço",
-        presentes: 400,
-        preparo: 360,
-        sobra: "Sobra não informada",
-    },
-    {
-        id: 2,
-        data: "06/11",
-        dataCompleta: "2026-11-06",
-        refeicao: "Almoço",
-        presentes: 145,
-        preparo: 160,
-        sobra: "Sobra registrada: 1,2 kg",
-    },
-    {
-        id: 3,
-        data: "05/11",
-        dataCompleta: "2026-11-05",
-        refeicao: "Almoço",
-        presentes: 152,
-        preparo: 168,
-        sobra: "Sobra não informada",
-    },
+type Props = {
+    onInicioPress: () => void;
+    onRelatoriosPress: () => void;
+    onCardapioPress: () => void;
+};
 
-]
+const quantity = (value: number | null) => value?.toLocaleString('pt-BR') ?? '—';
 
-export default function Historico() {
+export default function Historico({ onInicioPress, onRelatoriosPress, onCardapioPress }: Props) {
+    const { workspace } = useSession();
+    const scope = workspace?.scope;
+    const school = workspace?.school;
+    const [mealType, setMealType] = useState<MealType>('LUNCH');
+    const [weekOffset, setWeekOffset] = useState(0);
+    const [exporting, setExporting] = useState(false);
+    const [exportError, setExportError] = useState('');
+    const exportController = useRef<AbortController | null>(null);
 
-    const [refeicaoSelecionada, setRefeicaoSelecionada] =
-        useState("Almoço");
+    const today = localDate();
+    const week = weekDays(addDays(today, weekOffset * 7));
+    const start = week[0];
+    const end = week[6] > today ? today : week[6];
+    const period = `${dateLabel(start)} a ${dateLabel(end)}`;
+    const query = { school: school?.id, meal_type: mealType, start_date: start, end_date: end };
+    const history = useRemote(`history/${start}/${end}/${mealType}`, signal => api.all(
+        () => api.mealMetrics(scope!, query, signal), { scope, signal }
+    ), Boolean(scope && school));
 
-    const [semana, setSemana] = useState(0);
+    const meals = history.data ?? [];
+    const activeMeals = meals.filter(meal => meal.status !== 'CANCELLED');
+    const daysWithForecast = new Set(activeMeals.filter(meal => meal.total_forecast_plates != null).map(meal => meal.reference_date));
+    const daysWithServed = new Set(activeMeals.filter(meal => meal.total_served_plates != null).map(meal => meal.reference_date));
 
+    useEffect(() => () => {
+        exportController.current?.abort();
+        exportController.current = null;
+    }, []);
 
-    const dataSemana = new Date();
+    async function download() {
+        if (!scope || !school || exportController.current || !activeMeals.length) return;
+        const controller = new AbortController();
+        exportController.current = controller;
+        setExporting(true);
+        setExportError('');
 
-    dataSemana.setDate(
-        dataSemana.getDate() + semana * 7
-    );
-
-
-    const inicioSemana = new Date(dataSemana);
-
-    const diaSemana = (inicioSemana.getDay() + 6) % 7;
-
-    inicioSemana.setDate(
-        inicioSemana.getDate() - diaSemana
-    );
-
-    inicioSemana.setHours(0, 0, 0, 0);
-
-    const fimSemana = new Date(inicioSemana);
-
-    fimSemana.setDate(
-        fimSemana.getDate() + 6
-    );
-
-    fimSemana.setHours(23, 59, 59, 999);
-
-    const formatarData = (data: Date) => {
-        return data.toLocaleDateString("pt-BR", {
-            day: "2-digit",
-            month: "2-digit",
-        });
-    };
-
-    const periodoFormatado =
-        `${formatarData(inicioSemana)} a ${formatarData(fimSemana)}`;
-
-    const planejamentosFiltrados = planejamentos.filter(
-        (planejamento) => {
-            const [ano, mes, dia] = planejamento.dataCompleta.split("-").map(Number);
-
-            const dataPlanejamento = new Date(ano, mes - 1, dia);
-
-            return (
-                planejamento.refeicao === refeicaoSelecionada &&
-                dataPlanejamento >= inicioSemana &&
-                dataPlanejamento <= fimSemana
-            );
+        try {
+            const pdf = await api.report(scope, { ...query, group: 'daily' }, 'pdf', controller.signal);
+            const file = prepararArquivoPdf(pdf, `reali-historico-${start}-${mealType.toLowerCase()}.pdf`,
+                `Histórico Reali · ${period}`, school.id, () => {
+                    if (controller.signal.aborted || scope.signal?.aborted) throw new Error('A exportação foi cancelada.');
+                });
+            await file.baixar();
+        } catch (error) {
+            if (!controller.signal.aborted) {
+                setExportError(error instanceof Error ? error.message : 'Não foi possível exportar o resumo.');
+            }
+        } finally {
+            if (exportController.current === controller) {
+                exportController.current = null;
+                setExporting(false);
+            }
         }
-    )
+    }
 
-    const diasPlanejados = planejamentosFiltrados.length;
-
-
-    const diasComPesagem = planejamentosFiltrados.filter(
-        (planejamento) =>
-            planejamento.sobra.startsWith("Sobra registrada")).length;
+    const changeWeek = (offset: number) => {
+        if (exportController.current) return;
+        setExportError('');
+        setWeekOffset(current => Math.min(0, current + offset));
+    };
 
     return (
         <View style={styles.container}>
+            <Header name="Histórico de refeições" right={null} titleStyle={styles.headerTitle} />
+            <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
+                {school && <Text style={styles.school}>{school.name}</Text>}
 
-            <Header name="Histórico" />
-            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
-                <View style={[styles.content, { flexGrow: 1 }]}>
+                {school && scope ? <>
+                    <Select label="Tipo de refeição" options={options.map(([, label]) => label)}
+                        value={mealTypes[mealType]} onChange={label => {
+                            const match = options.find(([, name]) => name === label);
+                            if (match && !exportController.current) {
+                                setExportError('');
+                                setMealType(match[0]);
+                            }
+                        }} />
+                    <PeriodSelector periodo={period} onAnterior={() => changeWeek(-1)} onProximo={() => changeWeek(1)}
+                        disableNext={weekOffset === 0 || exporting} labelAnterior="Semana anterior" labelProximo="Próxima semana" />
 
-                    <View style={styles.presentation}>
-                        <Text style={styles.titlePresentation}>
-                            Histórico e resumo
-                        </Text>
+                    {history.loading && <ActivityIndicator accessibilityLabel="Carregando histórico" color={colors.secondary} />}
+                    {history.error && <>
+                        <Text accessibilityRole="alert" style={styles.message}>{history.error.message}</Text>
+                        <Button label="Tentar novamente" onPress={history.refresh} />
+                    </>}
 
-                        <Text style={styles.subtitlePresentation}>
-                            Planejamento e registros em um só lugar.
-                        </Text>
-                    </View>
-
-                    <Select
-                        label="Tipo de refeição"
-                        options={[
-                            "Café da Manhã",
-                            "Almoço",
-                            "Lanche",
-                            "Jantar",
-                        ]}
-                        value={refeicaoSelecionada}
-                        onChange={setRefeicaoSelecionada}
-                    />
-
-
-                    <PeriodSelector
-                        periodo={periodoFormatado}
-                        onAnterior={() => setSemana(semana - 1)}
-                        onProximo={() => setSemana(semana + 1)}
-                    />
-
-
-                    <View style={styles.indicators}>
-                        <View style={styles.indicator}>
-                            <Kpicard
-                                variant="gestao"
-                                title="Dias planejados"
-                                value={diasPlanejados}
-                            />
+                    {history.data && <>
+                        <View style={styles.indicators}>
+                            <Kpicard variant="gestao" title="Dias com previsão" value={daysWithForecast.size} style={styles.indicator} />
+                            <Kpicard variant="gestao" title="Dias com contagem de pratos" value={daysWithServed.size} style={styles.indicator} />
                         </View>
-
-                        <View style={styles.indicator}>
-                            <Kpicard
-                                variant="gestao"
-                                title="Dias com pesagem"
-                                value={diasComPesagem}
-                                unit={`de ${diasPlanejados}`}
-                            />
-                        </View>
-                    </View>
-                    <Text style={styles.title}> Planejamentos recentes</Text>
-
-                    <Text style={styles.description}> Consulte os planejamentos registrados anteriormente</Text>
-
-                    {planejamentosFiltrados.length === 0 ? (
-                        <Text style={styles.messageVacated}>
-                            Nenhum planejamento encontrado para {refeicaoSelecionada}.
-                        </Text>
-                    ) : (
-                        planejamentosFiltrados.map((planejamento) => (
-                            <Card
-                                key={planejamento.id}
-                                title={`${planejamento.data} · ${planejamento.refeicao}`}
-                                description={`${planejamento.presentes} presentes → preparo para ${planejamento.preparo}`}
-                            >
-                                <Text style={styles.leftOver}>
-                                    {planejamento.sobra}
-                                </Text>
+                        <Text accessibilityRole="header" style={styles.title}>Registros da semana</Text>
+                        {!meals.length && <Text style={styles.message}>Nenhuma refeição registrada neste período.</Text>}
+                        {meals.map(meal => (
+                            <Card key={meal.id} title={`${dateLabel(meal.reference_date)} · ${mealTypes[meal.meal_type]}`}
+                                description={statuses[meal.status]}>
+                                <Text style={styles.recordDetail}>Entradas consideradas no preparo · {quantity(meal.snapshot_entries)}</Text>
+                                <Text style={styles.recordDetail}>Pratos previstos · {quantity(meal.total_forecast_plates)}</Text>
+                                <Text style={styles.recordDetail}>Pratos servidos · {quantity(meal.total_served_plates)}</Text>
                             </Card>
-                        ))
-                    )}
-
-
-                    <View style={{ marginTop: "auto", paddingTop: 16, marginBottom: 24 }}>
-                        <Button
-                            label="Exportar resumo"
-                            onPress={() => console.log("Exportar resumo")}
-                        />
-                    </View>
-
-
-                </View>
-
+                        ))}
+                        {!!activeMeals.length && (
+                            <Button label={exporting ? 'Exportando…' : 'Exportar resumo em PDF'}
+                                onPress={() => void download()} disabled={exporting || history.loading || Boolean(history.error)} />
+                        )}
+                    </>}
+                    {exportError && <Text accessibilityRole="alert" style={styles.message}>{exportError}</Text>}
+                </> : <Text style={styles.message}>Nenhuma escola selecionada para consultar o histórico.</Text>}
             </ScrollView>
 
-            <BottomTabs />
+            <BottomTabs activeTab="historico" showRelatorios showHistorico showPerfil={false}
+                onHomePress={onInicioPress} onRelatoriosPress={onRelatoriosPress}
+                onCardapiosPress={onCardapioPress} />
         </View>
-    )
+    );
 }

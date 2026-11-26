@@ -13,6 +13,7 @@ import PerfilUsuario from './screens/PerfilUsuario/PerfilUsuario';
 import Cardapio from './screens/CardapioCozinha/CardapioCozinha';
 import Relatorio from './screens/Relatorio/Relatorio';
 import TelaAssistente from './screens/TelaAssistente/TelaAssistente';
+import Historico from './screens/Historico/Historico';
 
 type Screen = 'home' | 'perfil' | 'cardapio' | 'relatorio' | 'historico' | 'assistente';
 
@@ -46,7 +47,7 @@ function SignedIn() {
 
   if (screen === 'assistente') {
     return <TelaAssistente onVoltar={home} />;
-}
+  }
   if (screen === 'perfil') return <PerfilUsuario onVoltar={home} />;
   if (screen === 'cardapio') {
     const menuProps = {
@@ -64,8 +65,11 @@ function SignedIn() {
     return isCook ? <Cardapio {...menuProps} onPerfilPress={profile} />
       : <CardapioGestao {...menuProps} onRelatoriosPress={report} onHistoricoPress={history} />;
   }
-  if (screen === 'relatorio' || screen === 'historico') {
-    return <Relatorio key={screen} initialMode={screen === 'historico' ? 'Diário' : 'Mensal'}
+  if (screen === 'historico') {
+    return <Historico onInicioPress={home} onRelatoriosPress={report} onCardapioPress={cardapio} />;
+  }
+  if (screen === 'relatorio') {
+    return <Relatorio
       onInicioPress={home} onRelatoriosPress={report} onCardapioPress={cardapio} onHistoricoPress={history} />;
   }
   const data = dashboard.data;
@@ -91,18 +95,18 @@ function SignedIn() {
 
 function SessionScreen() {
   const { status, me, workspace, error } = useSession();
-  const [showLogin, setShowLogin] = useState(false);
-
-  useEffect(() => {
-    if (status === 'AUTHENTICATED') setShowLogin(false);
-  }, [status]);
 
   useEffect(() => {
     if (error) Alert.alert('Reali', error);
   }, [error]);
 
   if (status === 'AUTHENTICATED') return <SignedIn key={workspace?.key ?? me?.user.id} />;
-  if (showLogin || status === 'SESSION_EXPIRED') return <Login />;
+  return <SignedOut sessionExpired={status === 'SESSION_EXPIRED'} />;
+}
+
+function SignedOut({ sessionExpired }: { sessionExpired: boolean }) {
+  const [showLogin, setShowLogin] = useState(false);
+  if (showLogin || sessionExpired) return <Login />;
   return <TelaInicial onEntrar={() => setShowLogin(true)} />;
 }
 

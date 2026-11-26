@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import {
   CalendarDays,
   ChartNoAxesColumn,
@@ -8,7 +8,6 @@ import {
 } from "lucide-react-native";
 
 import { colors } from "../../theme/colors";
-import { IconButton } from "../IconButton/IconButton";
 import { styles } from "./styles";
 
 type TabId = "home" | "relatorios" | "cardapios" | "historico" | "perfil";
@@ -26,8 +25,6 @@ type FooterProps = {
   onHistoricoPress?: () => void;
   onPerfilPress?: () => void;
 };
-
-const noop = () => {};
 
 export const BottomTabs = ({
   activeTab = "home",
@@ -80,21 +77,15 @@ export const BottomTabs = ({
 
   return (
     <View style={styles.footer}>
-      {tabs.filter((tab) => tab.visible).map((tab) => {
-        const isActive = activeTab === tab.id;
+      {tabs.filter((tab) => tab.visible).map(({ id, label, icon: Icon, onPress }) => {
+        const isActive = activeTab === id;
         const tabColor = isActive ? colors.surface : colors.white;
 
         return (
-          <View key={tab.id} style={styles.item}>
-            <IconButton
-              icon={tab.icon}
-              onPress={tab.onPress ?? noop}
-              color={tabColor}
-              size={20}
-              accessibilityLabel={tab.label}
-              style={styles.iconButton}
-            />
-
+          <Pressable key={id} style={styles.item} accessibilityRole="tab" accessibilityLabel={label}
+            accessibilityState={{ selected: isActive, disabled: !isActive && !onPress }}
+            disabled={!isActive && !onPress} onPress={onPress}>
+            <Icon color={tabColor} size={20} />
             <Text
               style={[
                 styles.label,
@@ -102,9 +93,9 @@ export const BottomTabs = ({
                 { color: tabColor },
               ]}
             >
-              {tab.label}
+              {label}
             </Text>
-          </View>
+          </Pressable>
         );
       })}
     </View>

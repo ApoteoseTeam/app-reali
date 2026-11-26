@@ -28,6 +28,19 @@ export type MealMetrics = Pick<Metrics, "total_forecast_plates" | "total_served_
 export type Dashboard = Metrics & { reference_date: string; meal_services: MealMetrics[]; meal_services_truncated: boolean };
 export type Summary = { summary: Metrics; previous: Metrics; period: Range; previous_period: Range; comparison: Partial<Record<keyof Metrics, number | null>> };
 export type Range = { start_date: string; end_date: string };
+export type ChatStatus = "PENDING" | "COMPLETED" | "FAILED";
+export type ChatSource = { ref: number; type: string; period: Range & { previous?: Range } };
+export type Conversation = {
+  id: string; school_id: string | null; title: string; status: "ACTIVE" | "ARCHIVED"; updated_at: string;
+};
+export type ConversationMessage = {
+  id: string; role: "USER" | "ASSISTANT"; content: string; status: ChatStatus; sources: ChatSource[]; created_at: string;
+};
+export type ChatRequest = { conversation_id?: string; school_id?: string; client_request_id: string; message: string };
+export type ChatResult = {
+  conversation_id: string; message_id: string; status: ChatStatus; answer: string | null;
+  sources: ChatSource[]; error: { code: string; message: string } | null;
+};
 
 export const mealTypes: Record<MealType, string> = { BREAKFAST: "Café da manhã", LUNCH: "Almoço", SNACK: "Lanche", DINNER: "Jantar" };
 export const roleNames: Record<string, string> = { DIRECTOR: "Direção", MANAGER: "Gestão", COOK: "Cozinha", NUTRITIONIST: "Nutrição", SECRETARIAT: "Secretaria" };
@@ -60,4 +73,19 @@ export class RealiApi {
   summary = (scope: Scope, query: Query, signal?: AbortSignal) => this.http.request<Summary>("analytics/organizations/summary/", {scope,query,signal});
   mealMetrics = (scope: Scope, query: Query, signal?: AbortSignal) => this.http.request<Page<MealMetrics>>("analytics/meal-services/", {scope,query,signal});
   report = (scope: Scope, query: Query, file_format:"pdf"|"csv", signal?: AbortSignal) => this.http.request<ArrayBuffer>("analytics/reports/export/", {scope,signal,binary:true,timeout:30000,query:{...query,file_format}});
+  conversations = (scope: Scope, signal: AbortSignal) => this.all(
+    () => this.http.request<Page<Conversation>>("ai/conversations/", { scope, signal }), { scope, signal });
+  conversationMessages = (scope: Scope, id: string, signal: AbortSignal) => this.all(
+    () => this.http.request<Page<ConversationMessage>>(`ai/conversations/${encodeURIComponent(id)}/messages/`, { scope, signal }),
+    { scope, signal });
+  chat = async (scope: Scope, body: ChatRequest, signal: AbortSignal) => {
+    try {
+      return await this.http.request<ChatResult>("ai/chat/", { scope, signal, method: "POST", body, replay: true, timeout: 95000 });
+    } catch (error) {
+      // Falhas após a gravação do turno também trazem o resultado e o ID da conversa.
+      const result = error instanceof ApiError ? error.data as Partial<ChatResult> | null : null;
+      if (result?.status === "FAILED" && result.conversation_id && result.message_id) return result as ChatResult;
+      throw error;
+    }
+  };
 }

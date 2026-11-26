@@ -18,11 +18,13 @@ export const styles = StyleSheet.create({
         backgroundColor: colors.azulGestao,
     },
 
-    backButton: {
+    headerButton: {
         width: 40,
         height: 44,
         backgroundColor: 'transparent',
         borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
 
     headerTitle: {
@@ -35,8 +37,38 @@ export const styles = StyleSheet.create({
         textAlign: 'left',
     },
 
-    headerRightSpace: {
-        width: 8,
+    headerActions: {
+        flexDirection: 'row',
+    },
+
+    hidden: {
+        display: 'none',
+    },
+
+    loading: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+
+    status: {
+        color: colors.primary,
+        fontSize: 14,
+    },
+
+    conversationItem: {
+        backgroundColor: colors.surfaceLight,
+        borderColor: colors.surface,
+        borderWidth: 1,
+        borderRadius: 12,
+        padding: 16,
+        gap: 5,
+    },
+
+    conversationTitle: {
+        color: colors.primary,
+        fontWeight: '700',
+        fontSize: 16,
     },
 
     conversation: {

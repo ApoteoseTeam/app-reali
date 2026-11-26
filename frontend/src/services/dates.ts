@@ -18,6 +18,12 @@ export function monthRange(month: string) {
   return { start_date: month + '-01', end_date: month + '-' + last };
 }
 
+export function addDays(date: string, offset: number) {
+  const day = new Date(date + 'T00:00:00Z');
+  day.setUTCDate(day.getUTCDate() + offset);
+  return day.toISOString().slice(0, 10);
+}
+
 export function weekDays(today: string) {
   const monday = new Date(today + 'T00:00:00Z');
   monday.setUTCDate(monday.getUTCDate() - (monday.getUTCDay() + 6) % 7);

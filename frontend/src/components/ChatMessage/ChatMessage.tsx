@@ -1,23 +1,20 @@
 import { Text, View } from 'react-native';
 
-import { Chip } from '../Chip/Chip';
 import { styles } from './styles';
 
 type ChatMessageProps = {
     remetente: 'assistente' | 'usuario';
     mensagem: string;
-    fonte?: string;
-    observacao?: string;
+    fontes?: { id: number; label: string }[];
 };
 
 export function ChatMessage({
     remetente,
     mensagem,
-    fonte,
-    observacao,
+    fontes,
 }: ChatMessageProps) {
     const isUsuario = remetente === 'usuario';
-    const nomeRemetente = isUsuario ? 'Você' : 'Assistente virtual';
+    const nomeRemetente = isUsuario ? 'Você' : 'RealInova';
 
     return (
         <View
@@ -33,13 +30,12 @@ export function ChatMessage({
                 {mensagem}
             </Text>
 
-            {fonte ? (
+            {!!fontes?.length && (
                 <View style={styles.sourceBox}>
-                    <Text style={styles.sourceText}>Fonte: {fonte}</Text>
+                    <Text style={styles.sourceText}>Fontes</Text>
+                    {fontes.map(fonte => <Text key={fonte.id} style={styles.sourceText}>{fonte.label}</Text>)}
                 </View>
-            ) : null}
-
-            {observacao ? <Chip texto={observacao} /> : null}
+            )}
         </View>
     );
 }

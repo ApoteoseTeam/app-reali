@@ -1,180 +1,223 @@
-import { useEffect, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
-import { ArrowLeft, Send } from 'lucide-react-native';
-import type React from 'react';
+import { useEffect, useRef, useState, type ComponentRef } from 'react';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { ArrowLeft, History, Plus, Send } from 'lucide-react-native';
 
-import { Header } from '../../components/Header/Header';
-import { IconButton } from '../../components/IconButton/IconButton';
-import { ChatMessage } from '../../components/ChatMessage/ChatMessage';
-import { Input } from '../../components/Input/Input';
+import type { ChatSource, Conversation } from '../../api/reali';
 import { Button } from '../../components/Button/Button';
-
+import { ChatMessage } from '../../components/ChatMessage/ChatMessage';
+import { Header } from '../../components/header/header';
+import { IconButton } from '../../components/IconButton/IconButton';
+import { Input } from '../../components/Input/Input';
+import { useRealInova } from '../../hooks/useRealInova';
+import { dateLabel } from '../../services/dates';
+import { api, useSession } from '../../session/provider';
 import { colors } from '../../theme/colors';
 import { styles } from './styles';
 
-type Message = {
-    id: string;
-    remetente: 'assistente' | 'usuario';
-    mensagem: string;
-    fonte?: string;
-    observacao?: string;
-};
-
-type AssistenteVirtualProps = {
-    onVoltar: () => void;
-};
-
 const perguntasRapidas = [
-    'Ajustar previsão de alunos',
-    'Sugerir cardápio com o estoque',
-    'Como registrar a presença?',
+    'Quantos alunos entraram hoje?',
+    'Quantos pratos foram servidos ontem?',
+    'Quantos pratos foram previstos hoje?',
 ];
 
-const mensagemInicial: Message = {
-    id: 'welcome',
-    remetente: 'assistente',
-    mensagem:
-        'Olá! Sou seu assistente virtual. Posso ajudar com dúvidas sobre o sistema e os dados. Não substituo a nutricionista: as sugestões são hipóteses.',
+const fontes: Record<string, string> = {
+    STUDENT_COUNTS: 'Contagem de entradas',
+    PLATE_COUNTS: 'Pratos servidos',
+    MEAL_FORECASTS: 'Previsão de refeições',
+    DAILY_METRICS: 'Indicadores diários',
+    MEAL_SERVICE_METRICS: 'Serviços de refeição',
+    PERIOD_COMPARISON: 'Comparação entre períodos',
+    SCHOOL_PERFORMANCE: 'Indicadores da escola',
+    SCHOOL_COMPARISON: 'Comparação entre escolas',
 };
 
-export default function TelaAssistente({
-    onVoltar,
-}: AssistenteVirtualProps) {
-    const [messages, setMessages] = useState<Message[]>([
-        mensagemInicial,
-    ]);
+function sourceLabel({ ref, type, period }: ChatSource) {
+    const label = fontes[type] ?? 'Indicadores do Reali';
+    const start = dateLabel(period.start_date);
+    const end = dateLabel(period.end_date);
+    const previous = period.previous;
+    const comparison = previous ? ` · comparação com ${dateLabel(previous.start_date)} a ${dateLabel(previous.end_date)}` : '';
+    return `[${ref}] ${label} · ${start === end ? start : `${start} a ${end}`}${comparison}`;
+}
 
-    const [draft, setDraft] = useState('');
+type Props = { onVoltar: () => void };
+export default function TelaAssistente({ onVoltar }: Props) {
+    const [showHistory, setShowHistory] = useState(false);
+    const [conversation, setConversation] = useState<Conversation>();
+    const [session, setSession] = useState(0);
 
-    const scrollRef = useRef<React.ComponentRef<typeof ScrollView>>(null);
-
-    useEffect(() => {
-        scrollRef.current?.scrollToEnd({
-            animated: true,
-        });
-    }, [messages]);
-
-    function enviarMensagem(texto = draft) {
-        const mensagem = texto.trim();
-
-        if (!mensagem) return;
-
-        const novaMensagem: Message = {
-            id: `${Date.now()}-user`,
-            remetente: 'usuario',
-            mensagem,
-        };
-
-        setMessages(current => [
-            ...current,
-            novaMensagem,
-            {
-                id: `${Date.now()}-response`,
-                remetente: 'assistente',
-                mensagem:
-                    'Sua pergunta foi registrada nesta demonstração. A integração com a inteligência artificial será conectada posteriormente.',
-                observacao: 'Resposta demonstrativa',
-            },
-        ]);
-
-        setDraft('');
-    }
-
-    function selecionarPergunta(pergunta: string) {
-        enviarMensagem(pergunta);
+    function openChat(next?: Conversation) {
+        setConversation(next);
+        setSession(current => current + 1);
+        setShowHistory(false);
     }
 
     return (
-        <KeyboardAvoidingView
-            style={styles.screen}
-            behavior={
-                Platform.OS === 'ios'
-                    ? 'padding'
-                    : undefined
-            }
-        >
-            <Header
-                name="Assistente virtual"
-                left={
-                    <IconButton
-                        icon={ArrowLeft}
-                        color={colors.white}
-                        size={22}
-                        accessibilityLabel="Voltar"
-                        onPress={onVoltar}
-                        style={styles.backButton}
-                    />
-                }
-                right={<View style={styles.headerRightSpace} />}
-                containerStyle={styles.header}
-                titleStyle={styles.headerTitle}
+        <View style={styles.screen}>
+            <View style={showHistory ? styles.hidden : styles.screen}>
+                <ChatSession key={session} conversation={conversation} onVoltar={onVoltar}
+                    onHistory={() => setShowHistory(true)} onNewChat={() => openChat()} />
+            </View>
+            {showHistory && <ConversationHistory onBack={() => setShowHistory(false)}
+                onNewChat={() => openChat()} onSelect={openChat} />}
+        </View>
+    );
+}
+
+function ChatSession({ conversation, onVoltar, onHistory, onNewChat }: Props & {
+    conversation?: Conversation; onHistory: () => void; onNewChat: () => void;
+}) {
+    const { workspace } = useSession();
+    const chat = useRealInova(workspace?.scope, workspace?.school?.id, conversation);
+    const [draft, setDraft] = useState('');
+    const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null);
+    const canSend = chat.canSend && Boolean(chat.retry || draft.trim());
+    const archived = conversation?.status === 'ARCHIVED';
+
+    async function send(message: string) {
+        if (!chat.canSend) return;
+        setDraft(message);
+        if (await chat.send(message)) setDraft('');
+    }
+
+    return (
+        <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+            <Header name="RealInova" containerStyle={styles.header} titleStyle={styles.headerTitle}
+                left={<HeaderAction icon={ArrowLeft} label="Voltar" onPress={onVoltar} />}
+                right={<View style={styles.headerActions}>
+                    <HeaderAction icon={History} label="Conversas anteriores" onPress={onHistory} disabled={chat.sending} />
+                    <HeaderAction icon={Plus} label="Nova conversa" onPress={onNewChat} disabled={chat.sending} />
+                </View>}
             />
 
-            <ScrollView
-                ref={scrollRef}
-                style={styles.conversation}
-                contentContainerStyle={styles.conversationContent}
+            <ScrollView ref={scrollRef} style={styles.conversation} contentContainerStyle={styles.conversationContent}
                 keyboardShouldPersistTaps="handled"
-                onContentSizeChange={() =>
-                    scrollRef.current?.scrollToEnd({
-                        animated: true,
-                    })
-                }
+                onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
             >
-                {messages.map(message => (
-                    <ChatMessage
-                        key={message.id}
-                        remetente={message.remetente}
-                        mensagem={message.mensagem}
-                        fonte={message.fonte}
-                        observacao={message.observacao}
+                {!conversation && !chat.messages.length && !chat.sending && !chat.retry && (
+                    <>
+                        <ChatMessage remetente="assistente"
+                            mensagem="Olá! Sou o RealInova. Posso ajudar a consultar contagens de entradas, pratos servidos e previsões de refeições." />
+                        <View style={styles.suggestions}>
+                            {perguntasRapidas.map(pergunta => (
+                                <Button key={pergunta} label={pergunta} onPress={() => void send(pergunta)}
+                                    disabled={!chat.canSend} style={styles.suggestionButton} textStyle={styles.suggestionText} />
+                            ))}
+                        </View>
+                    </>
+                )}
+                {chat.loading && <Loading label="Carregando conversa…" />}
+                {!chat.loading && !chat.loadError && conversation && !chat.messages.length && (
+                    <Text style={styles.status}>Esta conversa ainda não tem mensagens.</Text>
+                )}
+                {chat.messages.map(message => (
+                    <ChatMessage key={message.id}
+                        remetente={message.role === 'USER' ? 'usuario' : 'assistente'}
+                        mensagem={message.content || (message.status === 'PENDING'
+                            ? chat.waiting ? 'Consultando os dados…' : 'A execução ficou pendente. Você pode enviar a pergunta novamente.'
+                            : 'O RealInova não conseguiu responder a esta pergunta.')}
+                        fontes={message.sources.map(source => ({ id: source.ref, label: sourceLabel(source) }))}
                     />
                 ))}
-
-                <View style={styles.suggestions}>
-                    {perguntasRapidas.map(pergunta => (
-                        <Button
-                            key={pergunta}
-                            label={pergunta}
-                            onPress={() =>
-                                selecionarPergunta(pergunta)
-                            }
-                            style={styles.suggestionButton}
-                            textStyle={styles.suggestionText}
-                        />
-                    ))}
-                </View>
+                {chat.sending && <Loading label="RealInova está respondendo…" />}
+                {chat.loadError && <>
+                    <Text accessibilityRole="alert" style={styles.status}>{chat.loadError}</Text>
+                    <Button label="Atualizar conversa" onPress={() => void chat.reload()} />
+                </>}
+                {chat.sendError && <Text accessibilityRole="alert" style={styles.status}>{chat.sendError}</Text>}
+                {archived && <Text style={styles.status}>Conversa arquivada. Abra uma nova conversa para continuar.</Text>}
+                {!workspace && <Text style={styles.status}>O RealInova precisa de acesso a uma instituição.</Text>}
             </ScrollView>
 
-            <View style={styles.composer}>
-                <View style={styles.composerRow}>
-                    <Input
-                        value={draft}
-                        onChangeText={setDraft}
-                        placeholder="Digite sua pergunta"
-                        placeholderTextColor="#64736A"
-                        returnKeyType="send"
-                        onSubmitEditing={() =>
-                            enviarMensagem()
-                        }
-                        accessibilityLabel="Digite sua pergunta"
-                        style={styles.messageInput}
-                    />
-
-                    <IconButton
-                        icon={Send}
-                        color={colors.white}
-                        size={21}
-                        accessibilityLabel="Enviar mensagem"
-                        onPress={() => enviarMensagem()}
-                        style={styles.sendButton}
-                    />
+            {!archived && workspace && (
+                <View style={styles.composer}>
+                    {chat.retry ? (
+                        <View style={styles.composerRow}>
+                            <Button label={chat.sending ? 'Verificando…' : 'Verificar envio'} disabled={!chat.canSend}
+                                onPress={() => void send(chat.retry?.message ?? '')} />
+                        </View>
+                    ) : (
+                        <View style={styles.composerRow}>
+                            <Input value={chat.sending ? '' : draft} onChangeText={setDraft} editable={chat.canSend}
+                                placeholder="Digite sua pergunta" placeholderTextColor="#64736A" maxLength={2000}
+                                returnKeyType="send" onSubmitEditing={() => void send(draft)}
+                                accessibilityLabel="Digite sua pergunta" style={styles.messageInput} />
+                            <IconButton icon={Send} color={colors.white} size={21} accessibilityLabel="Enviar mensagem"
+                                onPress={() => void send(draft)} disabled={!canSend} style={styles.sendButton} />
+                        </View>
+                    )}
+                    <Text style={styles.privacyHint}>
+                        {workspace.school?.name ?? workspace.organization.name} · Evite enviar nomes de alunos.
+                    </Text>
                 </View>
-
-                <Text style={styles.privacyHint}>
-                    Não envie nomes de alunos.
-                </Text>
-            </View>
+            )}
         </KeyboardAvoidingView>
+    );
+}
+
+function HeaderAction({ icon, label, onPress, disabled }: {
+    icon: typeof ArrowLeft; label: string; onPress: () => void; disabled?: boolean;
+}) {
+    return <IconButton icon={icon} color={colors.white} size={21} accessibilityLabel={label}
+        onPress={onPress} disabled={disabled} style={styles.headerButton} />;
+}
+
+function Loading({ label }: { label: string }) {
+    return <View style={styles.loading}>
+        <ActivityIndicator color={colors.secondary} />
+        <Text accessibilityLiveRegion="polite" style={styles.status}>{label}</Text>
+    </View>;
+}
+
+function ConversationHistory({ onBack, onNewChat, onSelect }: {
+    onBack: () => void; onNewChat: () => void; onSelect: (item: Conversation) => void;
+}) {
+    const { workspace } = useSession();
+    const scope = workspace?.scope;
+    const schoolId = workspace?.school?.id ?? null;
+    const [conversations, setConversations] = useState<Conversation[]>();
+    const [error, setError] = useState('');
+    const [attempt, setAttempt] = useState(0);
+
+    useEffect(() => {
+        if (!scope) return;
+        const controller = new AbortController();
+        void api.conversations(scope, controller.signal).then(rows => {
+            if (controller.signal.aborted) return;
+            const currentSchool = rows.filter(item => item.school_id === schoolId);
+            setConversations(currentSchool.sort((a, b) => Date.parse(b.updated_at) - Date.parse(a.updated_at)));
+        }).catch(error => {
+            if (!controller.signal.aborted) setError(error instanceof Error ? error.message : 'Não foi possível carregar as conversas.');
+        });
+        return () => controller.abort();
+    }, [scope, schoolId, attempt]);
+
+    return (
+        <View style={styles.screen}>
+            <Header name="Conversas anteriores" containerStyle={styles.header} titleStyle={styles.headerTitle}
+                left={<HeaderAction icon={ArrowLeft} label="Voltar ao chat" onPress={onBack} />}
+                right={<HeaderAction icon={Plus} label="Nova conversa" onPress={onNewChat} />} />
+            <ScrollView style={styles.conversation} contentContainerStyle={styles.conversationContent}>
+                {!scope && <Text style={styles.status}>Vincule uma instituição para consultar suas conversas.</Text>}
+                {scope && !conversations && !error && <Loading label="Carregando conversas…" />}
+                {error && <>
+                    <Text accessibilityRole="alert" style={styles.status}>{error}</Text>
+                    <Button label="Tentar novamente" onPress={() => {
+                        setError('');
+                        setAttempt(current => current + 1);
+                    }} />
+                </>}
+                {conversations?.length === 0 && <Text style={styles.status}>Nenhuma conversa salva neste contexto.</Text>}
+                {conversations?.map(item => (
+                    <Pressable key={item.id} style={styles.conversationItem} accessibilityRole="button" onPress={() => onSelect(item)}>
+                        <Text style={styles.conversationTitle}>{item.title === 'Nova conversa' ? 'Conversa com RealInova' : item.title}</Text>
+                        <Text style={styles.status}>
+                            {new Date(item.updated_at).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}
+                            {item.status === 'ARCHIVED' ? ' · Arquivada' : ''}
+                        </Text>
+                    </Pressable>
+                ))}
+            </ScrollView>
+        </View>
     );
 }

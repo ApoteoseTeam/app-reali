@@ -1,5 +1,5 @@
 import { View, Text, Image } from "react-native";
-import { ProgressBar } from "../../components/Progressbar/Progressbar";
+import { ProgressBar } from "../../components/progressbar/Progressbar";
 import { styles } from "./style";
 
 type SplashScreenProps = {
