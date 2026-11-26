@@ -12,11 +12,13 @@ import HomeCozinha from './screens/HomeCozinha/HomeCozinha';
 import PerfilUsuario from './screens/PerfilUsuario/PerfilUsuario';
 import Cardapio from './screens/CardapioCozinha/CardapioCozinha';
 import Relatorio from './screens/Relatorio/Relatorio';
+import TelaAssistente from './screens/TelaAssistente/TelaAssistente';
 
-type Screen = 'home' | 'perfil' | 'cardapio' | 'relatorio' | 'historico';
+type Screen = 'home' | 'perfil' | 'cardapio' | 'relatorio' | 'historico' | 'assistente';
 
 function SignedIn() {
   const [screen, setScreen] = useState<Screen>('home');
+  const assistant = () => setScreen('assistente');
   const { me, workspace } = useSession();
   const scope = workspace?.scope;
   const school = workspace?.school;
@@ -42,6 +44,9 @@ function SignedIn() {
   const history = () => setScreen('historico');
   const isCook = workspace?.member.role === 'COOK';
 
+  if (screen === 'assistente') {
+    return <TelaAssistente onVoltar={home} />;
+}
   if (screen === 'perfil') return <PerfilUsuario onVoltar={home} />;
   if (screen === 'cardapio') {
     const menuProps = {
@@ -71,7 +76,7 @@ function SignedIn() {
       presentes={data?.total_student_entries} totalPlanejado={data?.total_forecast_plates}
       onPerfilPress={profile} onCardapioPress={cardapio} />;
   }
-  return <Home profilePhoto={me?.user.profile_photo} onPerfilPress={profile}
+  return <Home onAssistentePress={assistant} profilePhoto={me?.user.profile_photo} onPerfilPress={profile}
     onCardapioPress={cardapio} onRelatoriosPress={report}
     onHistoricoPress={history} resumo={{
       nome: name, escola: school?.name ?? '—', data: dateLabel(data?.reference_date ?? today),
