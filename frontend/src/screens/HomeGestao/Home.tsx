@@ -116,7 +116,7 @@ export default function Home({
                         size={29}
                         color="#FFFFFF"
                         accessibilityLabel="Abrir assistente virtual"
-                        onPress={() => onAssistentePress?.()}
+                        onPress={onAssistentePress}
                         style={styles.assistantButton}
                     />
                 </View>
