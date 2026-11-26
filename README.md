@@ -1,276 +1,190 @@
-<div>
-  Se você esta vendo isso nessa etapa do projeto, você é um desenvolvedor.
+# Finly 💙
 
-Para começar a desenvolver, siga os seguintes passos:
+**Finly** é uma plataforma de gestão financeira pessoal que está sendo desenvolvida com o objetivo de ajudar usuários a organizar suas finanças, acompanhar movimentações e visualizar informações financeiras em um único lugar.
 
-1 - Clone o reposotório.
+O projeto busca tornar o controle financeiro mais simples, intuitivo e acessível por meio de uma interface moderna e de uma API para gerenciamento dos dados.
 
-2 - confira se esta conectado ao repositório remoto: https://github.com/ApoteoseTeam/ReAlimenta.git
+> 🚧 **Status:** Em desenvolvimento. Funcionalidades, arquitetura e integrações poderão mudar durante a evolução do projeto.
 
-3 - Faça as atualizações/novas funcionalidades.
+## 🎯 Objetivo
 
-4 - faça o commit.
+Desenvolver uma aplicação full stack para facilitar o gerenciamento financeiro, oferecendo recursos para acompanhar receitas, despesas, contas e categorias, além de visualizar informações relevantes por meio de um dashboard.
 
-5 - suba para repositório remoto.
+## ✨ Funcionalidades
 
-Obs:
+- **Dashboard:** visualização consolidada de informações financeiras.
+- **Lançamentos financeiros:** gerenciamento de receitas e despesas.
+- **Contas:** organização e acompanhamento de contas financeiras.
+- **Categorias:** classificação das movimentações por categoria.
+- **API REST:** comunicação entre o frontend e o backend.
+- **Interface responsiva:** experiência de uso em desenvolvimento com React.
 
-1 - Siga o padrão de commits para TODO projeto: https://www.conventionalcommits.org/pt-br/v1.0.0-beta.4/
+*As funcionalidades estão sujeitas a alterações conforme o andamento do projeto.*
 
-# Guia de Desenvolvimento — Realimenta
+## 🛠️ Tecnologias utilizadas
 
-Este guia apresenta as instruções para configurar e executar o projeto **Realimenta** localmente, utilizando React Native, Expo e TypeScript.
+### Frontend
+- [React](https://react.dev/) — construção da interface.
+- JavaScript (JSX) — lógica e componentes.
+- [Vite](https://vite.dev/) — ambiente de desenvolvimento e build.
+- CSS — estilização da interface.
 
-O desenvolvimento será realizado no VS Code, com visualização da aplicação diretamente pelo navegador.
+### Backend
+- [Python](https://www.python.org/) — linguagem principal do backend.
+- [Django](https://www.djangoproject.com/) — framework web.
+- Django REST Framework — desenvolvimento da API REST.
+- SQLite — banco de dados utilizado no ambiente atual.
 
-## 1. Tecnologias utilizadas
+### Ferramentas
+- Git e GitHub — versionamento de código.
+- Visual Studio Code — ambiente de desenvolvimento.
 
-- **React Native:** desenvolvimento da interface da aplicação.
-- **Expo SDK 58:** ferramentas e infraestrutura de desenvolvimento.
-- **TypeScript:** linguagem utilizada no projeto.
-- **React Native Web:** execução da aplicação no navegador.
-- **Git e GitHub:** versionamento e colaboração entre integrantes.
-
-## 2. Pré-requisitos
-
-Antes de clonar o repositório, instale:
-
-| Ferramenta | Versão recomendada | Download |
-|---|---|---|
-| Node.js | 24 LTS, 24.3+ | https://nodejs.org/ |
-| Git | Versão estável | https://git-scm.com/downloads |
-| VS Code | Versão estável | https://code.visualstudio.com/ |
-| Navegador | Chrome, Edge ou Firefox atualizado | — |
-
-O npm acompanha a instalação do Node.js.
-
-**Não é necessário instalar:** Android Studio, Java JDK, Gradle, Expo CLI globalmente ou emuladores Android/iOS.
-
-### Verificar as instalações
-
-Abra o terminal e execute:
-
-```bash
-node -v
-npm -v
-git --version
-```
-
-Os comandos devem retornar as versões instaladas.
-
-## 3. Clonando o repositório
-
-Abra o terminal do VS Code ou PowerShell e execute:
-
-```bash
-git clone https://github.com/ApoteoseTeam/app-realimenta.git
-```
-
-Entre na pasta do projeto:
-
-```bash
-cd app-realimenta
-```
-
-> **Importante:** integrantes precisam ter acesso à organização ou ao repositório no GitHub caso ele seja privado.
-
-## 4. Instalando as dependências
-
-Na raiz do projeto, execute:
-
-```bash
-npm ci
-```
-
-Esse comando instala as dependências conforme as versões registradas no arquivo `package-lock.json`.
-
-As principais dependências incluem:
-
-- React
-- React Native
-- Expo
-- TypeScript
-- React Native Web
-- React DOM
-- Expo Metro Runtime
-
-Não é necessário instalar essas dependências individualmente.
-
-**Atenção:** não execute `npm audit fix --force` sem alinhamento com a equipe. Atualizações forçadas podem causar incompatibilidades com o Expo.
-
-## 5. Executando o Realimenta na Web
-
-Após instalar as dependências, execute:
-
-```bash
-npx expo start --web
-```
-
-O Expo iniciará o servidor de desenvolvimento.
-
-Normalmente, a aplicação estará disponível em:
+## 📁 Estrutura do projeto
 
 ```text
-http://localhost:8081
+Finly/
+├── .venv/                  # Ambiente virtual Python
+├── backend/
+│   ├── config/             # Configurações do Django
+│   ├── dashboard/          # Aplicação do dashboard
+│   │   ├── models.py       # Modelos de dados
+│   │   ├── serializers.py  # Serialização dos dados da API
+│   │   ├── views.py        # Views e lógica das requisições
+│   │   ├── urls.py         # Rotas da aplicação, se configuradas
+│   │   ├── admin.py        # Configuração do Django Admin
+│   │   ├── apps.py         # Configuração da aplicação
+│   │   └── tests.py        # Testes
+│   ├── finance/            # Aplicação financeira
+│   ├── user/               # Aplicação de usuários
+│   ├── db.sqlite3          # Banco de dados local
+│   └── manage.py           # Utilitário de gerenciamento Django
+├── frontend/
+│   ├── public/             # Arquivos públicos
+│   ├── src/                # Código-fonte do React
+│   ├── package.json        # Dependências e scripts
+│   ├── package-lock.json   # Versões das dependências
+│   ├── vite.config.js      # Configuração do Vite
+│   └── index.html          # Documento HTML principal
+├── .env                    # Variáveis de ambiente
+└── .gitignore              # Arquivos ignorados pelo Git
 ```
 
-Abra esse endereço no navegador.
+*Observação: a árvore acima resume a estrutura identificada no projeto; arquivos internos podem ser adicionados ou reorganizados durante o desenvolvimento.*
 
-### Atualizações em tempo real
+## ⚙️ Como executar o projeto
 
-O Expo utiliza Fast Refresh para atualizar a aplicação durante o desenvolvimento.
+### 1. Pré-requisitos
 
-Ao modificar um componente e salvar o arquivo, as alterações geralmente serão refletidas automaticamente no navegador.
+Instale as seguintes ferramentas:
 
-Para encerrar o servidor:
+- Python 3.11 ou superior.
+- Node.js e npm.
+- Git.
 
-```text
-Ctrl + C
-```
-
-## 6. Organização do trabalho com Git
-
-Cada integrante deve desenvolver suas funcionalidades em uma branch própria.
-
-Evite realizar alterações diretamente na branch `main`.
-
-### Atualizar a branch principal
-
-Antes de iniciar uma tarefa:
+### 2. Clonar o repositório
 
 ```bash
-git switch main
-git pull origin main
+git clone https://github.com/Kakawm005/Finly
+cd Finly
 ```
 
-### Criar uma branch
+### 3. Configurar o backend
+
+Entre na pasta do backend:
 
 ```bash
-git switch -c feature/nome-da-funcionalidade
+cd backend
 ```
 
-Exemplos de nomes:
+Ative o ambiente virtual existente, caso esteja na raiz do projeto.
 
-```text
-feature/tela-login
-feature/tela-home
-feature/cadastro-usuario
-fix/correcao-formulario
+**Windows — PowerShell:**
+
+```powershell
+..\.venv\Scripts\Activate.ps1
 ```
 
-### Registrar alterações
+Instale as dependências do backend conforme o arquivo de dependências do projeto. Caso ainda não exista um `requirements.txt`, ele deverá ser criado com as dependências utilizadas.
 
-Depois de concluir uma alteração:
+Execute as migrações:
 
 ```bash
-git status
-git add .
-git commit -m "feat: adiciona tela de login"
+python manage.py migrate
 ```
 
-### Enviar a branch ao GitHub
+Inicie o servidor Django:
 
 ```bash
-git push -u origin feature/nome-da-funcionalidade
+python manage.py runserver
 ```
 
-Em seguida, abra um **Pull Request** no GitHub para que as alterações sejam revisadas antes de integrar à `main`.
+Por padrão, o servidor fica disponível em `http://127.0.0.1:8000/`.
 
-## 7. Padrão de commits
+### 4. Configurar o frontend
 
-Utilizamos mensagens padronizadas para facilitar o acompanhamento das alterações.
-
-| Prefixo | Utilização |
-|---|---|
-| `feat:` | Nova funcionalidade |
-| `fix:` | Correção de erro |
-| `refactor:` | Refatoração sem mudança funcional |
-| `style:` | Ajustes de formatação do código |
-| `docs:` | Alterações na documentação |
-| `chore:` | Configurações e manutenção |
-| `test:` | Inclusão ou alteração de testes |
-
-Exemplos:
+Em outro terminal, entre na pasta do frontend:
 
 ```bash
-git commit -m "feat: implementa cadastro de usuários"
-git commit -m "fix: corrige validação do formulário"
-git commit -m "docs: atualiza instruções de instalação"
+cd frontend
 ```
 
-## 8. Boas práticas de desenvolvimento
-
-- Utilize TypeScript para tipar componentes, propriedades, funções e dados.
-- Evite modificar arquivos de configuração sem comunicar a equipe.
-- Crie componentes reutilizáveis.
-- Mantenha as alterações organizadas por funcionalidade.
-- Não envie `node_modules` para o GitHub.
-- Não publique senhas, tokens, credenciais ou arquivos `.env` com informações sensíveis.
-- Execute a aplicação antes de abrir um Pull Request.
-- Atualize a documentação sempre que houver mudanças relevantes no ambiente.
-
-## 9. Solução de problemas
-
-### O comando `npm` não é reconhecido
-
-Verifique se o Node.js está instalado:
+Instale as dependências:
 
 ```bash
-node -v
+npm install
 ```
 
-Se necessário, reinstale o Node.js e reinicie o terminal.
-
-### O comando `npm ci` apresenta erros
-
-Verifique se você está na raiz do projeto, onde ficam `package.json` e `package-lock.json`.
-
-Se esses arquivos estiverem corretos e o erro persistir, compartilhe a mensagem no canal técnico da equipe antes de modificar as dependências.
-
-### A aplicação Web não inicia
-
-Execute:
+Inicie o servidor de desenvolvimento:
 
 ```bash
-npx expo-doctor
+npm run dev
 ```
 
-Para verificar a compatibilidade das dependências.
+Acesse o endereço local apresentado pelo Vite no terminal.
 
-Se houver problemas relacionados ao cache, tente:
+> **Importante:** os comandos pressupõem que as dependências e os scripts estejam configurados corretamente. As variáveis de ambiente e a URL da API também precisam estar configuradas conforme o ambiente de execução.
+
+## 🔐 Variáveis de ambiente
+
+O projeto possui arquivos `.env` para configurações locais.
+
+Utilize variáveis de ambiente para armazenar informações como:
+
+- Chaves e segredos da aplicação.
+- Configurações de conexão com serviços externos.
+- Endereço-base da API, quando aplicável.
+- Configurações específicas de desenvolvimento e produção.
+
+**Nunca envie credenciais, chaves privadas ou segredos para o GitHub.** Mantenha os arquivos `.env` fora do versionamento e disponibilize um `.env.example` com os nomes das variáveis necessárias, sem valores secretos.
+
+## 🧪 Testes
+
+O backend possui um arquivo `tests.py` na aplicação `dashboard`, destinado aos testes dessa parte do sistema.
+
+Para executar os testes do Django:
 
 ```bash
-npx expo start --web --clear
+cd backend
+python manage.py test
 ```
 
-### A porta 8081 está ocupada
+Os testes devem ser ampliados conforme novas funcionalidades e regras de negócio forem implementadas.
 
-O Expo poderá solicitar outra porta. Utilize o endereço informado no terminal.
+## 🗺️ Próximos passos
 
-### A aplicação funciona no Android, mas não na Web
+- [ ] Aprimorar a interface e a experiência do usuário.
+- [ ] Expandir os recursos do dashboard financeiro.
+- [ ] Evoluir o gerenciamento de contas, categorias, receitas e despesas.
+- [ ] Ampliar a cobertura de testes automatizados.
+- [ ] Melhorar a validação e o tratamento de erros da API.
+- [ ] Fortalecer a segurança e a gestão de variáveis de ambiente.
+- [ ] Preparar o projeto para implantação em produção.
+- [ ] Avaliar futuras integrações financeiras e recursos de inteligência artificial.
 
-Algumas bibliotecas nativas não possuem suporte Web.
+## 👨‍💻 Desenvolvimento
 
-Nesses casos, será necessário verificar a compatibilidade da biblioteca ou implementar um comportamento específico para o navegador.
+O Finly é um projeto em evolução, desenvolvido para aprofundar conhecimentos em desenvolvimento full stack, construção de APIs REST, integração entre frontend e backend e organização de aplicações web.
 
-## 10. Fluxo diário resumido
+## 📄 Licença
 
-Após a configuração inicial:
-
-1. Abrir o VS Code.
-2. Atualizar a branch principal com `git pull`.
-3. Criar ou acessar sua branch de trabalho.
-4. Executar `npx expo start --web`.
-5. Desenvolver e testar as funcionalidades.
-6. Criar commits com mensagens padronizadas.
-7. Enviar as alterações ao GitHub.
-8. Abrir um Pull Request para revisão.
-
----
-
-**Equipe:** Apoteose Team  
-**Projeto:** Realimenta  
-**Stack mobile/web:** React Native + Expo + TypeScript
-
-> O objetivo deste fluxo é manter o desenvolvimento colaborativo organizado e permitir que todos trabalhem no Realimenta utilizando apenas o computador e o navegador, sem necessidade de emuladores.
-</div>
+A licença do projeto ainda não foi definida. Até que uma licença seja adicionada ao repositório, não presuma que o código esteja liberado para reutilização ou redistribuição.
