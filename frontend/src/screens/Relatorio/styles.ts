@@ -1,15 +1,16 @@
+
 import { StyleSheet } from 'react-native';
 import { colors } from '../../theme/colors';
 
 const azulGestao = '#102B53';
 
 export const styles = StyleSheet.create({
-    tela: {
+    screen: {
         flex: 1,
         backgroundColor: '#FFFFFF',
     },
 
-    cabecalho: {
+    header: {
         minHeight: 56,
         paddingHorizontal: 16,
         justifyContent: 'center',
@@ -17,14 +18,14 @@ export const styles = StyleSheet.create({
         backgroundColor: azulGestao,
     },
 
-    tituloCabecalho: {
+    headerTitle: {
         color: '#FFFFFF',
         fontSize: 18,
         fontWeight: '700',
         textAlign: 'center',
     },
 
-    conteudo: {
+    content: {
         width: '100%',
         maxWidth: 640,
         alignSelf: 'center',
@@ -32,7 +33,7 @@ export const styles = StyleSheet.create({
         gap: 14,
     },
 
-    relatorio: {
+    report: {
         backgroundColor: '#FFFFFF',
         borderColor: colors.surface,
         borderWidth: 1,
@@ -41,13 +42,13 @@ export const styles = StyleSheet.create({
         gap: 10,
     },
 
-    marca: {
+    brand: {
         width: 64,
         height: 28,
         alignSelf: 'flex-start',
     },
 
-    tituloRelatorio: {
+    reportTitle: {
         color: azulGestao,
         fontSize: 17,
         fontWeight: '700',
@@ -59,24 +60,24 @@ export const styles = StyleSheet.create({
         lineHeight: 19,
     },
 
-    indicadores: {
+    indicators: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: 8,
     },
 
-    indicador: {
+    indicator: {
         flexGrow: 1,
         flexBasis: 136,
     },
 
-    subtitulo: {
+    subtitle: {
         color: colors.secondary,
         fontSize: 14,
         fontWeight: '700',
     },
 
-    acoes: {
+    actions: {
         width: '100%',
         maxWidth: 640,
         alignSelf: 'center',
@@ -85,7 +86,7 @@ export const styles = StyleSheet.create({
         padding: 16,
     },
 
-    botao: {
+    button: {
         flex: 1,
         minHeight: 44,
         paddingHorizontal: 8,
@@ -98,36 +99,36 @@ export const styles = StyleSheet.create({
         backgroundColor: azulGestao,
     },
 
-    botaoSecundario: {
+    secondaryButton: {
         backgroundColor: '#FFFFFF',
     },
 
-    textoSecundario: {
+    secondaryText: {
         color: azulGestao,
     },
 
-    desabilitado: {
+    disabled: {
         opacity: 0.5,
     },
 
-    comparacao: {
+    comparison: {
         color: '#3A6B24',
         fontSize: 12,
         fontWeight: '600',
         lineHeight: 18,
     },
 
-    diario: {
+    daily: {
         gap: 8,
     },
 
-    rotuloDiario: {
+    dailyLabel: {
         color: colors.secondary,
         fontSize: 14,
         fontWeight: '600',
     },
 
-    inputDiario: {
+    dailyInput: {
         minHeight: 44,
         backgroundColor: colors.secondary,
         borderRadius: 10,
@@ -136,13 +137,13 @@ export const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
 
-    ajudaDiario: {
+    dailyHelp: {
         color: '#465950',
         fontSize: 12,
         lineHeight: 17,
     },
 
-    cardMargem: {
+    marginCard: {
         marginVertical: 8,
         padding: 14,
         gap: 4,
@@ -151,57 +152,37 @@ export const styles = StyleSheet.create({
         backgroundColor: '#E6F2DA',
     },
 
-    tituloMargem: {
+    marginTitle: {
         color: azulGestao,
         fontSize: 15,
         fontWeight: '700',
     },
 
-    inputExtras: {
-        minHeight: 44,
-        backgroundColor: '#E6F2DA',
-        borderWidth: 1,
-        borderColor: colors.surface,
-        borderRadius: 10,
-        paddingHorizontal: 14,
-        paddingVertical: 10,
-        color: azulGestao,
-    },
-
-    totalDiario: {
+    dailyTotal: {
         marginTop: 24,
         padding: 14,
         borderRadius: 12,
         backgroundColor: colors.secondary,
     },
 
-    totalLegenda: {
+    totalLabel: {
         color: '#FFFFFF',
         fontSize: 13,
     },
 
-    totalValor: {
+    totalValue: {
         color: '#FFFFFF',
         fontSize: 22,
         fontWeight: '700',
     },
 
-    salvarDiario: {
-        marginTop: 20,
-        minHeight: 44,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: azulGestao,
-        borderRadius: 10,
-    },
-
-    rodape: {
+    footer: {
         flexDirection: 'row',
         paddingHorizontal: 8,
         backgroundColor: azulGestao,
     },
 
-    aba: {
+    tab: {
         flex: 1,
         minHeight: 52,
         paddingVertical: 6,
@@ -210,7 +191,7 @@ export const styles = StyleSheet.create({
         gap: 3,
     },
 
-    textoAba: {
+    tabText: {
         fontSize: 11,
         fontWeight: '600'
     },

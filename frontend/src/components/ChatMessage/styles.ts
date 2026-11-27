@@ -5,38 +5,37 @@ import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
 
 export const styles = StyleSheet.create({
-    balao: {
-        width: '100%',
-        maxWidth: 290,
+    balloon: {
+        maxWidth: '88%',
         paddingHorizontal: 14,
         paddingVertical: 10,
         borderRadius: 16,
         gap: spacing.sm,
     },
 
-    balaoAssistente: {
+    assistantBubble: {
         alignSelf: 'flex-start',
         backgroundColor: '#E6F2DA',
         borderBottomLeftRadius: 4,
     },
 
-    balaoUsuario: {
+    userBubble: {
         alignSelf: 'flex-end',
         backgroundColor: colors.secondary,
         borderBottomRightRadius: 4,
     },
 
-    mensagem: {
+    message: {
         fontSize: 14,
         lineHeight: 20,
         color: '#1E2B25',
     },
 
-    mensagemUsuario: {
+    userMessage: {
         color: '#FFFFFF',
     },
 
-    caixaFonte: {
+    sourceBox: {
         backgroundColor: '#FFFFFF',
         borderColor: '#D5E3CB',
         borderWidth: 1,
@@ -45,7 +44,7 @@ export const styles = StyleSheet.create({
         paddingVertical: 6,
     },
 
-    textoFonte: {
+    sourceText: {
         fontSize: typography.sizes.small,
         color: '#44544B',
     },

@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { View, Text, Image, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { Undo2, Settings, Pencil, CircleUser, Phone, MapPin, Lock, type LucideIcon } from 'lucide-react-native';
+import { Undo2, Settings, Pencil, CircleUser, Phone, MapPin, Building2, Lock, type LucideIcon } from 'lucide-react-native';
 import { Button } from '../../components/Button/Button';
 import { IconButton } from '../../components/IconButton/IconButton';
 import { Header } from '../../components/header/header';
@@ -9,6 +9,7 @@ import { colors } from '../../theme/colors';
 import { api, useSession } from '../../session/provider';
 import { roleNames } from '../../api/reali';
 import { styles } from './styles';
+import { LogoutModal } from '../../components/LogoutModal/LogoutModal';
 
 type LinhaProps = {
   icone: LucideIcon;
@@ -21,26 +22,30 @@ const Linha = ({ icone: Icone, texto, onPress }: LinhaProps) => {
   const conteudo = (
     <>
       <Icone size={20} color={colors.primary} />
-      <Text style={styles.linhaTexto}>{texto}</Text>
+      <Text style={styles.lineText}>{texto}</Text>
     </>
   );
 
   if (onPress) {
     return (
       <TouchableOpacity
-        style={styles.linha}
+        style={styles.line}
         onPress={onPress}
         activeOpacity={0.7}
+        accessibilityRole="button"
       >
         {conteudo}
       </TouchableOpacity>
     );
   }
 
-  return <View style={styles.linha}>{conteudo}</View>;
+  return <View style={styles.line}>{conteudo}</View>;
 };
 
-export default function PerfilUsuario({ onVoltar }: { onVoltar?: () => void } = {}) {
+export default function PerfilUsuario({ onVoltar, onSelecionarContexto }: {
+  onVoltar?: () => void;
+  onSelecionarContexto?: () => void;
+} = {}) {
   const { me, workspace, signOut, updateProfile } = useSession();
   const [editor, setEditor] = useState<'profile' | 'password' | null>(null);
   const [name, setName] = useState('');
@@ -52,6 +57,7 @@ export default function PerfilUsuario({ onVoltar }: { onVoltar?: () => void } = 
   const running = useRef(false);
   const role = workspace?.member.role;
   const photo = me?.user.profile_photo;
+  const [logoutVisible, setLogoutVisible] = useState(false);
 
   function openEditor(next: typeof editor) {
     if (running.current) return;
@@ -115,57 +121,61 @@ export default function PerfilUsuario({ onVoltar }: { onVoltar?: () => void } = 
 
   return (
     <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
-      <View style={styles.perfilTopo}>
-        <View style={styles.fundoTopo} />
-
+      <View style={styles.topProfile}>
+        <View style={styles.topBackground} />
+        
         <Header
           name="MEU PERFIL"
-          containerStyle={styles.topo}
-          titleStyle={styles.titulo}
+          containerStyle={styles.top}
+          titleStyle={styles.title}
           left={
             <IconButton
               icon={Undo2}
               color={colors.white}
               size={24}
-              style={styles.iconeTopo}
+              style={styles.topIcon}
               accessibilityLabel="Voltar"
               onPress={() => onVoltar?.()}
             />
           }
-          right={<View style={styles.iconeEspacador} />}
+          right={<View style={styles.iconSpacer} />}
         />
 
         <View style={styles.avatarArea}>
-          <View style={styles.avatarBorda}>
-            <Image
+          
+          <View style={styles.avatarBorder}>
+            <Image 
               source={photo ? { uri: 'data:image/jpeg;base64,' + photo } : require('../../assets/foto-de-perfil.jpg')}
-              style={styles.avatar}
-            />
+              style={styles.avatar} />
+
           </View>
           <IconButton
             icon={Pencil}
             color={colors.white}
             size={16}
-            style={styles.editar}
+            style={styles.edit}
             accessibilityLabel="Alterar foto"
             onPress={changePhoto}
           />
         </View>
       </View>
 
-      <Text style={styles.nome}>{me?.user.full_name || me?.user.email || "—"}</Text>
-      <Text style={styles.cargo}>{role ? roleNames[role] ?? role : "—"}</Text>
+      <Text style={styles.name}>{me?.user.full_name || me?.user.email || "—"}</Text>
+      <Text style={styles.position}>{role ? roleNames[role] ?? role : "—"}</Text>
 
-      <View style={styles.conteudo}>
+      <View style={styles.content}>
         <View style={styles.card}>
-          <Text style={styles.cardTitulo}>Dados pessoais</Text>
+          <Text style={styles.cardTitle}>Dados pessoais</Text>
           <Linha icone={CircleUser} texto={me?.user.email ?? "—"} />
           <Linha icone={Phone} texto="—" />
           <Linha icone={MapPin} texto={workspace?.school?.name ?? "—"} />
         </View>
 
-        <View style={[styles.card, styles.cardConta]}>
-          <Text style={styles.cardTitulo}>Minha conta</Text>
+        <View style={[styles.card, styles.cardAccount]}>
+          <Text style={styles.cardTitle}>Minha conta</Text>
+          {onSelecionarContexto && (
+            <Linha icone={Building2} texto="Trocar organização ou escola" onPress={onSelecionarContexto} />
+          )}
           <Linha
             icone={Settings}
             texto="Editar perfil"
@@ -180,7 +190,7 @@ export default function PerfilUsuario({ onVoltar }: { onVoltar?: () => void } = 
 
         {editor && (
           <View style={styles.card}>
-            <Text style={styles.cardTitulo}>{editor === 'profile' ? 'Editar perfil' : 'Editar senha'}</Text>
+            <Text style={styles.cardTitle}>{editor === 'profile' ? 'Editar perfil' : 'Editar senha'}</Text>
             {editor === 'profile' ? (
               <>
                 <Text>Nome completo</Text>
@@ -208,10 +218,19 @@ export default function PerfilUsuario({ onVoltar }: { onVoltar?: () => void } = 
         {(busy || message) && <Text accessibilityLiveRegion="polite">{busy ? 'Processando…' : message}</Text>}
         <Button
           label="Sair da conta"
-          style={styles.botaoSair}
-          textStyle={styles.botaoSairTexto}
-          onPress={signOut}
+          style={styles.exitButton}
+          textStyle={styles.exitButtonText}
+          onPress={() => setLogoutVisible(true)}
           disabled={busy}
+        />
+
+        <LogoutModal
+          visible={logoutVisible}
+          onCancel={() => setLogoutVisible(false)}
+          onConfirm={() => {
+            setLogoutVisible(false);
+            void run(signOut);
+          }}
         />
       </View>
     </ScrollView>

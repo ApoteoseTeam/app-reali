@@ -32,7 +32,7 @@ import { Header } from '../components/header/header';
 import { Banner } from "../components/Banner/Banner";
 import { SegmentedControl } from '../components/SegmentedControl/SegmentedControl';
 import { RecordCard } from '../components/RecordCard/RecordCard';
-export default function testPage() {
+export default function TestPage() {
   const [checked, setChecked] = useState(false);
   const [categoria, setCategoria] = useState('');
   const [periodo, setPeriodo] = useState("Semana")

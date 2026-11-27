@@ -1,45 +1,41 @@
 import { Text, View } from 'react-native';
 
-import { Chip } from '../Chip/Chip';
 import { styles } from './styles';
 
 type ChatMessageProps = {
     remetente: 'assistente' | 'usuario';
     mensagem: string;
-    fonte?: string;
-    observacao?: string;
+    fontes?: { id: number; label: string }[];
 };
 
 export function ChatMessage({
     remetente,
     mensagem,
-    fonte,
-    observacao,
+    fontes,
 }: ChatMessageProps) {
     const isUsuario = remetente === 'usuario';
-    const nomeRemetente = isUsuario ? 'Você' : 'Assistente virtual';
+    const nomeRemetente = isUsuario ? 'Você' : 'RealInova';
 
     return (
         <View
             style={[
-                styles.balao,
-                isUsuario ? styles.balaoUsuario : styles.balaoAssistente,
+                styles.balloon,
+                isUsuario ? styles.userBubble : styles.assistantBubble,
             ]}
         >
             <Text
-                style={[styles.mensagem, isUsuario && styles.mensagemUsuario]}
+                style={[styles.message, isUsuario && styles.userMessage]}
                 accessibilityLabel={`${nomeRemetente}: ${mensagem}`}
             >
                 {mensagem}
             </Text>
 
-            {fonte ? (
-                <View style={styles.caixaFonte}>
-                    <Text style={styles.textoFonte}>Fonte: {fonte}</Text>
+            {!!fontes?.length && (
+                <View style={styles.sourceBox}>
+                    <Text style={styles.sourceText}>Fontes</Text>
+                    {fontes.map(fonte => <Text key={fonte.id} style={styles.sourceText}>{fonte.label}</Text>)}
                 </View>
-            ) : null}
-
-            {observacao ? <Chip texto={observacao} /> : null}
+            )}
         </View>
     );
 }

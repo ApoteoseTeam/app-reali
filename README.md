@@ -1,276 +1,164 @@
-<div>
-  Se você esta vendo isso nessa etapa do projeto, você é um desenvolvedor.
+# Reali
 
-Para começar a desenvolver, siga os seguintes passos:
+O Reali apoia o planejamento e o acompanhamento da alimentação escolar. A interface reúne fluxos para gestão e cozinha, como consulta de cardápios, registro da produção e visualização de indicadores. O backend organiza o acesso por instituição e escola, recebe contagens de dispositivos e disponibiliza previsões, relatórios e notificações. O chat RealInova é uma integração opcional.
 
-1 - Clone o reposotório.
+## Estrutura do projeto
 
-2 - confira se esta conectado ao repositório remoto: https://github.com/ApoteoseTeam/ReAlimenta.git
+| Pasta ou arquivo | Responsabilidade |
+| --- | --- |
+| `frontend/` | Aplicativo Expo SDK 58 com React Native, TypeScript e suporte à web via React Native Web. |
+| `frontend/src/` | Telas, componentes, cliente REST, gerenciamento de sessão e serviços do aplicativo. |
+| `frontend/app.json` e `frontend/eas.json` | Configuração do app e perfis de compilação Expo. |
+| `backend/` | Django 5.2, Django REST Framework, autenticação JWT e regras de negócio. |
+| `backend/apps/` e `backend/config/` | Módulos Django, configuração do servidor e roteamento. |
+| `backend/docs/` | Contratos de integração e guias de operação. |
 
-3 - Faça as atualizações/novas funcionalidades.
+O frontend consome a API em `/api/v1/`. O Django usa SQLite por padrão em desenvolvimento e aceita PostgreSQL configurado por variáveis de ambiente.
 
-4 - faça o commit.
+## Executar localmente
 
-5 - suba para repositório remoto.
+Os comandos abaixo usam PowerShell. Instale Git, Node.js 24 com npm e Python 3.14. Para rodar no navegador, use dois terminais e mantenha os dois processos abertos.
 
-Obs:
+### 1. Clonar o projeto
 
-1 - Siga o padrão de commits para TODO projeto: https://www.conventionalcommits.org/pt-br/v1.0.0-beta.4/
+Se você já tem o repositório, abra a pasta dele e siga para o backend.
 
-# Guia de Desenvolvimento — Realimenta
-
-Este guia apresenta as instruções para configurar e executar o projeto **Realimenta** localmente, utilizando React Native, Expo e TypeScript.
-
-O desenvolvimento será realizado no VS Code, com visualização da aplicação diretamente pelo navegador.
-
-## 1. Tecnologias utilizadas
-
-- **React Native:** desenvolvimento da interface da aplicação.
-- **Expo SDK 58:** ferramentas e infraestrutura de desenvolvimento.
-- **TypeScript:** linguagem utilizada no projeto.
-- **React Native Web:** execução da aplicação no navegador.
-- **Git e GitHub:** versionamento e colaboração entre integrantes.
-
-## 2. Pré-requisitos
-
-Antes de clonar o repositório, instale:
-
-| Ferramenta | Versão recomendada | Download |
-|---|---|---|
-| Node.js | 24 LTS, 24.3+ | https://nodejs.org/ |
-| Git | Versão estável | https://git-scm.com/downloads |
-| VS Code | Versão estável | https://code.visualstudio.com/ |
-| Navegador | Chrome, Edge ou Firefox atualizado | — |
-
-O npm acompanha a instalação do Node.js.
-
-**Não é necessário instalar:** Android Studio, Java JDK, Gradle, Expo CLI globalmente ou emuladores Android/iOS.
-
-### Verificar as instalações
-
-Abra o terminal e execute:
-
-```bash
-node -v
-npm -v
-git --version
+```powershell
+git clone https://github.com/ApoteoseTeam/app-reali.git
+cd app-reali
 ```
 
-Os comandos devem retornar as versões instaladas.
+### 2. Iniciar o backend
 
-## 3. Clonando o repositório
+No primeiro terminal, partindo da raiz:
 
-Abra o terminal do VS Code ou PowerShell e execute:
-
-```bash
-git clone https://github.com/ApoteoseTeam/app-realimenta.git
+```powershell
+cd backend
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+$env:DJANGO_DEBUG = 'true'
+.\.venv\Scripts\python.exe manage.py check
+.\.venv\Scripts\python.exe manage.py migrate
+.\.venv\Scripts\python.exe manage.py runserver
 ```
 
-Entre na pasta do projeto:
+Em Linux ou macOS, use `./.venv/bin/python` e `export DJANGO_DEBUG=true`. Com `POSTGRES_DB` ausente no ambiente, o Django cria o banco local `backend/db.sqlite3`. As configurações são lidas do ambiente do processo. Use o [exemplo de variáveis](backend/.env.example) como referência.
 
-```bash
-cd app-realimenta
-```
+| Endereço local | Uso |
+| --- | --- |
+| [http://127.0.0.1:8000/api/docs/](http://127.0.0.1:8000/api/docs/) | Swagger no modo de desenvolvimento. |
+| [http://127.0.0.1:8000/api/schema/](http://127.0.0.1:8000/api/schema/) | Esquema OpenAPI no modo de desenvolvimento. |
+| [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/) | Administração do Django. |
 
-> **Importante:** integrantes precisam ter acesso à organização ou ao repositório no GitHub caso ele seja privado.
+### 3. Iniciar o frontend
 
-## 4. Instalando as dependências
+No segundo terminal, partindo da raiz:
 
-Na raiz do projeto, execute:
-
-```bash
+```powershell
+cd frontend
 npm ci
+Copy-Item .env.example .env.local
+npm run web
 ```
 
-Esse comando instala as dependências conforme as versões registradas no arquivo `package-lock.json`.
+Se `.env.local` já existir, preserve o arquivo e confira se `EXPO_PUBLIC_API_URL=http://127.0.0.1:8000/api/v1` corresponde ao backend local. Abra o endereço mostrado pelo Expo, normalmente [http://localhost:8081](http://localhost:8081). Reinicie o Expo ao alterar a URL da API.
 
-As principais dependências incluem:
+### 4. Preparar acesso e dados
 
-- React
-- React Native
-- Expo
-- TypeScript
-- React Native Web
-- React DOM
-- Expo Metro Runtime
+As contas institucionais são provisionadas por convite. Em um banco vazio, crie um operador local em outro terminal, a partir de `backend/`:
 
-Não é necessário instalar essas dependências individualmente.
-
-**Atenção:** não execute `npm audit fix --force` sem alinhamento com a equipe. Atualizações forçadas podem causar incompatibilidades com o Expo.
-
-## 5. Executando o Realimenta na Web
-
-Após instalar as dependências, execute:
-
-```bash
-npx expo start --web
+```powershell
+.\.venv\Scripts\python.exe manage.py createsuperuser
 ```
 
-O Expo iniciará o servidor de desenvolvimento.
+Use esse operador para o fluxo administrativo. Para testar o aplicativo, provisione uma instituição, uma escola e uma conta institucional com o vínculo e o papel que você quer testar. O fluxo de convite usa `REALI_ACTIVATION_URL` e configuração de e-mail. O [guia de autenticação](backend/docs/AUTHENTICATION.md) detalha permissões, provisionamento, ativação e recuperação de senha.
 
-Normalmente, a aplicação estará disponível em:
+### Usar PostgreSQL em desenvolvimento
 
-```text
-http://localhost:8081
+Crie previamente a base e um usuário com permissão para criar tabelas no schema. No terminal do Django, configure as variáveis abaixo e exporte `POSTGRES_PASSWORD` com a senha do usuário do banco.
+
+```powershell
+$env:POSTGRES_DB = 'reali'
+$env:POSTGRES_USER = 'reali'
+$env:POSTGRES_HOST = '127.0.0.1'
+$env:POSTGRES_PORT = '5432'
+.\.venv\Scripts\python.exe manage.py migrate --plan
+.\.venv\Scripts\python.exe manage.py migrate
+.\.venv\Scripts\python.exe manage.py runserver
 ```
 
-Abra esse endereço no navegador.
+## Android
 
-### Atualizações em tempo real
+### Rodar em um emulador durante o desenvolvimento
 
-O Expo utiliza Fast Refresh para atualizar a aplicação durante o desenvolvimento.
+Com o Android SDK, um JDK compatível e um emulador configurados, ajuste `EXPO_PUBLIC_API_URL` em `frontend/.env.local` para `http://10.0.2.2:8000/api/v1`. Esse endereço permite ao emulador padrão do Android alcançar o backend na máquina de desenvolvimento. Acrescente `10.0.2.2` aos hosts permitidos e reinicie o backend no terminal dele:
 
-Ao modificar um componente e salvar o arquivo, as alterações geralmente serão refletidas automaticamente no navegador.
-
-Para encerrar o servidor:
-
-```text
-Ctrl + C
+```powershell
+$env:DJANGO_ALLOWED_HOSTS = 'localhost,127.0.0.1,10.0.2.2'
+.\.venv\Scripts\python.exe manage.py runserver
 ```
 
-## 6. Organização do trabalho com Git
+No terminal do frontend, com o emulador aberto, rode `npm run android`. Para um dispositivo físico conectado à mesma rede, use o IP local do computador na URL da API, inclua esse IP em `DJANGO_ALLOWED_HOSTS` e inicie o Django com `manage.py runserver 0.0.0.0:8000`. O aparelho precisa conseguir alcançar a porta 8000. Consulte o [guia de integração mobile](backend/MOBILE_REACT_NATIVE.md).
 
-Cada integrante deve desenvolver suas funcionalidades em uma branch própria.
+### Gerar um APK para instalar no celular
 
-Evite realizar alterações diretamente na branch `main`.
+O perfil `preview` em [eas.json](frontend/eas.json) usa distribuição interna, que gera um APK para instalação direta. Confira estes pontos antes do build:
 
-### Atualizar a branch principal
+1. Os arquivos de ícone, splash e favicon usados pelo [app.json](frontend/app.json) ficam em `frontend/src/assets/`. Mantenha os caminhos do Expo atualizados caso substitua esses arquivos.
+2. Entre com uma conta Expo com acesso ao projeto EAS identificado por `extra.eas.projectId` no `app.json`.
+3. No ambiente EAS `preview`, defina `EXPO_PUBLIC_API_URL` como a URL HTTPS do backend com o caminho `/api/v1`. O endereço precisa estar acessível pelo celular. O app exige HTTPS nas compilações de release e incorpora essa URL no pacote. Mantenha credenciais no ambiente do backend.
 
-Antes de iniciar uma tarefa:
+Em `frontend/`, execute:
 
-```bash
-git switch main
-git pull origin main
+```powershell
+npx eas-cli@latest login
+npx eas-cli@latest build --platform android --profile preview
 ```
 
-### Criar uma branch
+Ao concluir, o EAS exibe o link do build. Abra o link no celular, baixe o APK e autorize a instalação pela origem usada se o Android solicitar. Para a Google Play, o perfil `production` gera um AAB. [Guia de APK do Expo](https://docs.expo.dev/build-reference/apk/) · [Variáveis de ambiente do EAS](https://docs.expo.dev/eas/environment-variables/usage/)
 
-```bash
-git switch -c feature/nome-da-funcionalidade
+## Validação
+
+No backend, em `backend/`:
+
+```powershell
+.\.venv\Scripts\python.exe manage.py check
+.\.venv\Scripts\python.exe manage.py makemigrations --check --dry-run
+.\.venv\Scripts\python.exe -m pytest -q
+.\.venv\Scripts\ruff.exe check .
 ```
 
-Exemplos de nomes:
+No frontend, em `frontend/`:
 
-```text
-feature/tela-login
-feature/tela-home
-feature/cadastro-usuario
-fix/correcao-formulario
+```powershell
+npx tsc --noEmit
 ```
 
-### Registrar alterações
+No checkout atual, a checagem TypeScript aponta diferenças de maiúsculas e minúsculas nos imports de Header, Select, Progressbar e Skeleton, além de uma propriedade duplicada em `HomeGestao/styles.ts`. Em ambientes que distinguem maiúsculas de minúsculas, como o servidor de build Android, alinhe os imports aos nomes reais dos arquivos para evitar erros de resolução.
 
-Depois de concluir uma alteração:
+Com os dois serviços ativos, abra o Swagger, carregue o frontend e entre com uma conta institucional provisionada. Confira se aparecem as telas correspondentes ao papel da conta.
 
-```bash
-git status
-git add .
-git commit -m "feat: adiciona tela de login"
-```
+## Problemas comuns
 
-### Enviar a branch ao GitHub
+| Sintoma | O que verificar |
+| --- | --- |
+| `npm ci` não encontra o manifesto | Execute o comando na pasta `frontend/`, que contém `package.json` e `package-lock.json`. |
+| Swagger retorna 404 | Confira se `DJANGO_DEBUG=true` está no ambiente em que o Django foi iniciado. |
+| O navegador bloqueia a API por CORS | Confira a URL da API e inclua a origem do Expo em `DJANGO_CORS_ALLOWED_ORIGINS` se usar outra porta ou outro domínio. |
+| Django retorna `DisallowedHost` | Inclua o hostname ou IP usado pelo cliente em `DJANGO_ALLOWED_HOSTS`. |
+| O APK abre, mas o login falha | Confira a URL HTTPS no ambiente EAS `preview`, a disponibilidade da API pelo celular e o vínculo da conta. Gere outro APK se corrigir a URL. |
+| O build falha ao ler um ícone ou splash | Confira a existência e o caminho de cada imagem declarada em `frontend/app.json`. |
 
-```bash
-git push -u origin feature/nome-da-funcionalidade
-```
+## Outros guias
 
-Em seguida, abra um **Pull Request** no GitHub para que as alterações sejam revisadas antes de integrar à `main`.
+- [Backend, configuração de produção e tarefas recorrentes](backend/README.md)
+- [Rotas da API](backend/API_ENDPOINTS.md)
+- [Autenticação, convites e operação](backend/docs/AUTHENTICATION.md)
+- [Serviços de merenda](backend/docs/MEAL_SERVICES.md) e [previsões](backend/docs/FORECAST_ENGINE.md)
+- [Integração de dispositivos e contagens](backend/docs/VISION_INTEGRATION.md)
+- [Indicadores e relatórios](backend/docs/REPORTING_API.md)
+- [Configuração de provedores do RealInova](backend/docs/REALINOVA_PROVIDERS.md)
 
-## 7. Padrão de commits
+## Contribuir
 
-Utilizamos mensagens padronizadas para facilitar o acompanhamento das alterações.
-
-| Prefixo | Utilização |
-|---|---|
-| `feat:` | Nova funcionalidade |
-| `fix:` | Correção de erro |
-| `refactor:` | Refatoração sem mudança funcional |
-| `style:` | Ajustes de formatação do código |
-| `docs:` | Alterações na documentação |
-| `chore:` | Configurações e manutenção |
-| `test:` | Inclusão ou alteração de testes |
-
-Exemplos:
-
-```bash
-git commit -m "feat: implementa cadastro de usuários"
-git commit -m "fix: corrige validação do formulário"
-git commit -m "docs: atualiza instruções de instalação"
-```
-
-## 8. Boas práticas de desenvolvimento
-
-- Utilize TypeScript para tipar componentes, propriedades, funções e dados.
-- Evite modificar arquivos de configuração sem comunicar a equipe.
-- Crie componentes reutilizáveis.
-- Mantenha as alterações organizadas por funcionalidade.
-- Não envie `node_modules` para o GitHub.
-- Não publique senhas, tokens, credenciais ou arquivos `.env` com informações sensíveis.
-- Execute a aplicação antes de abrir um Pull Request.
-- Atualize a documentação sempre que houver mudanças relevantes no ambiente.
-
-## 9. Solução de problemas
-
-### O comando `npm` não é reconhecido
-
-Verifique se o Node.js está instalado:
-
-```bash
-node -v
-```
-
-Se necessário, reinstale o Node.js e reinicie o terminal.
-
-### O comando `npm ci` apresenta erros
-
-Verifique se você está na raiz do projeto, onde ficam `package.json` e `package-lock.json`.
-
-Se esses arquivos estiverem corretos e o erro persistir, compartilhe a mensagem no canal técnico da equipe antes de modificar as dependências.
-
-### A aplicação Web não inicia
-
-Execute:
-
-```bash
-npx expo-doctor
-```
-
-Para verificar a compatibilidade das dependências.
-
-Se houver problemas relacionados ao cache, tente:
-
-```bash
-npx expo start --web --clear
-```
-
-### A porta 8081 está ocupada
-
-O Expo poderá solicitar outra porta. Utilize o endereço informado no terminal.
-
-### A aplicação funciona no Android, mas não na Web
-
-Algumas bibliotecas nativas não possuem suporte Web.
-
-Nesses casos, será necessário verificar a compatibilidade da biblioteca ou implementar um comportamento específico para o navegador.
-
-## 10. Fluxo diário resumido
-
-Após a configuração inicial:
-
-1. Abrir o VS Code.
-2. Atualizar a branch principal com `git pull`.
-3. Criar ou acessar sua branch de trabalho.
-4. Executar `npx expo start --web`.
-5. Desenvolver e testar as funcionalidades.
-6. Criar commits com mensagens padronizadas.
-7. Enviar as alterações ao GitHub.
-8. Abrir um Pull Request para revisão.
-
----
-
-**Equipe:** Apoteose Team  
-**Projeto:** Realimenta  
-**Stack mobile/web:** React Native + Expo + TypeScript
-
-> O objetivo deste fluxo é manter o desenvolvimento colaborativo organizado e permitir que todos trabalhem no Realimenta utilizando apenas o computador e o navegador, sem necessidade de emuladores.
-</div>
+Crie uma branch a partir de `main`, valide as mudanças e abra um pull request. Use [Conventional Commits](https://www.conventionalcommits.org/pt-br/v1.0.0/) nas mensagens de commit, como `docs: detalha a execução local`.

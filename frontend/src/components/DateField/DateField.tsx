@@ -61,7 +61,7 @@ export function DateField({
             <Text style={styles.label}>{label}</Text>
 
             <Pressable
-                style={styles.campo}
+                style={styles.field}
                 onPress={() => setAberto(true)}
                 accessibilityRole="button"
                 accessibilityLabel={`${label}, ${dataFormatada || 'nenhuma data selecionada'
@@ -98,13 +98,13 @@ export function DateField({
                 animationType="fade"
                 onRequestClose={fecharCalendario}
             >
-                <View style={styles.fundoModal}>
+                <View style={styles.modalBackground}>
                     <ScrollView
-                        style={styles.janela}
-                        contentContainerStyle={styles.conteudoJanela}
+                        style={styles.window}
+                        contentContainerStyle={styles.windowContent}
                         accessibilityViewIsModal
                     >
-                        <Text style={styles.titulo} accessibilityRole="header">
+                        <Text style={styles.title} accessibilityRole="header">
                             {label}
                         </Text>
 

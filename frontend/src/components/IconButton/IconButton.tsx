@@ -6,17 +6,21 @@ interface IconButtonProps {
     icon: LucideIcon;
     onPress: () => void;
     accessibilityLabel?: string;
+    disabled?: boolean;
     color?: string;
     size?: number;
     style?: StyleProp<ViewStyle>;
 }
 
-export const IconButton = ({ icon: Icon, onPress, accessibilityLabel, color, size, style }: IconButtonProps) => {
+export const IconButton = ({ icon: Icon, onPress, accessibilityLabel, disabled, color, size, style }: IconButtonProps) => {
     return (
         <Pressable
             accessibilityRole="button"
             accessibilityLabel={accessibilityLabel}
-            onPress={onPress} style={({ pressed }) => [style ?? IconButtonStyle.Button, pressed && IconButtonStyle.buttonPressed,]}>
+            disabled={disabled}
+            accessibilityState={{ disabled }}
+            onPress={onPress}
+            style={({ pressed }) => [style ?? IconButtonStyle.Button, pressed && IconButtonStyle.buttonPressed, disabled && { opacity: 0.45 }]}>
             <Icon color={color} size={size} />
         </Pressable>
     )

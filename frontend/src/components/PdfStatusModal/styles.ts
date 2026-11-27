@@ -2,14 +2,14 @@ import { StyleSheet } from "react-native";
 const azul = '#102B53';
 
 export const styles = StyleSheet.create({
-    fundo: {
+    background: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
         padding: 24,
         backgroundColor: 'rgba(0, 0, 0, 0.48)',
     },
-    cartao: {
+    card: {
         width: '100%',
         maxWidth: 340,
         alignItems: 'center',
@@ -18,7 +18,7 @@ export const styles = StyleSheet.create({
         borderRadius: 20,
         backgroundColor: '#FFFFFF',
     },
-    icone: {
+    icon: {
         width: 52,
         height: 52,
         borderRadius: 26,
@@ -26,15 +26,23 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: '#E6F2DA',
     },
-    iconeErro: { backgroundColor: '#FCE4DE' },
-    titulo: {
+
+    errorIcon: {
+        backgroundColor: '#FCE4DE'
+    },
+
+    title: {
         color: azul,
         fontSize: 18,
         fontWeight: '700',
         textAlign: 'center',
     },
-    descricao: { color: '#465950', fontSize: 13, textAlign: 'center' },
-    arquivo: {
+
+    description: {
+        color: '#465950', fontSize: 13, textAlign: 'center'
+    },
+
+    archive: {
         color: azul,
         backgroundColor: '#E6F2DA',
         borderRadius: 12,
@@ -42,16 +50,44 @@ export const styles = StyleSheet.create({
         paddingVertical: 6,
         textAlign: 'center',
     },
-    acoes: { width: '100%', gap: 8 },
-    botao: {
+
+    rail: {
+        width: '100%',
+        height: 6,
+        borderRadius: 3,
+        overflow: 'hidden',
+        backgroundColor: '#DCE8CF',
+    },
+
+    bar: {
+        height: '100%', borderRadius: 3, backgroundColor: azul
+    },
+
+    actions: {
+        width: '100%', gap: 8
+    },
+
+    button: {
         minHeight: 44,
         alignItems: 'center',
         justifyContent: 'center',
         paddingHorizontal: 12,
         borderRadius: 10,
     },
-    botaoPrincipal: { backgroundColor: azul },
-    botaoContorno: { borderColor: azul, borderWidth: 1 },
-    textoAzul: { color: azul },
-    textoBranco: { color: '#FFFFFF' },
+
+    mainButton: {
+        backgroundColor: azul
+    },
+
+    outlineButton: {
+        borderColor: azul, borderWidth: 1
+    },
+
+    blueText: {
+        color: azul
+    },
+    
+    whiteText: {
+        color: '#FFFFFF'
+    },
 });

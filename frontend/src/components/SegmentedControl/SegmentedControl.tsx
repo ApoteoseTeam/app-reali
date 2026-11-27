@@ -22,14 +22,14 @@ export const SegmentedControl = ({
             key={opcao}
             onPress={() => aoSelecionar(opcao)}
             style={[
-              styles.opcao,
-              ativo && styles.opcaoAtiva
+              styles.option,
+              ativo && styles.activeOption
             ]}
           >
             <Text
               style={[
-                styles.texto,
-                ativo && styles.textoAtivo
+                styles.text,
+                ativo && styles.activeText
               ]}
             >
               {opcao}

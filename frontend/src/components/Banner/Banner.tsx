@@ -25,14 +25,14 @@ export function Banner({ tipo = "info", titulo, mensagem }: Props) {
     ]}>
       <Ionicons name={icones[tipo]} size={22} color={cor.texto} />
 
-      <View style={styles.conteudo}>
+      <View style={styles.content}>
         {titulo && (
-          <Text style={[styles.titulo, { color: cor.texto }]}>
+          <Text style={[styles.title, { color: cor.texto }]}>
             {titulo}
           </Text>
         )}
 
-        <Text style={styles.mensagem}>{mensagem}</Text>
+        <Text style={styles.message}>{mensagem}</Text>
       </View>
     </View>
   )

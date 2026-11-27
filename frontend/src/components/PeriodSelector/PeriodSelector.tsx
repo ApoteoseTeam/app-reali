@@ -11,23 +11,26 @@ type PeriodSelectorProps = {
     onProximo: () => void;
     labelAnterior?: string;
     labelProximo?: string;
+    disableNext?: boolean;
+    disablePrevious?: boolean;
 };
 
-export function PeriodSelector({ periodo, onAnterior, onProximo, labelAnterior = 'Período anterior', labelProximo = 'Próximo período',
+export function PeriodSelector({ periodo, onAnterior, onProximo, disableNext, disablePrevious, labelAnterior = 'Período anterior', labelProximo = 'Próximo período',
 }: PeriodSelectorProps) {
     return (
         <View style={styles.container}>
             <IconButton
                 icon={ChevronLeft}
                 onPress={onAnterior}
+                disabled={disablePrevious}
                 accessibilityLabel={labelAnterior}
                 color={colors.secondary}
                 size={20}
-                style={styles.botao}
+                style={styles.button}
             />
 
             <Text
-                style={styles.periodo}
+                style={styles.period}
                 accessibilityLiveRegion="polite"
             >
                 {periodo}
@@ -36,10 +39,11 @@ export function PeriodSelector({ periodo, onAnterior, onProximo, labelAnterior =
             <IconButton
                 icon={ChevronRight}
                 onPress={onProximo}
+                disabled={disableNext}
                 accessibilityLabel={labelProximo}
                 color={colors.secondary}
                 size={20}
-                style={styles.botao}
+                style={styles.button}
             />
         </View>
     );

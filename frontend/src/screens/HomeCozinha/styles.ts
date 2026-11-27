@@ -10,25 +10,29 @@ export const coresRodape = {
 };
 
 export const styles = StyleSheet.create({
-    tela: {
+    screen: {
         flex: 1,
         backgroundColor: branco,
     },
-    cabecalho: {
+
+    header: {
         minHeight: 64,
         justifyContent: 'center',
         paddingHorizontal: 18,
         backgroundColor: azul,
     },
+
     logo: {
         width: 53,
         height: 53,
         tintColor: branco,
     },
+
     scroll: {
         flex: 1,
     },
-    conteudo: {
+
+    content: {
         width: '100%',
         maxWidth: 640,
         alignSelf: 'center',
@@ -36,20 +40,24 @@ export const styles = StyleSheet.create({
         paddingBottom: 28,
         gap: 24,
     },
-    saudacao: {
+
+    greeting: {
         paddingHorizontal: 4,
         gap: 4,
     },
-    titulo: {
+
+    title: {
         color: colors.secondary,
         fontSize: 22,
         fontWeight: '700',
     },
-    data: {
+
+    date: {
         color: '#52665B',
         fontSize: 14,
     },
-    cartao: {
+
+    card: {
         backgroundColor: colors.secondary,
         borderWidth: 0,
         borderRadius: 28,
@@ -57,38 +65,45 @@ export const styles = StyleSheet.create({
         paddingVertical: 28,
         gap: 22,
     },
-    rotulo: {
+
+    label: {
         color: branco,
         fontSize: 15,
         fontWeight: '700',
     },
-    numero: {
+
+    number: {
         color: branco,
         fontSize: 80,
         fontWeight: '700',
     },
-    presentes: {
+
+    presence: {
         color: branco,
         fontSize: 19,
     },
-    planejamento: {
+    
+    planning: {
         color: branco,
         fontSize: 28,
         fontWeight: '700',
         lineHeight: 36,
     },
-    foto: {
+
+    photo: {
         width: '100%',
         aspectRatio: 5 / 3,
         maxHeight: 205,
         borderRadius: 16,
     },
-    rodape: {
+
+    footer: {
         flexDirection: 'row',
         paddingHorizontal: 8,
         backgroundColor: azul,
     },
-    aba: {
+
+    tab: {
         flex: 1,
         minHeight: 52,
         paddingVertical: 6,
@@ -96,7 +111,8 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         gap: 3,
     },
-    textoAba: {
+
+    textTab: {
         color: branco,
         fontSize: 11,
         fontWeight: '600',

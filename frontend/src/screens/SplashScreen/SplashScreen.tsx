@@ -14,7 +14,7 @@ export const SplashScreen = ({ progress }: SplashScreenProps) => {
                 style={styles.logo}
             />
             <ProgressBar progress={progress} />
-            <Text style={styles.texto}>Iniciando...</Text>
+            <Text style={styles.text}>Iniciando...</Text>
         </View>
     );
 };

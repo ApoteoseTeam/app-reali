@@ -1,38 +1,31 @@
 import { StyleSheet } from "react-native";
+import { colors } from "../../theme/colors";
 
 export const styles = StyleSheet.create({
-
     footer: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-around",
         width: "100%",
         height: 56,
-        backgroundColor: "#E6F0DF",
+        backgroundColor: colors.primary,
         borderTopWidth: 1,
-        borderTopColor: "#D6E5CD",
+        borderTopColor: colors.primary,
     },
 
     item: {
         flex: 1,
+        height: '100%',
         alignItems: "center",
         justifyContent: "center",
     },
 
-    iconButton: {
-        padding: 2,
-        backgroundColor: "transparent",
-    },
-
     label: {
         fontSize: 9,
-        color: "#718078",
         marginTop: 2,
     },
 
     activeLabel: {
-        color: "#315E50",
         fontWeight: "bold",
     },
-
 });

@@ -15,7 +15,7 @@ export const styles = StyleSheet.create({
         color: colors.text,
     },
 
-    campo: {
+    field: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 12,
@@ -40,7 +40,7 @@ export const styles = StyleSheet.create({
         color: '#565656',
     },
 
-    fundoModal: {
+    modalBackground: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
@@ -48,7 +48,7 @@ export const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.45)',
     },
 
-    janela: {
+    window: {
         width: '100%',
         maxWidth: 380,
         maxHeight: '90%',
@@ -57,12 +57,12 @@ export const styles = StyleSheet.create({
         borderRadius: 16,
     },
 
-    conteudoJanela: {
+    windowContent: {
         padding: 16,
         gap: 16,
     },
 
-    titulo: {
+    title: {
         fontSize: 18,
         fontWeight: typography.weights.bold,
         color: colors.secondary,
