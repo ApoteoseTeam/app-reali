@@ -1,6 +1,6 @@
 # Correções de contagem
 
-Os endpoints `GET/POST /api/v1/count-adjustments/`, `GET /api/v1/count-adjustments/{id}/` e `POST /api/v1/count-adjustments/{id}/reverse/` usam JWT e `X-Organization-ID`. A direção e a gestão só operam nas escolas autorizadas. O registro de correção contém ator, data de criação, escola, câmera, tipo, registro de origem, serviço se aplicável, delta, justificativa e ID de auditoria.
+Os endpoints `GET/POST /api/v1/count-adjustments/`, `GET /api/v1/count-adjustments/{id}/` e `POST /api/v1/count-adjustments/{id}/reverse/` usam JWT e `X-Organization-ID`. O gestor só opera nas escolas autorizadas. O registro de correção contém ator, data de criação, escola, câmera, tipo, registro de origem, serviço se aplicável, delta, justificativa e ID de auditoria.
 
 Para corrigir uma contagem existente, envie o tipo e a referência. Escola, câmera, horário e serviço são herdados do original.
 

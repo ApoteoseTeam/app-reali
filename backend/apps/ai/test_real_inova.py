@@ -218,7 +218,7 @@ def test_conversations_owner_org_status_history_delete_and_replay(site, provider
     Membership.objects.create(
         user=site.director.user,
         organization=site.foreign.organization,
-        role="DIRECTOR",
+        role="MANAGER",
         all_schools_access=True,
     )
     other_org = client_for(site.director, site.foreign.organization_id)
@@ -430,8 +430,11 @@ def test_limits_are_scoped_and_tools_apply_rbac(site, provider):
     DailyMetrics.objects.create(
         school=site.foreign, reference_date=site.day, total_student_entries=98765
     )
-    for role in ("DIRECTOR", "MANAGER", "COOK", "SECRETARIAT"):
-        member = site.director if role == "DIRECTOR" else membership(site.school, role)
+    for member in (
+        site.director,
+        *(membership(site.school, role) for role in ("MANAGER", "COOK", "SECRETARIAT")),
+    ):
+        role = member.role
         scope = user_scope(
             member.user_id, site.org.pk, member.user.session_version
         ).bind(None)
@@ -460,26 +463,27 @@ def test_limits_are_scoped_and_tools_apply_rbac(site, provider):
                 tools.get_student_counts(str(site.day - timedelta(days=60)))["error"]
                 == "AI_INVALID_ARGUMENTS"
             )
-        if role in ("DIRECTOR", "SECRETARIAT", "MANAGER"):
+        if role in ("MANAGER", "SECRETARIAT"):
             comparison = tools.compare_schools(day)
             assert str(site.foreign.pk) not in json.dumps(comparison, default=str)
     usage = client_for(member).get(ROOT + "usage/").json()
     assert usage["organization"] is None
 
 
-def test_director_retains_legacy_admin_conversations_for_same_scope(site):
+@pytest.mark.parametrize("previous_role", ("DIRECTOR", "ADMIN"))
+def test_manager_retains_legacy_conversations_for_same_scope(site, previous_role):
     member = site.director
     scope = user_scope(member.user_id, site.org.pk, member.user.session_version)
     legacy = AIConversation.objects.create(
         user=member.user,
         organization=site.org,
-        access_role="ADMIN",
-        scope_key=scope.key_for_role("ADMIN"),
+        access_role=previous_role,
+        scope_key=scope.key_for_role(previous_role),
     )
     AIConversation.objects.create(
         user=member.user,
         organization=site.org,
-        access_role="ADMIN",
+        access_role=previous_role,
         scope_key="previous-school-scope",
     )
     assert list(scope.conversations()) == [legacy]

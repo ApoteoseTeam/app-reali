@@ -50,7 +50,7 @@ def site(monkeypatch):
     director = User.objects.create(email="director@example.com")
     cook = User.objects.create(email="cook@example.com")
     Membership.objects.create(
-        user=director, organization=org, role="DIRECTOR", all_schools_access=True
+        user=director, organization=org, role="MANAGER", all_schools_access=True
     )
     local_access = Membership.objects.create(user=cook, organization=org, role="COOK")
     SchoolAccess.objects.create(membership=local_access, school=school)

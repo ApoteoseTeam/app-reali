@@ -4,8 +4,8 @@
 |---|---|
 | Envio unitário e lote | Agente ativo e credencial válida para as câmeras atribuídas |
 | Envio unitário legado | Chave antiga ativa e câmera ainda sem agente, enquanto o modo legado estiver habilitado |
-| Consultas e resumos | Direção, gestão, nutrição ou secretaria no escopo concedido |
-| Ajustes e reversões | Direção ou gestão no escopo concedido |
+| Consultas e resumos | Gestor, nutrição ou secretaria no escopo concedido |
+| Ajustes e reversões | Gestor no escopo concedido |
 | Atividade técnica | Papéis de histórico técnico da câmera no escopo concedido |
 
 O token de dispositivo é o da Fase 3. A API revalida a credencial dentro da transação em que registra as contagens. Escolas e organizações desativadas interrompem novos envios. Um evento de prato aponta para um serviço da mesma escola. Filtros aplicados após o escopo nunca ampliam acesso. Câmeras e serviços fora do escopo recebem o mesmo erro de não localização de IDs inexistentes.

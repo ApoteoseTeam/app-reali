@@ -1,5 +1,6 @@
 from base64 import b64decode, b64encode
 from binascii import Error as Base64Error
+from collections.abc import Mapping
 from io import BytesIO
 
 from django.utils import timezone
@@ -207,7 +208,18 @@ class ProvisionSchoolSerializer(serializers.Serializer):
 
 class ApproveInstitutionSerializer(serializers.Serializer):
     schools = ProvisionSchoolSerializer(many=True, allow_empty=False, max_length=200)
-    director_email = serializers.EmailField(required=False)
+    manager_email = serializers.EmailField(required=False)
+
+    def to_internal_value(self, data):
+        # Preserve provisioning requests from existing API clients.
+        if (
+            isinstance(data, Mapping)
+            and "director_email" in data
+            and "manager_email" not in data
+        ):
+            data = data.copy()
+            data["manager_email"] = data["director_email"]
+        return super().to_internal_value(data)
 
     def validate_schools(self, schools):
         if len({school["code"] for school in schools}) != len(schools):
@@ -221,7 +233,7 @@ class DirectProvisionSerializer(ApproveInstitutionSerializer):
     phone = serializers.CharField(
         max_length=30, allow_blank=True, required=False, default=""
     )
-    director_email = serializers.EmailField()
+    manager_email = serializers.EmailField()
 
 
 class ProvisionedSerializer(serializers.Serializer):

@@ -1,1 +1,1 @@
-Seu acesso a {{ organization }} no Reali foi encerrado. Para mais informações, contate a direção da instituição.
+Seu acesso a {{ organization }} no Reali foi encerrado. Para mais informações, contate a gestão da instituição.

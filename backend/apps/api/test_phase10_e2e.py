@@ -63,7 +63,7 @@ def test_school_operations_from_invitation_to_report_over_http(
     Membership.objects.create(
         organization=organization,
         user=director,
-        role=Membership.Role.DIRECTOR,
+        role=Membership.Role.MANAGER,
         all_schools_access=True,
     )
     device = EdgeDevice.objects.create(school=school, name="Agente E2E")

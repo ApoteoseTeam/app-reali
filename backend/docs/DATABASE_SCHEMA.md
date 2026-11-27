@@ -943,7 +943,7 @@ Os tipos declarados e valores padrão são os do SQLite. O esquema de instância
 
 #### `users_membership`
 
-**Finalidade.** Vincula um usuário a uma organização e define seu papel, o estado do vínculo e se pode acessar todas as escolas. Os cargos vigentes são `DIRECTOR`, `MANAGER`, `NUTRITIONIST`, `COOK` e `SECRETARIAT`. Vínculos históricos `TEACHER` ficam inativos até receberem um cargo vigente e serem reativados.
+**Finalidade.** Vincula um usuário a uma organização e define seu papel, o estado do vínculo e se pode acessar todas as escolas. Os cargos vigentes são `MANAGER`, `NUTRITIONIST`, `COOK` e `SECRETARIAT`. Vínculos históricos `TEACHER` ficam inativos até receberem um cargo vigente e serem reativados.
 
 | Coluna | Tipo declarado | Aceita NULL | Padrão SQL | Chaves e referências |
 | --- | --- | --- | --- | --- |

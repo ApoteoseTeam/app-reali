@@ -33,7 +33,7 @@ class ApiRegressionTests(TestCase):
         cls.membership = Membership.objects.create(
             user=cls.user,
             organization=cls.org,
-            role=Membership.Role.DIRECTOR,
+            role=Membership.Role.MANAGER,
             all_schools_access=True,
         )
         cls.camera = Camera.objects.create(

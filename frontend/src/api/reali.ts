@@ -43,7 +43,7 @@ export type ChatResult = {
 };
 
 export const mealTypes: Record<MealType, string> = { BREAKFAST: "Café da manhã", LUNCH: "Almoço", SNACK: "Lanche", DINNER: "Jantar" };
-export const roleNames: Record<string, string> = { DIRECTOR: "Direção", MANAGER: "Gestão", COOK: "Cozinha", NUTRITIONIST: "Nutrição", SECRETARIAT: "Secretaria" };
+export const roleNames: Record<string, string> = { MANAGER: "Gestor", COOK: "Cozinha", NUTRITIONIST: "Nutrição", SECRETARIAT: "Secretaria" };
 
 export class RealiApi {
   constructor(readonly http: HttpClient) {}

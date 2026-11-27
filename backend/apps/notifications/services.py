@@ -5,7 +5,6 @@ from django.db.models import F, Q
 from django.utils import timezone
 
 from apps.api.permissions import (
-    DIRECTORS,
     KITCHEN_ROLES,
     MANAGEMENT_ROLES,
     ROLE_PERMISSIONS,
@@ -46,9 +45,9 @@ POLICIES = {
     Kind.FORECAST_DIFFERENCE: Policy(
         ROLE_PERMISSIONS["analytics_reports"], Priority.HIGH
     ),
-    Kind.INVITATION_CREATED: Policy(DIRECTORS),
-    Kind.INVITATION_EXPIRING: Policy(DIRECTORS, email=True),
-    Kind.INVITATION_CLOSED: Policy(DIRECTORS),
+    Kind.INVITATION_CREATED: Policy(MANAGEMENT_ROLES),
+    Kind.INVITATION_EXPIRING: Policy(MANAGEMENT_ROLES, email=True),
+    Kind.INVITATION_CLOSED: Policy(MANAGEMENT_ROLES),
     Kind.MEMBERSHIP_UPDATED: Policy(required=True),
     Kind.COUNT_ADJUSTMENT_CREATED: Policy(MANAGEMENT_ROLES),
     Kind.DATA_RECONCILED: Policy(ROLE_PERMISSIONS["analytics_reports"]),

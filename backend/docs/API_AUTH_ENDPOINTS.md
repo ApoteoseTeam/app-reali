@@ -1,6 +1,6 @@
 # Contrato HTTP de autenticação e acesso
 
-Base `/api/v1/`, JSON em UTF-8, JWT em `Authorization: Bearer <access>`. Rotas de direção e escolas exigem `X-Organization-ID`. A documentação navegável está em `/api/docs/` com `DEBUG=true`.
+Base `/api/v1/`, JSON em UTF-8, JWT em `Authorization: Bearer <access>`. Rotas de gestão e escolas exigem `X-Organization-ID`. A documentação navegável está em `/api/docs/` com `DEBUG=true`.
 
 | Método e caminho | Quem pode usar | Resposta de sucesso |
 |---|---|---|
@@ -12,17 +12,17 @@ Base `/api/v1/`, JSON em UTF-8, JWT em `Authorization: Bearer <access>`. Rotas d
 | `GET /admin/institution-requests/`, `GET /admin/institution-requests/{id}/` | Equipe com permissão de análise | `200` com lista paginada ou detalhe |
 | `POST /admin/institution-requests/{id}/approve/`, `POST /admin/institution-requests/{id}/reject/` | Equipe com permissão de análise | `200` com solicitação revisada |
 | `POST /admin/organizations/provision/` | Equipe com permissão de análise | `201` com `organization` e `initial_invitation` |
-| `POST /admin/organizations/{id}/initial-invitation/` | Equipe com permissão de análise, sem direção ativa | `201` com novo convite de recuperação |
+| `POST /admin/organizations/{id}/initial-invitation/` | Equipe com permissão de análise, sem gestor ativo com acesso institucional | `201` com novo convite de recuperação |
 | `POST /admin/initial-invitations/{id}/resend/` ou `/revoke/` | Equipe com permissão de análise | `200` com o convite atualizado |
 | `POST /admin/users/{id}/revoke-sessions/` ou `/deactivate/` | Equipe com permissão de contas | `204` |
-| `POST /invitations/` | Direção autorizada | `201` com convite e estado do transporte |
-| `GET /invitations/`, `GET /invitations/{id}/` | Direção autorizada | `200` com até 100 itens recentes ou detalhe |
-| `POST /invitations/{id}/revoke/` ou `/resend/` | Direção autorizada | `200` com convite atualizado |
+| `POST /invitations/` | Gestor autorizado | `201` com convite e estado do transporte |
+| `GET /invitations/`, `GET /invitations/{id}/` | Gestor autorizado | `200` com até 100 itens recentes ou detalhe |
+| `POST /invitations/{id}/revoke/` ou `/resend/` | Gestor autorizado | `200` com convite atualizado |
 | `POST /auth/invitations/verify/` | Público | `200` com `{"valid":true}` |
 | `POST /auth/invitations/activate/` | Público para conta nova, com sessão do destinatário para conta existente | `200` com mensagem |
-| `GET /memberships/`, `GET /memberships/{id}/`, `PATCH /memberships/{id}/` | Direção autorizada | `200` com lista paginada ou vínculo |
-| `POST /memberships/{id}/deactivate/` ou `/reactivate/` | Direção autorizada | `200` com vínculo atualizado |
-| `GET /memberships/{id}/schools/`, `PUT /memberships/{id}/schools/` | Direção autorizada | `200` com `school_ids` e `all_schools_access` |
+| `GET /memberships/`, `GET /memberships/{id}/`, `PATCH /memberships/{id}/` | Gestor autorizado | `200` com lista paginada ou vínculo |
+| `POST /memberships/{id}/deactivate/` ou `/reactivate/` | Gestor autorizado | `200` com vínculo atualizado |
+| `GET /memberships/{id}/schools/`, `PUT /memberships/{id}/schools/` | Gestor autorizado | `200` com `school_ids` e `all_schools_access` |
 
 A listagem de vínculos aceita `organization`, `school`, `role` e `is_active`. O PATCH recebe `role`. Ativação e recuperação recebem `password_confirmation` junto da senha. Para aceitar com conta existente, envie somente `token` e o JWT dessa conta. Campos de papel e escola enviados na ativação não concedem privilégios. Listas paginadas usam `count`, `next`, `previous` e `results`.
 
@@ -45,10 +45,10 @@ Solicitação pública e aprovação correspondente
 ```
 
 ```json
-{"schools":[{"name":"Escola Municipal","code":"EM-01"}],"director_email":"direcao@example.com"}
+{"schools":[{"name":"Escola Municipal","code":"EM-01"}],"manager_email":"gestor@example.com"}
 ```
 
-O provisionamento direto acrescenta `name`, `email` e `phone` ao corpo da aprovação. O e-mail de direção é obrigatório nesse fluxo. A rejeição recebe `{"rejection_reason":"Motivo da decisão"}`. A recuperação da direção recebe `{"email":"direcao@example.com"}`.
+O provisionamento direto acrescenta `name`, `email` e `phone` ao corpo da aprovação. O campo `manager_email` é obrigatório nesse fluxo. O campo legado `director_email` continua aceito quando `manager_email` estiver ausente. A rejeição recebe `{"rejection_reason":"Motivo da decisão"}`. A recuperação do gestor inicial recebe `{"email":"gestor@example.com"}`.
 
 Convite e substituição de escolas
 

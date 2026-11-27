@@ -43,7 +43,8 @@ def api(member, organization=None):
 
 
 def membership(school, role, *, all_schools=False):
-    user = User.objects.create(email=f"{role.lower()}@example.com")
+    name = f"institutional-{role.lower()}" if all_schools else role.lower()
+    user = User.objects.create(email=f"{name}@example.com")
     member = Membership.objects.create(
         organization=school.organization,
         user=user,
@@ -66,7 +67,7 @@ def site():
         code="X",
         organization=Organization.objects.create(name="Outra rede"),
     )
-    director = membership(school, "DIRECTOR", all_schools=True)
+    director = membership(school, "MANAGER", all_schools=True)
     device = EdgeDevice.objects.create(name="Agente", school=school)
     entrance = Camera.objects.create(
         name="Portaria", school=school, edge_device=device, camera_type="ENTRANCE"

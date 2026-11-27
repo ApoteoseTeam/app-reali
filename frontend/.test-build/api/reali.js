@@ -5,7 +5,7 @@ exports.objectId = objectId;
 const client_1 = require("./client");
 exports.mealTypes = { BREAKFAST: "Café da manhã", LUNCH: "Almoço", SNACK: "Lanche", DINNER: "Jantar" };
 exports.mealStatuses = { PLANNED: "Planejado", PREPARING: "Em preparo", SERVING: "Em distribuição", FINISHED: "Finalizado", CANCELLED: "Cancelado" };
-exports.roleNames = { DIRECTOR: "Direção", ADMIN: "Administração", MANAGER: "Gestão", COOK: "Cozinha", NUTRITIONIST: "Nutrição", TEACHER: "Docência", SECRETARIAT: "Secretaria" };
+exports.roleNames = { MANAGER: "Gestor", COOK: "Cozinha", NUTRITIONIST: "Nutrição", SECRETARIAT: "Secretaria" };
 function objectId(value) {
     if (typeof value !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value))
         throw new client_1.ApiError(400, "INVALID_ID", "Identificador inválido.");

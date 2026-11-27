@@ -69,11 +69,13 @@ class Scope:
             scope = Q(access_role=self.role) & (
                 school_scope | Q(school__isnull=True, scope_key=self.key)
             )
-            if self.role == Membership.Role.DIRECTOR:
-                scope |= Q(access_role="ADMIN") & (
-                    school_scope
-                    | Q(school__isnull=True, scope_key=self.key_for_role("ADMIN"))
-                )
+            if self.role == Membership.Role.MANAGER:
+                # Historical scope keys include the role used when the conversation began.
+                for previous_role in ("DIRECTOR", "ADMIN"):
+                    scope |= Q(access_role=previous_role) & (
+                        school_scope
+                        | Q(school__isnull=True, scope_key=self.key_for_role(previous_role))
+                    )
             rows = rows.filter(scope)
         return rows.order_by("-updated_at", "-pk")
 

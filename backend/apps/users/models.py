@@ -57,7 +57,6 @@ class User(AbstractUser):
 
 class Membership(BaseModel):
     class Role(models.TextChoices):
-        DIRECTOR = "DIRECTOR", "Diretor"
         MANAGER = "MANAGER", "Gestor"
         NUTRITIONIST = "NUTRITIONIST", "Nutricionista"
         COOK = "COOK", "Merendeira(o)"

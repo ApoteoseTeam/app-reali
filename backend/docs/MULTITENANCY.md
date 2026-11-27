@@ -4,12 +4,12 @@ Rotas institucionais usam `X-Organization-ID` com o UUID da organização seleci
 
 Os querysets de escolas, câmeras, refeições, contagens e métricas aplicam o escopo antes de localizar o objeto. Uma escola de outra organização nunca passa pelo filtro. A API usa `404` para detalhes fora do escopo, `403` quando falta autorização e uma página vazia para filtros de leitura sem resultados. A lista de seleção no app mostra somente escolas ativas. O histórico de escolas desativadas continua acessível aos papéis e vínculos autorizados. Novas operações de preparo, gerenciamento de equipamentos/serviços, concessões e reconstrução de métricas exigem escola ativa.
 
-A direção restrita administra vínculos e convites inteiramente contidos em seu escopo, sem privilégios de direção sobre outros vínculos. Diretores com acesso institucional podem conceder privilégios institucionais. Substituir escolas exige enviar o conjunto inteiro no PUT. O último diretor ativo e o último diretor ativo com acesso institucional são protegidos. Desativar o vínculo corta o acesso dessa organização sem desativar a conta global.
+O gestor restrito administra vínculos e convites de outros cargos quando estão inteiramente contidos em seu escopo. Gestores com acesso institucional podem atribuir o cargo de gestor e conceder acesso institucional. Substituir escolas exige enviar o conjunto inteiro no PUT. O último gestor ativo e o último gestor ativo com acesso institucional são protegidos. Desativar o vínculo corta o acesso dessa organização sem desativar a conta global.
 
 ## Dados legados
 
-- O ID de usuário continua numérico. Organizações, vínculos, escolas e convites continuam com UUID. A API aceita `ADMIN` como alias de entrada para `DIRECTOR`.
+- O ID de usuário continua numérico. Organizações, vínculos, escolas e convites continuam com UUID.
 - A migration normaliza e-mails e bloqueia colisões com os IDs envolvidos, para conciliação manual. Ela não mescla contas.
-- Vínculos `ADMIN` passam a `DIRECTOR` com acesso institucional explícito. Demais vínculos legados permanecem ativos, mas precisam receber suas escolas ou concessão institucional antes de ler ou operar dados das unidades.
+- As migrações anteriores converteram vínculos `ADMIN` em `DIRECTOR` com acesso institucional explícito. As migrações `0005_merge_director_into_manager` convertem vínculos e convites `DIRECTOR` para `MANAGER`, preservando IDs, estados, escolas e tokens.
 - Convites legados para administradores preservam o escopo institucional. Se houver mais de um convite válido para o mesmo endereço e organização, apenas o mais recente continua pendente. Convites pendentes sem escopo de escola são revogados, e os expirados são classificados como expirados. Os registros permanecem para consulta.
-- Revise a atribuição de escolas e faça backup antes de migrar um ambiente existente. A reversão de esquema não restaura os papéis, e-mails e estados legados que foram normalizados.
+- Faça backup antes de implantar e execute `python manage.py migrate` com a versão nova do backend. Coordene a troca de versão para que os processos anteriores sejam substituídos quando a migração for aplicada. Para voltar à versão anterior, restaure o backup com os cargos originais.
