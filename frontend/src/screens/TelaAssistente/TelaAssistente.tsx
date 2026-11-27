@@ -5,7 +5,7 @@ import { ArrowLeft, History, Plus, Send } from 'lucide-react-native';
 import type { ChatSource, Conversation } from '../../api/reali';
 import { Button } from '../../components/Button/Button';
 import { ChatMessage } from '../../components/ChatMessage/ChatMessage';
-import { Header } from '../../components/header/header';
+import { Header } from '../../components/Header/header';
 import { IconButton } from '../../components/IconButton/IconButton';
 import { Input } from '../../components/Input/Input';
 import { useRealInova } from '../../hooks/useRealInova';

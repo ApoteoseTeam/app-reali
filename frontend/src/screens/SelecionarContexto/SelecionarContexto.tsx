@@ -4,7 +4,7 @@ import { Check } from 'lucide-react-native';
 
 import type { School } from '../../api/reali';
 import { Button } from '../../components/Button/Button';
-import { Header } from '../../components/header/header';
+import { Header } from '../../components/Header/header';
 import { api, useSession } from '../../session/provider';
 import { colors } from '../../theme/colors';
 import { styles } from './styles';

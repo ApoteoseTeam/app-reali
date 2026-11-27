@@ -2,7 +2,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { ClipboardList, House, TrendingUp, History} from 'lucide-react-native';
 
 import { Card } from '../../components/Card/Card';
-import { Header } from '../../components/header/header';
+import { Header } from '../../components/Header/header';
 import { MenuDayCard } from '../../components/MenuDayCard/MenuDayCard';
 import { styles } from './styles';
 
