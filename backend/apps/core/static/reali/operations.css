@@ -1,0 +1,23 @@
+.reali-operations {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(11rem, 100%), 1fr));
+    gap: 0.75rem;
+    margin-block: 0 1.25rem;
+}
+
+.reali-operations a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    justify-content: space-between;
+    padding: 0.875rem;
+    border: 1px solid var(--hairline-color);
+    border-radius: 4px;
+    background: var(--darkened-bg);
+}
+
+.reali-operations strong {
+    color: var(--body-fg);
+    font-size: 1.5rem;
+    font-variant-numeric: tabular-nums;
+}
