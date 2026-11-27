@@ -86,3 +86,58 @@ def test_staff_cannot_create_institution(institution_form):
     assert client.get(url).status_code == 403
     assert client.post(url, data).status_code == 403
     assert not Organization.objects.exists()
+
+
+def test_superuser_creates_school_for_existing_institution(admin_client, admin_user):
+    institution = Organization.objects.create(name="Rede cadastrada")
+    other = Organization.objects.create(name="Outra rede")
+    School.objects.create(organization=other, name="Escola da outra rede", code="01")
+    url = reverse("admin:institutions_school_add")
+    assert url in admin_client.get(reverse("admin:index")).content.decode()
+    assert admin_client.get(url).status_code == 200
+
+    response = admin_client.post(
+        url, {"organization": institution.pk, "name": "Nova escola", "code": "01"}
+    )
+    assert response.status_code == 302
+    school = institution.schools.get(code="01", is_active=True)
+    assert school.name == "Nova escola"
+    assert AuditLog.objects.filter(
+        action="SCHOOL_CREATED",
+        actor=admin_user,
+        organization=institution,
+        school=school,
+    ).exists()
+    account_form = (
+        admin_client.get(reverse("admin:users_user_add")).context["adminform"].form
+    )
+    assert account_form.fields["schools"].queryset.filter(pk=school.pk).exists()
+
+
+def test_school_form_rejects_duplicate_codes_and_inactive_institutions(admin_client):
+    institution = Organization.objects.create(name="Rede cadastrada")
+    inactive = Organization.objects.create(name="Rede inativa", is_active=False)
+    School.objects.create(organization=institution, name="Escola existente", code="01")
+    url = reverse("admin:institutions_school_add")
+    for organization, error_field in (
+        (institution, "__all__"),
+        (inactive, "organization"),
+    ):
+        response = admin_client.post(
+            url, {"organization": organization.pk, "name": "Nova escola", "code": "01"}
+        )
+        assert response.status_code == 200
+        assert error_field in response.context["adminform"].form.errors
+    assert School.objects.count() == 1
+
+
+def test_staff_cannot_create_school(admin_client):
+    staff = User.objects.create_user(
+        "staff@example.com", full_name="Operador", is_staff=True
+    )
+    staff.user_permissions.add(Permission.objects.get(codename="add_school"))
+    admin_client.force_login(staff)
+    url = reverse("admin:institutions_school_add")
+
+    assert admin_client.get(url).status_code == 403
+    assert admin_client.post(url, {}).status_code == 403
