@@ -4,6 +4,7 @@ from django.contrib.auth.forms import BaseUserCreationForm
 from django.core.validators import MinLengthValidator
 
 from apps.api.audit import audit
+from apps.core.admin import OperationsReadOnlyAdmin
 from apps.institutions.models import Organization, School
 from apps.users.models import Membership, SchoolAccess, User, normalize_email
 
@@ -65,8 +66,13 @@ class AccountCreationForm(BaseUserCreationForm):
 
 
 @admin.register(User)
-class AccountAdmin(admin.ModelAdmin):
+class AccountAdmin(OperationsReadOnlyAdmin):
+    reali_label = "Contas"
     form = AccountCreationForm
+    list_display = ("full_name", "email", "is_active", "is_staff", "last_login")
+    list_filter = ("is_active", "is_staff")
+    search_fields = ("full_name", "email")
+    ordering = ("full_name", "email")
     fields = (
         "full_name",
         "email",
@@ -78,20 +84,24 @@ class AccountAdmin(admin.ModelAdmin):
         "schools",
     )
 
-    def has_module_permission(self, request):
-        return request.user.is_superuser
-
     def has_add_permission(self, request):
         return request.user.is_superuser
 
-    def has_view_permission(self, request, obj=None):
-        return False
+    def get_fields(self, request, obj=None):
+        if obj is None:
+            return self.fields
+        return (
+            "full_name",
+            "email",
+            "is_active",
+            "is_staff",
+            "is_superuser",
+            "date_joined",
+            "last_login",
+        )
 
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
+    def get_readonly_fields(self, request, obj=None):
+        return super().get_readonly_fields(request, obj) if obj is not None else ()
 
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
@@ -114,4 +124,35 @@ class AccountAdmin(admin.ModelAdmin):
             actor=request.user,
             organization=membership.organization,
             details={"membership_id": str(membership.pk), "role": membership.role},
+        )
+
+
+@admin.register(Membership)
+class MembershipAdmin(OperationsReadOnlyAdmin):
+    reali_label = "Vínculos e acessos"
+    fields = (
+        "user",
+        "organization",
+        "role",
+        "is_active",
+        "all_schools_access",
+        "assigned_schools",
+        "created_at",
+        "updated_at",
+    )
+    list_display = ("user", "organization", "role", "is_active", "all_schools_access")
+    list_filter = ("role", "is_active", "all_schools_access")
+    list_select_related = ("user", "organization")
+    search_fields = ("user__email", "user__full_name", "organization__name")
+
+    @admin.display(description="Escolas atribuídas")
+    def assigned_schools(self, obj):
+        return (
+            ", ".join(
+                f"{name} ({code})"
+                for name, code in obj.school_accesses.order_by(
+                    "school__name", "school__code"
+                ).values_list("school__name", "school__code")
+            )
+            or "—"
         )

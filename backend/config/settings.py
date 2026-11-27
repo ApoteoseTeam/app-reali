@@ -49,7 +49,7 @@ if os.getenv("DJANGO_TRUST_PROXY_HTTPS", "false").lower() == "true":
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
+    "config.admin.RealiAdminConfig",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",

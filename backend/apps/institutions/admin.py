@@ -2,6 +2,7 @@ from django import forms
 from django.contrib import admin
 
 from apps.api.audit import audit
+from apps.core.admin import OperationsReadOnlyAdmin
 from apps.institutions.models import Organization, School
 
 
@@ -42,22 +43,47 @@ class SchoolInline(admin.StackedInline):
 
 
 @admin.register(Organization)
-class OrganizationAdmin(admin.ModelAdmin):
+class OrganizationAdmin(OperationsReadOnlyAdmin):
+    reali_label = "Instituições"
     form = OrganizationForm
     inlines = (SchoolInline,)
+    fields = OrganizationForm.Meta.fields
+    list_display = ("name", "cnpj", "email", "is_active", "created_at")
+    list_filter = ("is_active",)
+    search_fields = ("name", "legal_name", "cnpj", "email")
+    ordering = ("name",)
 
     def has_add_permission(self, request):
         return request.user.is_superuser
 
-    def has_view_permission(self, request, obj=None):
-        return False
+    def get_fields(self, request, obj=None):
+        if obj is None:
+            return self.fields
+        return (*self.fields, "is_active", "created_at", "updated_at")
 
-    def has_change_permission(self, request, obj=None):
-        return False
+    def get_readonly_fields(self, request, obj=None):
+        return super().get_readonly_fields(request, obj) if obj is not None else ()
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+    def get_inlines(self, request, obj=None):
+        return self.inlines if obj is None else ()
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
         audit("ORGANIZATION_CREATED", obj, actor=request.user, organization=obj)
+
+
+@admin.register(School)
+class SchoolAdmin(OperationsReadOnlyAdmin):
+    reali_label = "Escolas"
+    fields = (
+        "organization",
+        *SchoolForm.Meta.fields,
+        "is_active",
+        "created_at",
+        "updated_at",
+    )
+    list_display = ("name", "organization", "code", "city", "state", "is_active")
+    list_filter = ("is_active", "state")
+    list_select_related = ("organization",)
+    search_fields = ("name", "code", "organization__name", "city")
+    ordering = ("name",)
