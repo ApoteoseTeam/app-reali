@@ -64,7 +64,7 @@ def tenant():
     member = Membership.objects.create(
         organization=org,
         user=director,
-        role=Membership.Role.DIRECTOR,
+        role=Membership.Role.MANAGER,
         all_schools_access=True,
     )
     return org, first, second, member
@@ -341,7 +341,7 @@ def test_password_recovery_and_change(tenant):
 
 
 @pytest.mark.django_db
-def test_public_request_and_internal_provision_to_director_activation(
+def test_public_request_and_internal_provision_to_manager_activation(
     tenant, django_capture_on_commit_callbacks
 ):
     org, _, _, director = tenant
@@ -389,7 +389,7 @@ def test_public_request_and_internal_provision_to_director_activation(
     assert public.post(ACTIVATE, activation(token), format="json").status_code == 200
     director_user = User.objects.get(email="bootstrap@example.com")
     created = director_user.memberships.get()
-    assert created.all_schools_access and created.role == Membership.Role.DIRECTOR
+    assert created.all_schools_access and created.role == Membership.Role.MANAGER
     assert login(director_user.email, NEW_PASSWORD).status_code == 200
     assert (
         AuditLog.objects.filter(action="INSTITUTION_APPROVED", actor=operator).count()
@@ -417,7 +417,7 @@ def test_public_request_and_internal_provision_to_director_activation(
             {
                 **payload,
                 "name": "Rede Direta",
-                "director_email": "direct@example.com",
+                "manager_email": "direct@example.com",
             },
             format="json",
         )
@@ -442,6 +442,8 @@ def test_public_request_and_internal_provision_to_director_activation(
         recovered = internal.post(recovery_path, recovery)
     assert recovered.status_code == 201
     assert recovered.json()["email"] == recovery["email"]
+    assert recovered.json()["role"] == Membership.Role.MANAGER
+    assert recovered.json()["all_schools_access"] is True
 
 
 @pytest.mark.django_db
@@ -504,7 +506,7 @@ def test_invitation_verification_lifecycle_and_email_failure(
     assert public.post(ACTIVATE, missing_confirmation, format="json").status_code == 400
     assert (
         public.post(
-            ACTIVATE, {**activation(final_token), "role": "DIRECTOR"}, format="json"
+            ACTIVATE, {**activation(final_token), "role": "MANAGER"}, format="json"
         ).status_code
         == 200
     )
@@ -571,9 +573,8 @@ def test_management_and_school_boundaries_live_sessions(tenant):
     other = Organization.objects.create(name="Outra")
     foreign = School.objects.create(organization=other, code="X", name="Outra")
     cook = make_member(org, first, Membership.Role.COOK, "cook@example.com")
-    manager = make_member(org, first, Membership.Role.MANAGER, "manager@example.com")
     restricted = make_member(
-        org, first, Membership.Role.DIRECTOR, "restricted@example.com"
+        org, first, Membership.Role.MANAGER, "restricted@example.com"
     )
     director_client = client_for(director.user, org)
     restricted_client = client_for(restricted.user, org)
@@ -588,16 +589,16 @@ def test_management_and_school_boundaries_live_sessions(tenant):
         == 403
     )
     assert (
-        client_for(manager.user, org)
-        .patch(staff + str(director.pk) + "/", {"role": "COOK"})
-        .status_code
-        == 403
+        restricted_client.patch(
+            staff + str(director.pk) + "/", {"role": "COOK"}, format="json"
+        ).status_code
+        == 404
     )
     assert restricted_client.get(detail).status_code == 200
     assert restricted_client.get(staff + str(director.pk) + "/").status_code == 404
     assert (
         restricted_client.post(
-            ROOT + "invitations/", invite_payload(first, role="DIRECTOR"), format="json"
+            ROOT + "invitations/", invite_payload(first, role="MANAGER"), format="json"
         ).status_code
         == 403
     )
@@ -662,7 +663,7 @@ def test_management_and_school_boundaries_live_sessions(tenant):
     assert user.get(ROOT + "schools/").status_code == 403
     assert user.get(ROOT + "auth/me/").json()["memberships"] == []
     assert director_client.post(detail + "reactivate/").status_code == 200
-    for role in ("ADMIN", "TEACHER"):
+    for role in ("ADMIN", "DIRECTOR", "TEACHER"):
         assert (
             director_client.patch(detail, {"role": role}, format="json").status_code
             == 400

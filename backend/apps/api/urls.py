@@ -56,7 +56,7 @@ from .access_views import (
     PasswordResetRequestView,
     RefreshView,
     RequestInstitutionView,
-    RecoverDirectorView,
+    RecoverManagerView,
     VerifyInvitationView,
 )
 from .views import OrganizationsView, SchoolViewSet
@@ -111,7 +111,7 @@ urlpatterns = [
     path("admin/organizations/provision/", DirectProvisionView.as_view()),
     path(
         "admin/organizations/<uuid:pk>/initial-invitation/",
-        RecoverDirectorView.as_view(),
+        RecoverManagerView.as_view(),
     ),
     path(
         "admin/initial-invitations/<uuid:pk>/resend/",

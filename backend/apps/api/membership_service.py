@@ -8,7 +8,7 @@ from apps.users.models import Membership, SchoolAccess
 
 from .account_mail import send_account_mail
 from .audit import audit
-from .permissions import DIRECTORS, require_role, schools_for
+from .permissions import MANAGEMENT_ROLES, require_role, schools_for
 
 
 def locked_staff(actor):
@@ -28,8 +28,8 @@ def locked_staff(actor):
 
 
 def validate_grant(actor, role, all_schools, school_ids):
-    if (role in DIRECTORS or all_schools) and not actor.all_schools_access:
-        raise PermissionDenied("A atribuição exige direção com escopo institucional.")
+    if (role in MANAGEMENT_ROLES or all_schools) and not actor.all_schools_access:
+        raise PermissionDenied("A atribuição exige um gestor com acesso institucional.")
     if all_schools and school_ids:
         raise ValidationError(
             {"school_ids": "Envie escolas específicas apenas para escopo restrito."}
@@ -55,15 +55,15 @@ def manageable_memberships(actor):
             Exists(access),
             ~Exists(access.exclude(school_id__in=authorized)),
             all_schools_access=False,
-        ).exclude(role__in=DIRECTORS)
+        ).exclude(role__in=MANAGEMENT_ROLES)
     return memberships.order_by("id")
 
 
-def prevent_last_director(
+def prevent_last_manager(
     membership, *, resulting_role, resulting_active, resulting_all_schools
 ):
     if (
-        membership.role not in DIRECTORS
+        membership.role not in MANAGEMENT_ROLES
         or not membership.is_active
         or not membership.user.is_active
     ):
@@ -72,21 +72,21 @@ def prevent_last_director(
         organization_id=membership.organization_id,
         is_active=True,
         user__is_active=True,
-        role__in=DIRECTORS,
+        role__in=MANAGEMENT_ROLES,
     ).exclude(pk=membership.pk)
-    if (resulting_role not in DIRECTORS or not resulting_active) and not other.exists():
-        raise ValidationError("A organização deve manter um diretor ativo.")
+    if (resulting_role not in MANAGEMENT_ROLES or not resulting_active) and not other.exists():
+        raise ValidationError("A organização deve manter um gestor ativo.")
     if (
         membership.all_schools_access
         and (
-            resulting_role not in DIRECTORS
+            resulting_role not in MANAGEMENT_ROLES
             or not resulting_active
             or not resulting_all_schools
         )
         and not other.filter(all_schools_access=True).exists()
     ):
         raise ValidationError(
-            "A organização deve manter um diretor ativo com acesso institucional."
+            "A organização deve manter um gestor ativo com acesso institucional."
         )
 
 
@@ -105,8 +105,8 @@ def update_membership(actor, membership_id, *, role=None, is_active=None, grant=
     all_schools = (
         membership.all_schools_access if grant is None else grant["all_schools_access"]
     )
-    if resulting_role in DIRECTORS and not actor.all_schools_access:
-        raise PermissionDenied("A atribuição exige direção com escopo institucional.")
+    if resulting_role in MANAGEMENT_ROLES and not actor.all_schools_access:
+        raise PermissionDenied("A atribuição exige um gestor com acesso institucional.")
     if is_active is True and not membership.user.is_active:
         raise ValidationError("A conta do funcionário está inativa.")
     if (
@@ -115,7 +115,7 @@ def update_membership(actor, membership_id, *, role=None, is_active=None, grant=
         and not schools_for(membership, active_only=True).exists()
     ):
         raise ValidationError("Atribua uma escola ativa antes de reativar o vínculo.")
-    prevent_last_director(
+    prevent_last_manager(
         membership,
         resulting_role=resulting_role,
         resulting_active=resulting_active,

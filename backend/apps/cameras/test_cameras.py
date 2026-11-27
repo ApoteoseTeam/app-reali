@@ -60,7 +60,7 @@ def installation():
     Membership.objects.create(
         user=director,
         organization=organization,
-        role="DIRECTOR",
+        role="MANAGER",
         all_schools_access=True,
     )
     return organization, school, branch, external, device, entrance, cafeteria, director
@@ -203,35 +203,38 @@ def test_permission_matrix_and_internal_support(installation):
     missing = Camera.objects.create(
         name="Outra unidade", camera_type="CAFETERIA", school=branch
     )
-    outsider = role_user(external.organization, external, "DIRECTOR")
+    outsider = role_user(external.organization, external, "MANAGER")
     assert (
         human(outsider, external.organization)
         .get(BASE + f"cameras/{entrance.pk}/status/")
         .status_code
         == 404
     )
-    scoped_director = role_user(org, school, "DIRECTOR")
+    scoped_director = role_user(org, school, "MANAGER")
     admin = human(scoped_director, org)
     assert admin.get(BASE + f"cameras/{missing.pk}/status/").status_code == 404
     assert admin.get(BASE + f"cameras/{entrance.pk}/status/").status_code == 200
 
-    manager = human(role_user(org, school, "MANAGER"), org)
+    assert admin.get(BASE + f"cameras/{entrance.pk}/health-history/").status_code == 200
     assert (
-        manager.get(BASE + f"cameras/{entrance.pk}/health-history/").status_code == 200
-    )
-    assert (
-        manager.post(
-            BASE + "cameras/", {"school": str(school.pk)}, format="json"
+        admin.post(
+            BASE + "cameras/",
+            {
+                "school": str(school.pk),
+                "name": "Nova portaria",
+                "camera_type": "ENTRANCE",
+            },
+            format="json",
         ).status_code
-        == 403
+        == 201
     )
     assert (
-        manager.post(
+        admin.post(
             BASE + f"edge-devices/{device.pk}/credentials/",
             {"password": PASSWORD},
             format="json",
         ).status_code
-        == 403
+        == 201
     )
 
     cook = human(role_user(org, school, "COOK"), org)

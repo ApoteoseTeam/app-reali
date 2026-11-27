@@ -30,7 +30,7 @@ def test_operations_dashboard_lists_operational_models_and_current_counts(
         UserInvitation.objects.create(
             organization=organization,
             email=f"{label}@example.com",
-            role=Membership.Role.DIRECTOR,
+            role=Membership.Role.MANAGER,
             token_hash=label,
             expires_at=timezone.now() + timedelta(days=days),
             invited_by=admin_user,

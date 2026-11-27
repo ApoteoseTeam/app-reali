@@ -4,11 +4,9 @@ O header JWT identifica a conta e `X-Organization-ID` escolhe o contexto. O Djan
 
 | Papel | Operações principais verificadas em contratos |
 | --- | --- |
-| Direção e administrador legado | Configuração escolar, funcionários, credenciais, preparação, indicadores, ajustes e auditoria no escopo concedido. |
-| Gestão | Planejamento, transições, relatórios, recálculo e ajustes no escopo concedido. |
+| Gestor | Configuração escolar, funcionários, credenciais, planejamento, transições, relatórios, recálculo, ajustes e auditoria no escopo concedido. |
 | Nutrição e Secretaria | Relatórios, histórico, indicadores, status e consultas de contagem permitidas. |
 | Cozinha | Preparo, distribuição, previsão e consultas operacionais da escola. |
-| Professor | Indicadores limitados às entradas e catálogo restrito do RealInova. |
 | Operador da plataforma | Provisionamento, suporte, sessões e auditoria de acordo com permissões Django concedidas. A permissão interna de cada operação é independente. |
 
 Os testes usam duas organizações, duas escolas no primeiro vínculo e uma escola externa. Confirmam listagem, filtros, detalhe, operações administrativas, relatórios, exportação, previsões, contagens, conversas, notificações e auditoria conforme a ação. O teste HTTP novo valida o vínculo de cozinha recém-ativado, a escola concedida, o bloqueio de outra organização e o bloqueio da segunda escola.

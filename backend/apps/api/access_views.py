@@ -28,7 +28,7 @@ from .account_service import (
 from .institution_service import (
     create_institution_request,
     direct_provision,
-    recover_director_invitation,
+    recover_manager_invitation,
     review_institution,
 )
 from .invitation_service import (
@@ -242,7 +242,7 @@ class InitialInvitationView(APIView):
         return Response(s.InvitationSerializer(invite).data)
 
 
-class RecoverDirectorView(APIView):
+class RecoverManagerView(APIView):
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "invitation-management"
 
@@ -252,7 +252,7 @@ class RecoverDirectorView(APIView):
     def post(self, request, pk):
         internal_operator(request.user, REVIEW_PERMISSION)
         data = validated(s.ResetRequestSerializer, request.data)
-        invite = recover_director_invitation(request.user, pk, data["email"])
+        invite = recover_manager_invitation(request.user, pk, data["email"])
         invite.refresh_from_db()
         return Response(s.InvitationSerializer(invite).data, status=201)
 

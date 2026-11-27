@@ -2,14 +2,14 @@
 
 `EdgeDevice` identifica um computador ou serviço local e tem uma única escola. O `id` é usado no gerenciamento do recurso. `device_identifier` é um UUID público estável para inventário e suporte. `agent_version` e `last_seen_at` vêm de heartbeats aceitos pelo servidor.
 
-1. Com JWT de direção e o contexto da organização, cadastre o dispositivo e selecione a escola.
+1. Com JWT de gestor e o contexto da organização, cadastre o dispositivo e selecione a escola.
 2. Cadastre a portaria e a cantina com `edge_device` ou associe câmeras existentes com PATCH. Consulte a nota de transição caso elas estejam publicando contagens pelo contrato legado.
 3. Salve as configurações de cada câmera e emita uma credencial do agente, confirmando a senha administrativa.
 4. Instale a credencial e a URL base HTTPS em configuração protegida ou gestor de segredos do serviço existente. O agente obtém as câmeras habilitadas em `GET /device/configuration/` e publica telemetria no heartbeat.
 
 ```mermaid
 sequenceDiagram
-    participant D as Direção
+    participant D as Gestor
     participant A as API Reali
     participant L as Software local
     D->>A: Cadastra agente e associa câmeras

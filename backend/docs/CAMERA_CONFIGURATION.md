@@ -1,6 +1,6 @@
 # Configuração operacional
 
-A direção lê e substitui parâmetros em `GET|PUT /api/v1/cameras/{id}/configuration/`. O PUT recebe os parâmetros completos. A primeira configuração tem versão 1. Conteúdo diferente incrementa a versão, e repetir o mesmo PUT preserva a versão. A resposta contém `version`, `updated_at` e `parameters`. Uma câmera sem configuração retorna `404` nessa consulta. O agente usa `GET /api/v1/device/configuration/` e recebe somente câmeras ativas atribuídas à sua identidade, com configuração `null` quando ainda ausente.
+O gestor lê e substitui parâmetros em `GET|PUT /api/v1/cameras/{id}/configuration/`. O PUT recebe os parâmetros completos. A primeira configuração tem versão 1. Conteúdo diferente incrementa a versão, e repetir o mesmo PUT preserva a versão. A resposta contém `version`, `updated_at` e `parameters`. Uma câmera sem configuração retorna `404` nessa consulta. O agente usa `GET /api/v1/device/configuration/` e recebe somente câmeras ativas atribuídas à sua identidade, com configuração `null` quando ainda ausente.
 
 Coordenadas vão de 0 a 1, com origem no canto superior esquerdo. A região de interesse usa retângulo com largura e altura positivas. A linha possui pontos distintos e deve caber na região quando ambas forem informadas. O sinal do lado da linha é dado por `(end.x-start.x)*(p.y-start.y) - (end.y-start.y)*(p.x-start.x)`. Escolha a mudança de sinal que representa entrada ou entrega no local.
 

@@ -17,7 +17,7 @@ from .account_service import check_password_policy
 from .audit import audit
 from .membership_service import locked_staff, validate_grant
 from .models import UserInvitation
-from .permissions import DIRECTORS, schools_for
+from .permissions import MANAGEMENT_ROLES, schools_for
 
 
 class ExistingAccountLoginRequired(APIException):
@@ -43,7 +43,7 @@ def manageable_invitations(actor):
             Exists(links),
             ~Exists(links.exclude(school_id__in=schools_for(actor).values("pk"))),
             all_schools_access=False,
-        ).exclude(role__in=DIRECTORS)
+        ).exclude(role__in=MANAGEMENT_ROLES)
     return invitations.order_by("-created_at", "id")
 
 
@@ -180,7 +180,7 @@ def update_invitation(invite_id, operation, *, actor=None, internal_user=None):
         invites = UserInvitation.objects.filter(
             organization=organization,
             invited_by__is_staff=True,
-            role__in=DIRECTORS,
+            role__in=MANAGEMENT_ROLES,
             all_schools_access=True,
         )
         user = internal_user
@@ -263,7 +263,7 @@ def accept_invitation(request_user, *, token, full_name=None, password=None):
                 raise
             raise ExistingAccountLoginRequired()
         audit("ACCOUNT_ACTIVATED", user, actor=user, organization=invite.organization)
-        if invite.role in DIRECTORS:
+        if invite.role in MANAGEMENT_ROLES:
             audit(
                 "INSTITUTIONAL_ADMIN_CREATED",
                 user,

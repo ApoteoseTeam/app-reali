@@ -8,7 +8,7 @@ from apps.users.models import Membership, normalize_email
 from .audit import audit
 from .invitation_service import issue_invitation
 from .models import InstitutionRequest, UserInvitation
-from .permissions import DIRECTORS
+from .permissions import MANAGEMENT_ROLES
 
 
 def create_institution_request(**data):
@@ -16,7 +16,7 @@ def create_institution_request(**data):
     return InstitutionRequest.objects.create(**data)
 
 
-def provision_organization(actor, *, name, email, phone, schools, director_email):
+def provision_organization(actor, *, name, email, phone, schools, manager_email):
     organization = Organization.objects.create(
         name=name, email=normalize_email(email), phone=phone
     )
@@ -27,8 +27,8 @@ def provision_organization(actor, *, name, email, phone, schools, director_email
     invitation = issue_invitation(
         organization,
         actor,
-        email=director_email,
-        role=Membership.Role.DIRECTOR,
+        email=manager_email,
+        role=Membership.Role.MANAGER,
         all_schools_access=True,
         schools=[],
     )
@@ -41,7 +41,7 @@ def direct_provision(actor, **data):
 
 
 @transaction.atomic
-def recover_director_invitation(actor, organization_id, email):
+def recover_manager_invitation(actor, organization_id, email):
     organization = (
         Organization.objects.select_for_update()
         .filter(pk=organization_id, is_active=True)
@@ -50,23 +50,26 @@ def recover_director_invitation(actor, organization_id, email):
     if not organization:
         raise NotFound("Organização ativa não encontrada.")
     if organization.memberships.filter(
-        is_active=True, user__is_active=True, role__in=DIRECTORS
+        is_active=True,
+        user__is_active=True,
+        role__in=MANAGEMENT_ROLES,
+        all_schools_access=True,
     ).exists():
         raise ValidationError(
-            "A organização já tem direção ativa. Use o fluxo institucional."
+            "A organização já tem um gestor ativo com acesso institucional. Use o fluxo institucional."
         )
     if organization.invitations.filter(
-        role__in=DIRECTORS,
+        role__in=MANAGEMENT_ROLES,
         all_schools_access=True,
         status=UserInvitation.Status.PENDING,
         expires_at__gt=timezone.now(),
     ).exists():
-        raise ValidationError("Revogue ou reenvie o convite de direção pendente.")
+        raise ValidationError("Revogue ou reenvie o convite de gestor pendente.")
     return issue_invitation(
         organization,
         actor,
         email=email,
-        role=Membership.Role.DIRECTOR,
+        role=Membership.Role.MANAGER,
         all_schools_access=True,
         schools=[],
     )
@@ -74,7 +77,7 @@ def recover_director_invitation(actor, organization_id, email):
 
 @transaction.atomic
 def review_institution(
-    actor, request_id, *, approve, schools=None, director_email=None, reason=""
+    actor, request_id, *, approve, schools=None, manager_email=None, reason=""
 ):
     application = (
         InstitutionRequest.objects.select_for_update().filter(pk=request_id).first()
@@ -98,7 +101,7 @@ def review_institution(
             email=application.contact_email,
             phone=application.phone,
             schools=schools,
-            director_email=director_email or application.contact_email,
+            manager_email=manager_email or application.contact_email,
         )
         application.organization = organization
         application.initial_invitation = invite

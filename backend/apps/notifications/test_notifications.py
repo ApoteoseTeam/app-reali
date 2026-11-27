@@ -62,7 +62,7 @@ Channel = NotificationDelivery.Channel
 Status = NotificationDelivery.Status
 
 
-def person(org, email, *, role=Membership.Role.DIRECTOR, schools=None):
+def person(org, email, *, role=Membership.Role.MANAGER, schools=None):
     user = User.objects.create_user(email)
     member = Membership.objects.create(
         user=user, organization=org, role=role, all_schools_access=schools is None

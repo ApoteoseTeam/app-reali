@@ -75,15 +75,39 @@ class OrganizationAdmin(OperationsReadOnlyAdmin):
 @admin.register(School)
 class SchoolAdmin(OperationsReadOnlyAdmin):
     reali_label = "Escolas"
-    fields = (
-        "organization",
-        *SchoolForm.Meta.fields,
-        "is_active",
-        "created_at",
-        "updated_at",
-    )
+    form = SchoolForm
+    fields = ("organization", *SchoolForm.Meta.fields)
     list_display = ("name", "organization", "code", "city", "state", "is_active")
     list_filter = ("is_active", "state")
     list_select_related = ("organization",)
     search_fields = ("name", "code", "organization__name", "city")
     ordering = ("name",)
+
+    def has_add_permission(self, request):
+        return request.user.is_superuser
+
+    def get_fields(self, request, obj=None):
+        if obj is None:
+            return self.fields
+        return (*self.fields, "is_active", "created_at", "updated_at")
+
+    def get_readonly_fields(self, request, obj=None):
+        return super().get_readonly_fields(request, obj) if obj is not None else ()
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "organization":
+            kwargs["queryset"] = Organization.objects.filter(is_active=True).order_by(
+                "name"
+            )
+            kwargs["label"] = "Instituição"
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        audit(
+            "SCHOOL_CREATED",
+            obj,
+            actor=request.user,
+            organization=obj.organization,
+            school_id=obj.pk,
+        )

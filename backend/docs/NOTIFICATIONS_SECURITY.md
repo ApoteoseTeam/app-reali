@@ -6,4 +6,4 @@ O PostgreSQL guarda o token Expo criptografado com Fernet e o hash para unicidad
 
 Push usa título e mensagem genéricos. O aplicativo valida o UUID, consulta o aviso com o contexto ativo e abre apenas destinos reconhecidos com autorização atual. No logout offline, o encerramento remoto pode aguardar conectividade. Um possível push pendente fica genérico e o servidor continua protegendo o acesso ao aviso.
 
-Auditoria institucional exige direção ativa. Operadores da plataforma usam uma permissão Django independente e rota própria. Os detalhes retornados são uma lista de campos operacionais permitidos. Eventos de autorização registram somente metadados da rota e do ator autenticado.
+Auditoria institucional exige vínculo ativo de gestor. Operadores da plataforma usam uma permissão Django independente e rota própria. Os detalhes retornados são uma lista de campos operacionais permitidos. Eventos de autorização registram somente metadados da rota e do ator autenticado.

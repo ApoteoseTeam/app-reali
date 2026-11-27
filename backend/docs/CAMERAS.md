@@ -8,8 +8,7 @@ O campo `is_active` representa a habilitação administrativa. O estado operacio
 
 | Papel | Estado | Histórico técnico | Cadastro, configuração e credenciais |
 |---|---|---|---|
-| Direção | Sim | Sim | Sim |
-| Gestão | Sim | Sim | Sem acesso |
+| Gestor | Sim | Sim | Sim |
 | Nutricionista | Sim | Últimos sete dias | Sem acesso |
 | Cozinha | Estado resumido da cantina | Sem acesso | Sem acesso |
 | Secretaria | Sim | Sim | Sem acesso |

@@ -17,7 +17,7 @@ Base `/api/v1/`. Envie `Authorization: Bearer <access>` e `X-Organization-ID: <u
 
 A criação de serviço recebe `school`, `date`, `meal_type`, `scheduled_time` e, opcionalmente, `scheduled_end_time`, `entry_window_start` e `history_excluded`. A criação de política recebe `school`, `meal_type`, `initial_rate` (pode ser `null`), `minimum_history` e `history_days`. Consulte [programações](MEAL_SCHEDULES.md) para um exemplo de configuração semanal.
 
-Envie `{}` para iniciar o preparo. A taxa opcional `estimated_plates_per_entry` exige papel de direção ou gestão. Um novo envio durante preparo mantém os valores gravados na primeira operação.
+Envie `{}` para iniciar o preparo. A taxa opcional `estimated_plates_per_entry` exige papel de gestor. Um novo envio durante preparo mantém os valores gravados na primeira operação.
 
 Exemplo resumido de resposta.
 

@@ -4,7 +4,7 @@ As consultas exigem autenticação de sessão JWT, organização e vínculo ativ
 
 | Papel | Diário, dashboard, histórico | Métricas de serviço | Institucional e exportação | Recálculo |
 | --- | --- | --- | --- | --- |
-| `DIRECTOR`, `MANAGER` | Sim | Sim | Sim | Sim |
+| `MANAGER` | Sim | Sim | Sim | Sim |
 | `NUTRITIONIST`, `SECRETARIAT` | Sim | Sim | Sim | 403 |
 | `COOK` | Últimos 30 dias | Últimos 30 dias | 403 | 403 |
 

@@ -10,9 +10,9 @@ O motor examina até 60 candidatos recentes para escolher até 30 amostras compa
 
 ## Ordem de seleção
 
-1. Taxa explícita do início, se direção ou gestão fizer a operação autorizada.
+1. Taxa explícita do início, se o gestor fizer a operação autorizada.
 2. Taxa histórica da escola, se houver amostra suficiente.
-3. Taxa inicial configurada pela direção para escola e tipo.
+3. Taxa inicial configurada pelo gestor para escola e tipo.
 4. Resultado `UNAVAILABLE`, com pratos e taxa em `null`.
 
 A política padrão procura três serviços em 90 dias, com configuração por escola e tipo. Pode-se ajustar o mínimo de 2 a 30 e o horizonte de 7 a 365 dias. A taxa explícita ou configurada admite 0 a 5. Estimativas exigem dados de entrada disponíveis ou cobertura suficiente para um zero observado. Sem dados disponíveis, o resultado fica indisponível mesmo se existir uma taxa cadastrada.

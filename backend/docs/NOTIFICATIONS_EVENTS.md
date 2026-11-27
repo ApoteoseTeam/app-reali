@@ -2,11 +2,11 @@
 
 | Origem | Tipos produzidos | Destinatários |
 | --- | --- | --- |
-| Estado de câmera | `CAMERA_OFFLINE`, `CAMERA_ERROR`, `CAMERA_RECOVERED` | Direção e gestão com acesso à escola. |
-| Heartbeat de câmera e agente | `DEVICE_SYNC_DELAY`, `DEVICE_OFFLINE` | Direção e gestão com acesso à escola. O atraso de sync exige a fila explicitamente reportada acima do limite. |
-| Merenda | `MEAL_SERVICE_REMINDER`, `MEAL_SERVICE_STARTED`, `MEAL_SERVING_STARTED`, `MEAL_SERVICE_FINISHED`, `MEAL_SERVICE_CANCELLED`, `FORECAST_UNAVAILABLE` | Direção, gestão e cozinha autorizadas. |
-| Convites e vínculos | `INVITATION_CREATED`, `INVITATION_EXPIRING`, `INVITATION_CLOSED`, `MEMBERSHIP_UPDATED` | Direção responsável pelo convite ainda autorizada. A atualização de vínculo é privada do titular ativo. |
-| Contagens corrigidas | `COUNT_ADJUSTMENT_CREATED` | Direção e gestão autorizadas. Inclui reversão. |
+| Estado de câmera | `CAMERA_OFFLINE`, `CAMERA_ERROR`, `CAMERA_RECOVERED` | Gestor com acesso à escola. |
+| Heartbeat de câmera e agente | `DEVICE_SYNC_DELAY`, `DEVICE_OFFLINE` | Gestor com acesso à escola. O atraso de sync exige a fila explicitamente reportada acima do limite. |
+| Merenda | `MEAL_SERVICE_REMINDER`, `MEAL_SERVICE_STARTED`, `MEAL_SERVING_STARTED`, `MEAL_SERVICE_FINISHED`, `MEAL_SERVICE_CANCELLED`, `FORECAST_UNAVAILABLE` | Gestor e cozinha com acesso à escola. |
+| Convites e vínculos | `INVITATION_CREATED`, `INVITATION_EXPIRING`, `INVITATION_CLOSED`, `MEMBERSHIP_UPDATED` | Gestor responsável pelo convite com acesso vigente. A atualização de vínculo é privada do titular ativo. |
+| Contagens corrigidas | `COUNT_ADJUSTMENT_CREATED` | Gestor com acesso à escola. Inclui reversão. |
 | Indicadores | `DATA_STALE`, `DATA_RECONCILED`, `FORECAST_DIFFERENCE` | Perfis de relatórios autorizados para a escola, incluindo Secretaria quando o vínculo permite. |
 | Reservados | `REPORT_READY`, `SYSTEM_ANNOUNCEMENT` | Disponíveis no catálogo para uso posterior. As exportações síncronas continuam auditadas. |
 

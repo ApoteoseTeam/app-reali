@@ -5,16 +5,15 @@ from apps.institutions.models import School
 from apps.users.models import Membership
 
 Role = Membership.Role
-DIRECTORS = {Role.DIRECTOR}
-MANAGEMENT_ROLES = DIRECTORS | {Role.MANAGER}
+MANAGEMENT_ROLES = {Role.MANAGER}
 KITCHEN_ROLES = MANAGEMENT_ROLES | {Role.COOK}
 FULL_REPORT_ROLES = MANAGEMENT_ROLES | {Role.NUTRITIONIST, Role.SECRETARIAT}
 ROLE_PERMISSIONS = {
-    "config": DIRECTORS,
-    "staff": DIRECTORS,
-    "audit_logs": DIRECTORS,
+    "config": MANAGEMENT_ROLES,
+    "staff": MANAGEMENT_ROLES,
+    "audit_logs": MANAGEMENT_ROLES,
     "manage_meals": MANAGEMENT_ROLES,
-    "forecast_policy": DIRECTORS,
+    "forecast_policy": MANAGEMENT_ROLES,
     "rebuild_metrics": MANAGEMENT_ROLES,
     "analytics_reports": FULL_REPORT_ROLES,
     "prepare": KITCHEN_ROLES,
@@ -25,14 +24,16 @@ ROLE_PERMISSIONS = {
     "indicators": FULL_REPORT_ROLES | {Role.COOK},
     "camera_status": FULL_REPORT_ROLES | {Role.COOK},
     "camera_history": FULL_REPORT_ROLES,
-    "camera_admin": DIRECTORS,
-    
+    "camera_admin": MANAGEMENT_ROLES,
+    "realinova_full": FULL_REPORT_ROLES,
+    "realinova_limited": {Role.COOK},
 }
 
 REALINOVA_ACCESS = {
     Role.MANAGER,
     Role.SECRETARIAT,
-}
+    }
+
 
 
 def require_role(membership, action):

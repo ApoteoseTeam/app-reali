@@ -7,7 +7,7 @@
 | `PLANNED` | `PREPARING` | Escola e vínculo ativos, papel autorizado e data do serviço atingida. Snapshot, previsão, estado e auditoria são gravados juntos. |
 | `PREPARING` | `SERVING` | Registra início real e responsável pela distribuição. |
 | `SERVING` | `FINISHED` | Registra fim real, responsável e qualidade operacional da cantina. |
-| `PLANNED` ou `PREPARING` | `CANCELLED` | Direção ou gestão informa justificativa. A operação exige ausência de contagens e ajustes de pratos. |
+| `PLANNED` ou `PREPARING` | `CANCELLED` | O gestor informa justificativa. A operação exige ausência de contagens e ajustes de pratos. |
 
 Repetir `start` enquanto o serviço está em preparo devolve o snapshot e a previsão originais. Transições repetidas fora desse estado devolvem `409`. Serviços finalizados ou cancelados continuam disponíveis nos filtros históricos. Somente serviços planejados aceitam edição. O cancelamento conserva qualquer previsão já registrada. A reconstrução vigente de indicadores exclui previsões de serviços cancelados.
 

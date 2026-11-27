@@ -49,7 +49,7 @@ def site():
     )
     director = User.objects.create(email="director@example.com", full_name="Direção")
     Membership.objects.create(
-        user=director, organization=org, role="DIRECTOR", all_schools_access=True
+        user=director, organization=org, role="MANAGER", all_schools_access=True
     )
     device = EdgeDevice.objects.create(school=school, name="Agente")
     entrance = Camera.objects.create(

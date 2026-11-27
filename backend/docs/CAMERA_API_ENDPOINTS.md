@@ -19,7 +19,7 @@ Base `/api/v1/`. Rotas humanas exigem `Authorization: Bearer <access>` e `X-Orga
 | `GET /device/configuration/` | `200` com inventário autorizado e intervalo de heartbeat |
 | `POST /device/counts/` | `201` ou `200` para reenvio pelo [contrato de contagens da Fase 4](DEVICE_COUNT_API.md) |
 
-As rotas de suporte espelham as humanas sob `/admin/cameras/` e `/admin/edge-devices/`. Paginação retorna `count`, `next`, `previous` e `results`. Direção envia o UUID da escola no campo `school`. Para cadastrar câmera, envie `name`, `camera_type`, `school` e, se já houver agente, `edge_device`. Para credenciais, envie `password` no corpo JSON e, quando aplicável, `expires_at` em ISO 8601 com offset.
+As rotas de suporte espelham as humanas sob `/admin/cameras/` e `/admin/edge-devices/`. Paginação retorna `count`, `next`, `previous` e `results`. O gestor envia o UUID da escola no campo `school`. Para cadastrar câmera, envie `name`, `camera_type`, `school` e, se já houver agente, `edge_device`. Para credenciais, envie `password` no corpo JSON e, quando aplicável, `expires_at` em ISO 8601 com offset.
 
 ```json
 {

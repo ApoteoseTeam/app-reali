@@ -56,7 +56,7 @@ def test_scoped_http_and_worker_load(live_server, provider, settings):
         org = Organization.objects.create(name=f"Rede de teste {number}")
         user = User.objects.create_user(f"load-{number}@reali.example.test", password)
         Membership.objects.create(
-            user=user, organization=org, role="DIRECTOR", all_schools_access=True
+            user=user, organization=org, role="MANAGER", all_schools_access=True
         )
         for code in (1, 2):
             school = School.objects.create(

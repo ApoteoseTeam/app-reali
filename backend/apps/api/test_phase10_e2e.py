@@ -63,7 +63,7 @@ def test_school_operations_from_invitation_to_report_over_http(
     Membership.objects.create(
         organization=organization,
         user=director,
-        role=Membership.Role.DIRECTOR,
+        role=Membership.Role.MANAGER,
         all_schools_access=True,
     )
     device = EdgeDevice.objects.create(school=school, name="Agente E2E")
@@ -222,7 +222,7 @@ def test_school_operations_from_invitation_to_report_over_http(
             client,
             "POST",
             "ai/chat/",
-            headers=cook_headers,
+            headers=director_headers,
             body={
                 "school_id": str(school.pk),
                 "message": "Quantos pratos foram servidos hoje?",
@@ -230,14 +230,14 @@ def test_school_operations_from_invitation_to_report_over_http(
         ).json()
         assert answer["status"] == "COMPLETED" and "22" in answer["answer"]
         conversations = send(
-            client, "GET", "ai/conversations/", headers=cook_headers
+            client, "GET", "ai/conversations/", headers=director_headers,
         ).json()
         assert conversations["count"] == 1
         history = send(
             client,
             "GET",
             f"ai/conversations/{conversations['results'][0]['id']}/messages/",
-            headers=cook_headers,
+            headers=director_headers,
         ).json()
         assert history["count"] == 2
 

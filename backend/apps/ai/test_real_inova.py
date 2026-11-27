@@ -445,18 +445,16 @@ def test_limits_are_scoped_and_tools_apply_rbac(site, provider):
     DailyMetrics.objects.create(
         school=site.foreign, reference_date=site.day, total_student_entries=98765
     )
-    for role in ("MANAGER", "SECRETARIAT"):
-        member = membership(site.school, role)
-        scope = Scope(
-            member_id=member.pk,
-            user_id=member.user_id,
-            organization_id=member.organization_id,
-            session_version=member.user.session_version,
-            role=member.role,
-            school_ids=tuple(
-                schools_for(member, active_only=True).values_list("pk", flat=True)
-    ),
-)
+    for member in (
+        membership(site.school, "MANAGER"),
+        membership(site.school, "SECRETARIAT"),
+):
+        role = member.role
+        scope = user_scope(
+            member.user_id,
+            site.org.pk,
+            member.user.session_version
+        ).bind(None)
         tools = QueryTools(scope, 100)
         day = str(site.day)
         result = tools.get_student_counts(day, school_id=str(site.school.pk))
@@ -477,11 +475,34 @@ def test_limits_are_scoped_and_tools_apply_rbac(site, provider):
             ]
             == 0
         )
-        if role in ("DIRECTOR", "SECRETARIAT", "MANAGER"):
+        if role == "COOK":
+            assert (
+                tools.get_student_counts(str(site.day - timedelta(days=60)))["error"]
+                == "AI_INVALID_ARGUMENTS"
+            )
+        if role in ("MANAGER", "SECRETARIAT"):
             comparison = tools.compare_schools(day)
             assert str(site.foreign.pk) not in json.dumps(comparison, default=str)
     usage = client_for(member).get(ROOT + "usage/").json()
     assert usage["organization"] is None
+
+@pytest.mark.parametrize("previous_role", ("DIRECTOR", "ADMIN"))
+def test_manager_retains_legacy_conversations_for_same_scope(site, previous_role):
+    member = site.director
+    scope = user_scope(member.user_id, site.org.pk, member.user.session_version)
+    legacy = AIConversation.objects.create(
+        user=member.user,
+        organization=site.org,
+        access_role=previous_role,
+        scope_key=scope.key_for_role(previous_role),
+    )
+    AIConversation.objects.create(
+        user=member.user,
+        organization=site.org,
+        access_role=previous_role,
+        scope_key="previous-school-scope",
+    )
+    assert list(scope.conversations()) == [legacy]
 
 def test_prompt_manipulation_cannot_invent_sources_or_query_foreign_school(
     site, provider
@@ -714,7 +735,7 @@ def test_quality_planning_summarizes_closed_observations(site, provider):
 
 def test_real_inova_access_is_limited_to_manager_and_secretariat(site):
     allowed_roles = ("MANAGER", "SECRETARIAT")
-    denied_roles = ("DIRECTOR", "COOK", "NUTRITIONIST")
+    denied_roles = ("COOK", "NUTRITIONIST")
 
     for role in allowed_roles:
         member = membership(site.school, role)
@@ -728,11 +749,7 @@ def test_real_inova_access_is_limited_to_manager_and_secretariat(site):
         assert scope.role == role
 
     for role in denied_roles:
-        member = (
-            site.director
-            if role == "DIRECTOR"
-            else membership(site.school, role)
-        )
+        member = membership(site.school, role)
 
         with pytest.raises(AIError):
             user_scope(
@@ -743,12 +760,6 @@ def test_real_inova_access_is_limited_to_manager_and_secretariat(site):
 
 def test_tool_permissions_remain_unchanged():
     expected = {
-        "DIRECTOR": {
-            "meal_history",
-            "forecast",
-            "indicators",
-            "analytics_reports",
-        },
         "MANAGER": {
             "meal_history",
             "forecast",
@@ -796,7 +807,7 @@ def test_tool_permissions_remain_unchanged():
             with pytest.raises(AIError):
                 scope.require(action)
                 
-def test_director_cannot_access_real_inova_but_legacy_conversations_remain(site):
+def test_manager_keeps_legacy_conversations_without_cross_scope_access(site):
     member = site.director
 
     legacy = AIConversation.objects.create(
@@ -805,24 +816,28 @@ def test_director_cannot_access_real_inova_but_legacy_conversations_remain(site)
         access_role="ADMIN",
         scope_key="legacy-admin-scope",
     )
-    AIConversation.objects.create(
+    other_scope = AIConversation.objects.create(
         user=member.user,
         organization=site.org,
         access_role="ADMIN",
         scope_key="previous-school-scope",
     )
 
-    with pytest.raises(AIError):
-        user_scope(
-            member.user_id,
-            site.org.pk,
-            member.user.session_version,
-        )
+    scope = user_scope(
+        member.user_id,
+        site.org.pk,
+        member.user.session_version,
+    )
 
+    conversations = list(scope.conversations())
+
+    # Conversas de outros escopos não devem aparecer.
+    assert legacy not in conversations
+    assert other_scope not in conversations
+
+    # As conversas históricas continuam armazenadas.
     assert AIConversation.objects.filter(
         user=member.user,
         organization=site.org,
         access_role="ADMIN",
     ).count() == 2
-
-    assert AIConversation.objects.filter(pk=legacy.pk).exists()

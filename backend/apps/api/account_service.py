@@ -17,7 +17,7 @@ from apps.users.models import User, normalize_email
 from .account_mail import account_link, send_account_mail
 from .audit import audit
 from .models import PasswordResetMail
-from .permissions import DIRECTORS
+from .permissions import MANAGEMENT_ROLES
 
 
 class ResetTokenGenerator(PasswordResetTokenGenerator):
@@ -150,10 +150,10 @@ def administer_account(actor, user_id, *, deactivate=False):
         )
     if (
         deactivate
-        and user.memberships.filter(is_active=True, role__in=DIRECTORS).exists()
+        and user.memberships.filter(is_active=True, role__in=MANAGEMENT_ROLES).exists()
     ):
         raise ValidationError(
-            "Transfira as funções de direção antes de desativar a conta."
+            "Transfira as funções de gestor antes de desativar a conta."
         )
     invalidate_sessions(user)
     if deactivate:
