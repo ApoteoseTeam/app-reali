@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Alert, Modal } from 'react-native';
+import { Alert, Modal, View, } from 'react-native';
 import { api, SessionProvider, useSession } from './session/provider';
 import { mealTypes } from './api/reali';
 import { useRemote } from './hooks/useRemote';
@@ -19,6 +19,7 @@ import SelecionarContexto from './screens/SelecionarContexto/SelecionarContexto'
 type Screen = 'home' | 'perfil' | 'cardapio' | 'relatorio' | 'historico' | 'assistente';
 
 function SignedIn() {
+
   const [requestedScreen, setScreen] = useState<Screen>('home');
   const [showContext, setShowContext] = useState(false);
   const { me, workspace, selecting, can } = useSession();
@@ -30,6 +31,7 @@ function SignedIn() {
     relatorio: can('analytics_reports'),
     assistente: can('realinova_full') || can('realinova_limited'),
   };
+
   const screen = allowed[requestedScreen] ? requestedScreen : 'home';
   const open = (target: Screen) => allowed[target] ? () => setScreen(target) : undefined;
   const showIndicators = can('indicators');
@@ -140,6 +142,3 @@ function SignedOut({ sessionExpired }: { sessionExpired: boolean }) {
 export default function App() {
   return <SessionProvider><SessionScreen /></SessionProvider>;
 }
-
-
-

@@ -68,12 +68,6 @@ export const styles = StyleSheet.create({
         color: '#C8DFB9'
     },
 
-    footer: {
-        flexDirection: 'row',
-        paddingHorizontal: 8,
-        backgroundColor: azul,
-    },
-
     tab: {
         flex: 1,
         minHeight: 52,

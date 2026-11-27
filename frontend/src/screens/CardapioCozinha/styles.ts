@@ -64,11 +64,6 @@ export const styles = StyleSheet.create({
         lineHeight: 18
     },
 
-    footer: {
-        flexDirection: 'row', 
-        backgroundColor: azul
-    },
-
     tab: {
         flex: 1,
         minHeight: 52,

@@ -1,15 +1,14 @@
 
 import { useEffect, useState, useRef } from 'react';
-import { Modal, Platform, ScrollView, Text, View, Pressable } from 'react-native';
-import { ClipboardList, History, House, TrendingUp } from 'lucide-react-native';
+import { Modal, Platform, ScrollView, Text, View } from 'react-native';
 
 import { BarList } from '../../components/BarList/BarList';
 import { Button } from '../../components/Button/Button';
 import { Card } from '../../components/Card/Card';
-import { Header } from '../../components/header/header';
+import { Header } from '../../components/Header/header';
 import { Kpicard } from '../../components/KpiCard/KpiCard';
 import { SegmentedControl } from '../../components/SegmentedControl/SegmentedControl';
-import { Select } from '../../components/select/Select';
+import { Select } from '../../components/Select/Select';
 import { Logo } from '../../components/Logo/Logo';
 import { Input } from '../../components/Input/Input';
 import { CompartilharRelatorioModal } from '../../components/CompartilhaRelatorioModal/CompartilhaRelatorioModal';
@@ -29,13 +28,7 @@ type FormularioResumoProps = {
     onHistoricoPress?: () => void;
 };
 
-export default function Relatorio({ onInicioPress, onRelatoriosPress, onCardapioPress, onHistoricoPress }: FormularioResumoProps = {}) {
-    const abas = [
-        { titulo: 'Início', Icone: House, onPress: onInicioPress },
-        { titulo: 'Relatórios', Icone: TrendingUp, ativa: true, onPress: onRelatoriosPress },
-        { titulo: 'Cardápio', Icone: ClipboardList, onPress: onCardapioPress },
-        { titulo: 'Histórico', Icone: History, onPress: onHistoricoPress },
-    ];
+export default function Relatorio({  }: FormularioResumoProps = {}) {
 
     const [modo, setModo] = useState('Mensal');
     const { workspace, can } = useSession();
@@ -341,24 +334,6 @@ export default function Relatorio({ onInicioPress, onRelatoriosPress, onCardapio
                     />
                 )}
             </Modal>
-            <View style={styles.footer}>
-                {abas.filter(aba => aba.ativa || aba.onPress).map(({ titulo, Icone, ativa, onPress }) => {
-                    const cor = ativa ? '#C8DFB9' : '#FFFFFF';  // adicionar navegação entre os icones do rodape
-
-                    return (
-                        <Pressable
-                            key={titulo}
-                            accessibilityRole="tab"
-                            accessibilityState={{ selected: !!ativa }}
-                            onPress={onPress}
-                            style={styles.tab}
-                        >
-                            <Icone color={cor} size={22} />
-                            <Text style={[styles.tabText, { color: cor }]}>{titulo}</Text>
-                        </Pressable>
-                    );
-                })}
-            </View>
         </View>
     );
 }

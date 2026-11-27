@@ -2,13 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 
 import { mealTypes, type MealStatus, type MealType } from '../../api/reali';
-import { BottomTabs } from '../../components/BottomTabs/BottomTabs';
 import { Button } from '../../components/Button/Button';
 import { Card } from '../../components/Card/Card';
-import { Header } from '../../components/header/header';
+import { Header } from '../../components/Header/header';
 import { Kpicard } from '../../components/KpiCard/KpiCard';
 import { PeriodSelector } from '../../components/PeriodSelector/PeriodSelector';
-import { Select } from '../../components/select/Select';
+import { Select } from '../../components/Select/Select';
 import { useRemote } from '../../hooks/useRemote';
 import { addDays, dateLabel, localDate, weekDays } from '../../services/dates';
 import { prepararArquivoPdf } from '../../services/reportPdf';
@@ -33,7 +32,7 @@ type Props = {
 
 const quantity = (value: number | null) => value?.toLocaleString('pt-BR') ?? '—';
 
-export default function Historico({ onInicioPress, onRelatoriosPress, onCardapioPress }: Props) {
+export default function Historico({ }: Props) {
     const { workspace, can } = useSession();
     const scope = workspace?.scope;
     const school = workspace?.school;
@@ -148,10 +147,6 @@ export default function Historico({ onInicioPress, onRelatoriosPress, onCardapio
                     {exportError && <Text accessibilityRole="alert" style={styles.message}>{exportError}</Text>}
                 </> : <Text style={styles.message}>Nenhuma escola selecionada para consultar o histórico.</Text>}
             </ScrollView>
-
-            <BottomTabs activeTab="historico" showRelatorios={Boolean(onRelatoriosPress)} showHistorico showPerfil={false}
-                onHomePress={onInicioPress} onRelatoriosPress={onRelatoriosPress}
-                onCardapiosPress={onCardapioPress} />
         </View>
     );
 }

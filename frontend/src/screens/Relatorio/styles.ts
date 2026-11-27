@@ -176,11 +176,6 @@ export const styles = StyleSheet.create({
         fontWeight: '700',
     },
 
-    footer: {
-        flexDirection: 'row',
-        paddingHorizontal: 8,
-        backgroundColor: azulGestao,
-    },
 
     tab: {
         flex: 1,

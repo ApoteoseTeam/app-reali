@@ -1,5 +1,5 @@
 import { Pressable, ScrollView, Text, View, Image } from 'react-native';
-import { ClipboardList, History, House, MessageCircle, TrendingUp, UserRound } from 'lucide-react-native';
+import { MessageCircle, UserRound } from 'lucide-react-native';
 
 import { Card } from '../../components/Card/Card';
 import { IconButton } from '../../components/IconButton/IconButton';
@@ -12,9 +12,6 @@ type HomeProps = {
     showIndicators?: boolean;
     onPerfilPress?: () => void;
     onAssistentePress?: () => void;
-    onRelatoriosPress?: () => void;
-    onCardapioPress?: () => void;
-    onHistoricoPress?: () => void;
 };
 
 type Resumo = {
@@ -28,17 +25,7 @@ export default function Home({
     showIndicators = true,
     onPerfilPress,
     onAssistentePress,
-    onRelatoriosPress,
-    onCardapioPress,
-    onHistoricoPress,
 }: HomeProps = {}) {
-    const abas = [
-        { titulo: 'Início', Icone: House, ativa: true },
-        { titulo: 'Relatórios', Icone: TrendingUp, onPress: onRelatoriosPress },
-        { titulo: 'Cardápio', Icone: ClipboardList, onPress: onCardapioPress },
-        { titulo: 'Histórico', Icone: History, onPress: onHistoricoPress },
-    ];
-
     return (
         <View style={styles.screen}>
             <View style={styles.header}>
@@ -124,24 +111,6 @@ export default function Home({
                     />
                 </View>}
             </ScrollView>
-
-            <View style={styles.footer}>
-                {abas.filter(aba => aba.ativa || aba.onPress).map(({ titulo, Icone, ativa, onPress }) => {
-                    const cor = ativa ? '#C8DFB9' : '#FFFFFF';  
-                    return (
-                        <Pressable
-                            key={titulo}
-                            accessibilityRole="tab"
-                            accessibilityState={{ selected: !!ativa }}
-                            onPress={onPress}
-                            style={styles.tab}
-                        >
-                            <Icone color={cor} size={22} />
-                            <Text style={[styles.textTab, { color: cor }]}>{titulo}</Text>
-                        </Pressable>
-                    );
-                })}
-            </View>
         </View >
     );
 }

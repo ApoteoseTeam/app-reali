@@ -143,12 +143,6 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  footer: {
-    flexDirection: 'row',
-    paddingHorizontal: 8,
-    backgroundColor: colors.azulGestao,
-  },
-
   tab: {
     flex: 1,
     minHeight: 52,

@@ -10,7 +10,12 @@ import {
 import { colors } from "../../theme/colors";
 import { styles } from "./styles";
 
-type TabId = "home" | "relatorios" | "cardapios" | "historico" | "perfil";
+type TabId =
+  | "home"
+  | "relatorios"
+  | "cardapios"
+  | "historico"
+  | "perfil";
 
 type FooterProps = {
   activeTab?: TabId;
@@ -18,6 +23,7 @@ type FooterProps = {
   showRelatorios?: boolean;
   showHistorico?: boolean;
   showPerfil?: boolean;
+  showCardapios?: boolean;
 
   onHomePress?: () => void;
   onRelatoriosPress?: () => void;
@@ -31,6 +37,7 @@ export const BottomTabs = ({
   showRelatorios = false,
   showHistorico = false,
   showPerfil = true,
+  showCardapios = true,
   onHomePress,
   onRelatoriosPress,
   onCardapiosPress,
@@ -56,7 +63,7 @@ export const BottomTabs = ({
       id: "cardapios",
       label: "Cardápio",
       icon: CalendarDays,
-      visible: true,
+      visible: showCardapios,
       onPress: onCardapiosPress,
     },
     {
@@ -77,27 +84,37 @@ export const BottomTabs = ({
 
   return (
     <View style={styles.footer}>
-      {tabs.filter((tab) => tab.visible).map(({ id, label, icon: Icon, onPress }) => {
-        const isActive = activeTab === id;
-        const tabColor = isActive ? colors.surface : colors.white;
+      {tabs
+        .filter((tab) => tab.visible && tab.onPress)
+        .map((tab) => {
+          const isActive = activeTab === tab.id;
+          const tabColor = isActive ? colors.surface : colors.white;
 
-        return (
-          <Pressable key={id} style={styles.item} accessibilityRole="tab" accessibilityLabel={label}
-            accessibilityState={{ selected: isActive, disabled: !isActive && !onPress }}
-            disabled={!isActive && !onPress} onPress={onPress}>
-            <Icon color={tabColor} size={20} />
-            <Text
-              style={[
-                styles.label,
-                isActive && styles.activeLabel,
-                { color: tabColor },
-              ]}
+          const Icon = tab.icon;
+
+          return (
+            <Pressable
+              key={tab.id}
+              style={styles.item}
+              onPress={tab.onPress}
+              accessibilityRole="tab"
+              accessibilityLabel={tab.label}
+              accessibilityState={{ selected: isActive }}
             >
-              {label}
-            </Text>
-          </Pressable>
-        );
-      })}
+              <Icon color={tabColor} size={20} />
+
+              <Text
+                style={[
+                  styles.label,
+                  isActive && styles.activeLabel,
+                  { color: tabColor },
+                ]}
+              >
+                {tab.label}
+              </Text>
+            </Pressable>
+          );
+        })}
     </View>
   );
 };
