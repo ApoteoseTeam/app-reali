@@ -18,6 +18,7 @@ from apps.analytics.test_analytics import site as site
 from apps.api.models import AuditLog
 from apps.api.session_auth import LoginSerializer
 from apps.users.models import Membership
+from apps.users.models import SchoolAccess
 from apps.api.permissions import schools_for
 
 from . import services
@@ -140,7 +141,8 @@ def test_chat_uses_real_analytics_provenance_and_two_model_calls(site, provider)
     script_tool(
         provider, services_tool, {"start_date": str(site.day), "meal_type": "LUNCH"}
     )
-    owner = client_for(site.director)
+    manager = membership(site.school, "MANAGER")
+    owner = client_for(manager)
     reply = ask(owner, school_id=site.school.pk)
     assert reply.status_code == 200, reply.data
     data = reply.json()
@@ -176,7 +178,8 @@ def test_chat_uses_real_analytics_provenance_and_two_model_calls(site, provider)
 
 
 def test_conversations_owner_org_status_history_delete_and_replay(site, provider):
-    owner = client_for(site.director)
+    manager = membership(site.school, "MANAGER")
+    owner = client_for(manager)
     created = owner.post(
         CONVERSATIONS, {"school_id": site.school.pk, "title": "Almoços"}, format="json"
     )
@@ -203,7 +206,7 @@ def test_conversations_owner_org_status_history_delete_and_replay(site, provider
     payload = json.loads(provider.requests[-1][1]["messages"][1]["content"])
     assert payload["previous_questions"] == [QUESTION]
     assert owner.get(CONVERSATIONS).json()["count"] == 1
-    member = membership(site.school, "MANAGER")
+    member = membership(site.school, "SECRETARIAT")
     foreign = client_for(member)
     assert (
         foreign.get(url).status_code
@@ -213,17 +216,17 @@ def test_conversations_owner_org_status_history_delete_and_replay(site, provider
     assert foreign.delete(url).status_code == 404
     assert ask(foreign, conversation_id=pk).status_code == 404
     assert (
-        client_for(site.director, site.foreign.organization_id).get(url).status_code
+        client_for(manager, site.foreign.organization_id).get(url).status_code
         == 403
     )
     assert ask(owner, organization_id=site.foreign.organization_id).status_code == 403
     Membership.objects.create(
-        user=site.director.user,
+        user=manager.user,
         organization=site.foreign.organization,
-        role="DIRECTOR",
+        role="MANAGER",
         all_schools_access=True,
     )
-    other_org = client_for(site.director, site.foreign.organization_id)
+    other_org = client_for(manager, site.foreign.organization_id)
     assert other_org.get(url).status_code == 404
     assert ask(other_org, conversation_id=pk).status_code == 404
     assert ask(owner, conversation_id=pk, school_id=site.branch.pk).status_code == 403
@@ -250,31 +253,35 @@ def test_conversations_owner_org_status_history_delete_and_replay(site, provider
 
 
 def test_scope_downgrade_revocation_and_user_deactivation(site, provider):
-    owner = client_for(site.director)
+    manager = membership(site.school, "MANAGER")
+    owner = client_for(manager)
     result = ask(owner)
     assert result.status_code == 200
     url = f"{CONVERSATIONS}{result.json()['conversation_id']}/"
-    site.director.all_schools_access = False
-    site.director.save(update_fields=["all_schools_access"])
+    SchoolAccess.objects.filter(
+    membership=manager,
+    school=site.school,
+).delete()
     assert owner.get(url).status_code == 404
     assert owner.get(CONVERSATIONS).json()["count"] == 0
     assert owner.delete(url).status_code == 204
-    site.director.is_active = False
-    site.director.save(update_fields=["is_active"])
+    manager.is_active = False
+    manager.save(update_fields=["is_active"])
     assert owner.get(CONVERSATIONS).status_code == 403
-    site.director.user.is_active = False
-    site.director.user.save(update_fields=["is_active"])
+    manager.user.is_active = False
+    manager.user.save(update_fields=["is_active"])
     assert owner.get(CONVERSATIONS).status_code == 401
 
 
 def test_access_rechecked_after_provider_returns(site, provider, monkeypatch):
+    manager = membership(site.school, "MANAGER")
     def revoke(*args):
-        site.director.is_active = False
-        site.director.save(update_fields=["is_active"])
+        manager.is_active = False
+        manager.save(update_fields=["is_active"])
         return "conteúdo protegido", [], ""
 
     monkeypatch.setattr(services, "perform", revoke)
-    reply = ask(client_for(site.director), school_id=site.school.pk)
+    reply = ask(client_for(manager), school_id=site.school.pk)
     assert reply.status_code == 403
     assert "conteúdo protegido" not in reply.content.decode()
     assert AIMessage.objects.get(role="ASSISTANT").content == ""
@@ -282,11 +289,12 @@ def test_access_rechecked_after_provider_returns(site, provider, monkeypatch):
 
 
 def test_logout_is_rechecked_when_provider_returns(site, provider, monkeypatch):
-    refresh = LoginSerializer.get_token(site.director.user)
+    manager = membership(site.school, "MANAGER")
+    refresh = LoginSerializer.get_token(manager.user)
     client = APIClient()
     client.credentials(
         HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}",
-        HTTP_X_ORGANIZATION_ID=str(site.director.organization_id),
+        HTTP_X_ORGANIZATION_ID=str(manager.organization_id),
     )
 
     def end_session(*args):
@@ -305,7 +313,8 @@ def test_logout_is_rechecked_when_provider_returns(site, provider, monkeypatch):
 
 def test_validation_authentication_and_disabled_provider(site, settings):
     assert APIClient().post(CHAT, {"message": "Olá"}, format="json").status_code == 401
-    client = client_for(site.director)
+    manager = membership(site.school, "MANAGER")
+    client = client_for(manager)
     settings.REALINOVA = {}
     for bad in ("", "   ", "x" * 2001, 2026):
         assert ask(client, bad).json()["error"]["code"] == "AI_INVALID_MESSAGE"
@@ -331,7 +340,8 @@ def test_upstream_errors_are_persisted_and_redacted(
         status_code,
         {"error": {"message": "private-key-do-not-log"}},
     )
-    reply = ask(client_for(site.director))
+    manager = membership(site.school, "MANAGER")
+    reply = ask(client_for(manager))
     assert reply.status_code == 503, reply.data
     body = reply.json()
     assert body["status"] == "FAILED" and body["error"]["code"] == code
@@ -345,6 +355,7 @@ def test_upstream_errors_are_persisted_and_redacted(
 
 def test_timeout_and_authorized_fallback(site, provider, settings):
     submitted = Event()
+    manager = membership(site.school, "MANAGER")
 
     def pending(payload):
         submitted.wait(2)
@@ -353,7 +364,7 @@ def test_timeout_and_authorized_fallback(site, provider, settings):
     provider.reply = pending
     settings.REALINOVA = {**settings.REALINOVA, "REQUEST_TIMEOUT_SECONDS": "1"}
     try:
-        timeout = ask(client_for(site.director))
+        timeout = ask(client_for(manager))
         assert (
             timeout.status_code == 504
             and timeout.json()["error"]["code"] == "AI_TIMEOUT"
@@ -377,7 +388,7 @@ def test_timeout_and_authorized_fallback(site, provider, settings):
         if payload["model"] == "fixture-primary"
         else (200, completion('{"mode":"quality","refs":[]}', usage=False))
     )
-    response = ask(client_for(site.director))
+    response = ask(client_for(manager))
     assert response.status_code == 200, response.data
     assert response.json()["usage"] == {
         "input_tokens": None,
@@ -400,12 +411,13 @@ def test_quota_limits_daily_cost_and_no_bill_for_direct_lookup(
         total_served_plates=375,
         has_served=True,
     )
+    manager = membership(site.school, "MANAGER")
     settings.REALINOVA = {
         **settings.REALINOVA,
         "DAILY_REQUEST_LIMIT": "2",
         "ORG_DAILY_BUDGET_MICROUSD": "20",
     }
-    client = client_for(site.director)
+    client = client_for(manager)
     result = ask(
         client, "Quantos pratos foram servidos ontem?", school_id=site.school.pk
     )
@@ -420,7 +432,8 @@ def test_quota_limits_daily_cost_and_no_bill_for_direct_lookup(
     )
     assert int(exhausted["Retry-After"]) > 0 and not provider.requests
     usage = client.get(ROOT + "usage/").json()
-    assert usage["requests"] == usage["organization"]["requests"] == 2
+    assert usage["requests"] == 2
+    assert usage["organization"] is None
     assert usage["charged_microusd"] == 0
 
 
@@ -470,30 +483,11 @@ def test_limits_are_scoped_and_tools_apply_rbac(site, provider):
     usage = client_for(member).get(ROOT + "usage/").json()
     assert usage["organization"] is None
 
-
-def test_director_retains_legacy_admin_conversations_for_same_scope(site):
-    member = site.director
-    scope = user_scope(member.user_id, site.org.pk, member.user.session_version)
-    legacy = AIConversation.objects.create(
-        user=member.user,
-        organization=site.org,
-        access_role="ADMIN",
-        scope_key=scope.key_for_role("ADMIN"),
-    )
-    AIConversation.objects.create(
-        user=member.user,
-        organization=site.org,
-        access_role="ADMIN",
-        scope_key="previous-school-scope",
-    )
-    assert list(scope.conversations()) == [legacy]
-
-
 def test_prompt_manipulation_cannot_invent_sources_or_query_foreign_school(
     site, provider
 ):
     make_facts(site)
-    client = client_for(site.director)
+    client = client_for(membership(site.school, "MANAGER"))
     script_tool(
         provider, "get_daily_metrics", {"school_id": str(site.foreign.pk)}, refs=()
     )
@@ -533,7 +527,7 @@ def test_tool_results_exclude_instructions_in_storage(site, provider):
     site.school.name = attack
     site.school.save(update_fields=["name"])
     script_tool(provider, "get_meal_forecasts", {"start_date": str(site.day)})
-    reply = ask(client_for(site.director), school_id=site.school.pk)
+    reply = ask(client_for(membership(site.school, "MANAGER")),school_id=site.school.pk,)
     assert reply.status_code == 200, reply.data
     assert attack not in json.dumps(provider.requests, ensure_ascii=False)
     assert "snapshot_entries" in str(provider.requests[-1][1])
@@ -559,18 +553,19 @@ def test_quality_explanations_use_reviewed_text(site, provider, question, needle
         200,
         completion(json.dumps({"mode": mode, "refs": []})),
     )
-    reply = ask(client_for(site.director), question)
+    reply = ask(client_for(membership(site.school, "MANAGER")),question,)
     assert reply.status_code == 200 and needle in reply.json()["answer"]
     assert reply.json()["sources"] == []
 
 
 def test_pruning_removes_old_history_and_recovers_pending(site, provider):
-    reply = ask(client_for(site.director))
+    member = membership(site.school, "MANAGER")
+    reply = ask(client_for(member))
     old_id = reply.json()["conversation_id"]
     AIConversation.objects.filter(pk=old_id).update(
         created_at=timezone.now() - timedelta(days=40)
     )
-    scope = user_scope(site.director.user_id, site.org.pk, 0)
+    scope = user_scope(member.user_id, site.org.pk, member.user.session_version)
     run, _, _, _ = services.reserve(
         scope, {"message": QUESTION}, None, services.limits()
     )
@@ -622,8 +617,9 @@ def test_postgres_simultaneous_retries_are_invoiced_once(site, provider):
 
 
 def test_quality_missing_data_does_not_turn_into_zero(site, provider):
+    manager = membership(site.school, "MANAGER")
     response = ask(
-        client_for(site.director),
+        client_for(manager),
         "Quantos pratos foram servidos ontem?",
         school_id=site.school.pk,
     )
@@ -637,6 +633,7 @@ def test_quality_missing_data_does_not_turn_into_zero(site, provider):
 
 def test_quality_largest_daily_error_comes_from_selected_period(site, provider):
     from apps.analytics.services import rebuild_daily_metrics
+    manager = membership(site.school, "MANAGER")
 
     make_facts(site)
     rebuild_daily_metrics(site.school, site.day)
@@ -660,7 +657,7 @@ def test_quality_largest_daily_error_comes_from_selected_period(site, provider):
         },
     )
     reply = ask(
-        client_for(site.director),
+        client_for(manager),
         "Em qual dia a diferença do período foi maior?",
         school_id=site.school.pk,
     )
@@ -671,9 +668,11 @@ def test_quality_largest_daily_error_comes_from_selected_period(site, provider):
 
 def test_organization_quota_is_shared_across_users(site, provider, settings):
     settings.REALINOVA = {**settings.REALINOVA, "ORG_DAILY_REQUEST_LIMIT": "1"}
-    first = ask(client_for(site.director), "O que significa erro absoluto?")
     manager = membership(site.school, "MANAGER")
-    second = ask(client_for(manager), "O que significa erro absoluto?")
+    secretariat = membership(site.school, "SECRETARIAT")
+
+    first = ask(client_for(manager), "O que significa erro absoluto?")
+    second = ask(client_for(secretariat), "O que significa erro absoluto?")
     assert first.status_code == 200
     assert (
         second.status_code == 429
@@ -682,6 +681,7 @@ def test_organization_quota_is_shared_across_users(site, provider, settings):
     assert not provider.requests
 
 def test_quality_planning_summarizes_closed_observations(site, provider):
+    manager = membership(site.school, "MANAGER")
     for offset, served in enumerate((12, 15, 22)):
         DailyMetrics.objects.create(
             school=site.school,
@@ -704,7 +704,7 @@ def test_quality_planning_summarizes_closed_observations(site, provider):
         mode="planning",
     )
     result = ask(
-        client_for(site.director),
+        client_for(manager),
         "O que o histórico recomenda para o planejamento?",
         school_id=site.school.pk,
     )
