@@ -21,6 +21,7 @@ export default function HomeCozinha({
     presentes = null,
     totalPlanejado = null,
     showForecast = true,
+    onCardapioPress,
 }: HomeCozinhaProps = {}) {
     return (
         <View style={styles.screen}>

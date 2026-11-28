@@ -12,6 +12,9 @@ type HomeProps = {
     showIndicators?: boolean;
     onPerfilPress?: () => void;
     onAssistentePress?: () => void;
+    onCardapioPress?: () => void;
+    onRelatoriosPress?: () => void;
+    onHistoricoPress?: () => void;
 };
 
 type Resumo = {
@@ -25,6 +28,9 @@ export default function Home({
     showIndicators = true,
     onPerfilPress,
     onAssistentePress,
+    onCardapioPress,
+    onRelatoriosPress,
+    onHistoricoPress,
 }: HomeProps = {}) {
     return (
         <View style={styles.screen}>

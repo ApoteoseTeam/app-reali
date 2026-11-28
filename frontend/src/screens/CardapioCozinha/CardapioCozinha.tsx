@@ -11,11 +11,15 @@ type CardapioSemanaProps = {
     onInicioPress?: () => void;
     onPerfilPress?: () => void;
     onHistoricoPress?: () => void;
+    onCardapioPress?: () => void;
+    onRelatorioPress?: () => void;
 };
 
 export default function CardapioSemanaCozinha({
     periodo = "—",
     dias = [],
+    onCardapioPress,
+    onRelatorioPress,
 }: CardapioSemanaProps = {}) {
     return (
         <View style={styles.screen}>

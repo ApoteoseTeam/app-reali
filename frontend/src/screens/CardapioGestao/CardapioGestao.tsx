@@ -8,11 +8,17 @@ import { styles } from './styles';
 type CardapioSemanaProps = {
     periodo?: string;
     dias?: { dia: string; refeicoes: { nome: string; preparacoes: string[] }[]; planejamento?: number }[];
+    onInicioPress?: () => void;
+    onHistoricoPress?: () => void;
+    onCardapioPress?: () => void;
+    onRelatoriosPress?: () => void;
 };
 
 export default function CardapioSemanaGestao({
     periodo = "—",
     dias = [],
+    onCardapioPress,
+    onRelatoriosPress,
 }: CardapioSemanaProps = {}) {
     return (
         <View style={styles.screen}>

@@ -28,7 +28,7 @@ type FormularioResumoProps = {
     onHistoricoPress?: () => void;
 };
 
-export default function Relatorio({  }: FormularioResumoProps = {}) {
+export default function Relatorio({onCardapioPress,  }: FormularioResumoProps = {}) {
 
     const [modo, setModo] = useState('Mensal');
     const { workspace, can } = useSession();
